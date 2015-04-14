@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<component-set>
+    <components>
+
+        <component>
+            <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+            <role-hint>js-library</role-hint>
+            <implementation>
+                org.apache.maven.artifact.handler.DefaultArtifactHandler
+            </implementation>
+            <configuration>
+                <type>js-library</type>
+                <extension>jar</extension>
+                <language>JavaScript</language>
+                <addedToClasspath>true</addedToClasspath>
+            </configuration>
+        </component>
+
+        <!-- The js-library packaging is for javascript libraries that don't get compiled, but instead act as jars to
+             other libraries. They do however have tests to run. -->
+        <component>
+            <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+            <role-hint>js-library</role-hint>
+            <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+            <configuration>
+                <lifecycles>
+                    <lifecycle>
+                        <id>default</id>
+                        <phases>
+                            <initialize>${project.groupId}:${project.artifactId}:${project.version}:initialize
+                            </initialize>
+                            <generate-resources>${project.groupId}:${project.artifactId}:${project.version}:unpack
+                            </generate-resources>
+                            <process-resources>
+                                org.apache.maven.plugins:maven-resources-plugin:resources
+                            </process-resources>
+                            <test>
+                                ${project.groupId}:${project.artifactId}:${project.version}:test
+                            </test>
+                            <package>
+                                org.apache.maven.plugins:maven-jar-plugin:jar
+                            </package>
+                            <install>
+                                org.apache.maven.plugins:maven-install-plugin:install
+                            </install>
+                            <deploy>
+                                org.apache.maven.plugins:maven-deploy-plugin:deploy
+                            </deploy>
+                        </phases>
+                    </lifecycle>
+                </lifecycles>
+            </configuration>
+        </component>
+
+        <!-- The js-script produces a single javascript file. No renamed css. Perhaps also attaches a -sources jar -->
+        <component>
+            <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+            <role-hint>js-standalone-compiled</role-hint>
+            <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+            <configuration>
+                <lifecycles>
+                    <lifecycle>
+                        <id>default</id>
+                        <phases>
+                            <compile>
+                                ${project.groupId}:${project.artifactId}:${project.version}:compile
+                            </compile>
+                            <test>
+                                ${project.groupId}:${project.artifactId}:${project.version}:test
+                            </test>
+                            <package>
+                                ${project.groupId}:${project.artifactId}:${project.version}:package
+                            </package>
+                        </phases>
+                    </lifecycle>
+                </lifecycles>
+            </configuration>
+        </component>
+
+        <!-- The js-script produces a single javascript file. No renamed css. Perhaps also attaches a -sources jar -->
+        <component>
+            <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+            <role-hint>js-modules-compiled</role-hint>
+            <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+            <configuration>
+                <lifecycles>
+                    <lifecycle>
+                        <id>default</id>
+                        <phases>
+                            <compile>
+                                ${project.groupId}:${project.artifactId}:${project.version}:compile
+                            </compile>
+                            <test>
+                                ${project.groupId}:${project.artifactId}:${project.version}:test
+                            </test>
+                        </phases>
+                    </lifecycle>
+                </lifecycles>
+            </configuration>
+        </component>
+    </components>
+
+</component-set>
