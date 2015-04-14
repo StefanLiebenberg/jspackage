@@ -1,7 +1,6 @@
 package org.slieb.closure.javascript;
 
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.jscomp.SourceFile;
@@ -15,6 +14,7 @@ import org.slieb.dependencies.DependencyParser;
 
 import java.io.IOException;
 
+import static com.google.common.base.Predicates.alwaysTrue;
 import static com.google.javascript.jscomp.NodeUtil.visitPreOrder;
 import static com.google.javascript.jscomp.parsing.ParserRunner.createConfig;
 
@@ -28,7 +28,7 @@ public class GoogDependencyParser implements DependencyParser<SourceFile, GoogDe
         config = createConfig(true, Config.LanguageMode.ECMASCRIPT6_STRICT, true, null);
         errorReporter = new SimpleErrorReporter();
     }
-    
+
     @Override
     public GoogDependencyNode parse(SourceFile resource) {
         try {
@@ -107,7 +107,7 @@ class Visitor implements NodeUtil.Visitor {
     }
 
     public GoogDependencyNode parse(Node rootNode) {
-        visitPreOrder(rootNode, this, Predicates.<Node>alwaysTrue());
+        visitPreOrder(rootNode, this, alwaysTrue());
         return builder.build();
     }
 }

@@ -27,6 +27,10 @@ public class GoogDependencyNode implements DependencyNode<SourceFile> {
         return sourceFile;
     }
 
+    public Boolean isBaseFile() {
+        return isBaseFile;
+    }
+
     @Override
     public Set<String> getRequires() {
         return null;
