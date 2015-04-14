@@ -18,6 +18,8 @@
         <dep.maven-plugin-tools>3.4</dep.maven-plugin-tools>
         <dep.maven-dependency-plugin>2.8</dep.maven-dependency-plugin>
         <dep.maven-plugin-testing-harness>3.3.0</dep.maven-plugin-testing-harness>
+        <dep.kute>0.4</dep.kute>
+        <dep.dependency-calculator>0.3</dep.dependency-calculator>
 
         <dep.mojo-executor>2.2.0</dep.mojo-executor>
         <dep.guice>4.0-beta5</dep.guice>

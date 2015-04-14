@@ -1,38 +1,30 @@
 package org.slieb.closure.javascript;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.javascript.jscomp.SourceFile;
-import org.slieb.dependencies.DependenciesHelper;
-import org.slieb.dependencies.DependencyCalculator;
-import org.slieb.dependencies.DependencyParser;
+import slieb.kute.api.ResourceProvider;
+import slieb.kute.resources.Resources;
+import slieb.kute.resources.implementations.FileResource;
+import slieb.kute.resources.providers.FileResourceProvider;
+import slieb.kute.resources.providers.GroupResourceProvider;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
+import java.util.Collection;
 
-import static com.google.javascript.jscomp.SourceFile.fromFile;
-import static org.apache.commons.io.FileUtils.iterateFiles;
+import static java.util.stream.Collectors.toSet;
+import static slieb.kute.resources.ResourceFilters.extensionFilter;
 
 public class GoogResources {
 
-    public static Supplier<Iterable<SourceFile>> getSourceFileIterableSupplierFromDirectories(Set<File> directories) {
-        ImmutableSet.Builder<SourceFile> immutableList = new ImmutableSet.Builder<>();
-        directories.forEach(directory -> {
-            Iterator<File> iterator = iterateFiles(directory, new String[]{".js"}, true);
-            while (iterator.hasNext()) {
-                immutableList.add(fromFile(iterator.next()));
-            }
-        });
-        return immutableList::build;
+    public static ResourceProvider<FileResource> getResourceProviderForSourceDirectories(Collection<File> directories) {
+        return new GroupResourceProvider<>(directories.stream().distinct().map(FileResourceProvider::new).collect(toSet()));
     }
 
-    public static List<SourceFile> getCalculatedListFor(Set<String> namespaces, Set<File> directories) {
-        DependencyParser<SourceFile, GoogDependencyNode> parser = new GoogDependencyParser();
-        Supplier<Iterable<SourceFile>> supplier = getSourceFileIterableSupplierFromDirectories(directories);
-        DependenciesHelper<GoogDependencyNode> helper = new GoogDependencyHelper();
-        return new DependencyCalculator<>(supplier, parser, helper).getResourcesFor(namespaces);
+    public static ResourceProvider<FileResource> getResourceProviderForSourceDirectories(Collection<File> directories, String... exentions) {
+        return Resources.filterResources(getResourceProviderForSourceDirectories(directories), extensionFilter(exentions));
     }
+
+    public static ResourceProvider<FileResource> getUnitTests(ResourceProvider<FileResource> provider) {
+        return Resources.filterResources(provider, extensionFilter(".unit-test.js"));
+    }
+
 
 }

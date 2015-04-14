@@ -8,7 +8,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "test", defaultPhase = LifecyclePhase.TEST)
 public class TestJavascriptMojo extends AbstractMojo {
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 //        throw new MojoExecutionException("not implemented yet");
     }
+    
 }

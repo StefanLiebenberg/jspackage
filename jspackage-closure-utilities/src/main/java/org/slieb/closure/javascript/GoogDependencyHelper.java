@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class GoogDependencyHelper implements DependenciesHelper<GoogDependencyNode> {
+public class GoogDependencyHelper<R> implements DependenciesHelper<GoogDependencyNode<R>> {
 
 
     @Override
-    public List<GoogDependencyNode> getBaselist(Collection<GoogDependencyNode> dependencies) {
-        ImmutableList.Builder<GoogDependencyNode> listBuilder = ImmutableList.builder();
-        Optional<GoogDependencyNode> optional = dependencies.stream().filter(GoogDependencyNode::isBaseFile).findFirst();
+    public List<GoogDependencyNode<R>> getBaselist(Collection<GoogDependencyNode<R>> dependencies) {
+        ImmutableList.Builder<GoogDependencyNode<R>> listBuilder = ImmutableList.builder();
+        Optional<GoogDependencyNode<R>> optional = dependencies.stream().filter(GoogDependencyNode::isBaseFile).findFirst();
         if (optional.isPresent()) {
             listBuilder.add(optional.get());
         }
@@ -23,7 +23,7 @@ public class GoogDependencyHelper implements DependenciesHelper<GoogDependencyNo
     }
 
     @Override
-    public Set<GoogDependencyNode> getResolveableSet(Collection<GoogDependencyNode> dependencies) {
+    public Set<GoogDependencyNode<R>> getResolveableSet(Collection<GoogDependencyNode<R>> dependencies) {
         return ImmutableSet.copyOf(dependencies);
     }
 }

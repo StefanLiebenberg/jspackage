@@ -14,8 +14,13 @@
     <dependencies>
         <dependency>
             <groupId>org.slieb</groupId>
+            <artifactId>kute</artifactId>
+            <version>${dep.kute}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slieb</groupId>
             <artifactId>dependency-calculator</artifactId>
-            <version>0.2</version>
+            <version>${dep.dependency-calculator}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -26,6 +31,12 @@
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
             <version>v20150315</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slieb.jspackage</groupId>
+            <artifactId>jspackage-closure-library</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

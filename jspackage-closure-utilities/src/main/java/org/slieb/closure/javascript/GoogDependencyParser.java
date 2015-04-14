@@ -13,40 +13,45 @@ import com.google.javascript.rhino.Token;
 import org.slieb.dependencies.DependencyParser;
 
 import java.io.IOException;
+import java.util.function.Function;
 
-import static com.google.common.base.Predicates.alwaysTrue;
 import static com.google.javascript.jscomp.NodeUtil.visitPreOrder;
 import static com.google.javascript.jscomp.parsing.ParserRunner.createConfig;
 
-public class GoogDependencyParser implements DependencyParser<SourceFile, GoogDependencyNode> {
+public class GoogDependencyParser<R> implements DependencyParser<R, GoogDependencyNode<R>> {
 
     private final Config config;
 
     private final ErrorReporter errorReporter;
 
-    public GoogDependencyParser() {
+    private final Function<R, SourceFile> sourceFileFunction;
+
+    public GoogDependencyParser(Function<R, SourceFile> sourceFileFunction) {
         config = createConfig(true, Config.LanguageMode.ECMASCRIPT6_STRICT, true, null);
         errorReporter = new SimpleErrorReporter();
+        this.sourceFileFunction = sourceFileFunction;
     }
 
     @Override
-    public GoogDependencyNode parse(SourceFile resource) {
+    public GoogDependencyNode<R> parse(R resource) {
         try {
-            return new Visitor(resource).parse(ParserRunner.parse(resource, resource.getCode(), config, errorReporter).ast);
+            SourceFile sourceFile = sourceFileFunction.apply(resource);
+            ParserRunner.ParseResult result = ParserRunner.parse(sourceFile, sourceFile.getCode(), config, errorReporter);
+            return new Visitor<>(resource).parse(result.ast);
         } catch (IOException ioException) {
             throw new RuntimeException(String.format("Could not parse dependencies of %s", resource), ioException);
         }
     }
 }
 
-class Builder {
+class Builder<R> {
 
     private Boolean isBaseFile = false;
     private final ImmutableSet.Builder<String> provides, requires;
-    private SourceFile sourceFile;
+    private R resource;
 
-    public Builder(SourceFile sourceFile) {
-        this.sourceFile = sourceFile;
+    public Builder(R resource) {
+        this.resource = resource;
         this.provides = new ImmutableSet.Builder<>();
         this.requires = new ImmutableSet.Builder<>();
     }
@@ -66,50 +71,78 @@ class Builder {
         return this;
     }
 
-    public GoogDependencyNode build() {
-        return new GoogDependencyNode(sourceFile, provides.build(), requires.build(), isBaseFile);
+    public GoogDependencyNode<R> build() {
+        return new GoogDependencyNode<>(resource, provides.build(), requires.build(), isBaseFile);
     }
 }
 
-class Visitor implements NodeUtil.Visitor {
+class Visitor<R> implements NodeUtil.Visitor {
 
-    private final Builder builder;
+    private final Builder<R> builder;
 
-    public Visitor(SourceFile sourceFile) {
-        this.builder = new Builder(sourceFile);
+    private boolean isDone = false;
+
+    public Visitor(R resource) {
+        this.builder = new Builder<>(resource);
     }
 
     @Override
     public void visit(Node node) {
-
-        if (!node.hasChildren()) return;
+        if (isDone || !node.hasChildren()) return;
 
         switch (node.getType()) {
             case Token.CALL:
-                switch (node.getFirstChild().getQualifiedName()) {
-                    case "goog.require":
-                        builder.addRequire(node.getChildAtIndex(1).getString());
-                        break;
-                    case "goog.provide":
-                        builder.addProvide(node.getChildAtIndex(1).getString());
-                        break;
+                Node callChild = node.getFirstChild();
+                if (callChild.isGetProp()) {
+                    if (callChild.getQualifiedName() != null) {
+                        switch (callChild.getQualifiedName()) {
+                            case "goog.provide":
+                                builder.addProvide(node.getChildAtIndex(1).getString());
+                                break;
+                            case "goog.require":
+                                builder.addRequire(node.getChildAtIndex(1).getString());
+                                break;
+                        }
+                    }
                 }
                 break;
             case Token.ASSIGN:
-                switch (node.getFirstChild().getQualifiedName()) {
-                    case "goog.base":
+                Node assignChild = node.getFirstChild();
+                if (assignChild.isGetProp()) {
+                    String name = assignChild.getQualifiedName();
+                    if (name != null && name.equals("goog.base")) {
+                        isDone = true;
                         builder.isBase();
-                        break;
+                    }
                 }
                 break;
-
         }
     }
 
-    public GoogDependencyNode parse(Node rootNode) {
-        visitPreOrder(rootNode, this, alwaysTrue());
+
+    private boolean shouldVisitChildren(Node node) {
+        if (isDone) return false;
+
+        switch (node.getType()) {
+            case Token.SCRIPT:
+            case Token.EXPR_RESULT:
+            case Token.IF:
+            case Token.BLOCK:
+                return true;
+            case Token.FUNCTION:
+            case Token.CALL:
+            case Token.GETPROP:
+            case Token.ASSIGN:
+            default:
+                return false;
+        }
+    }
+
+    public GoogDependencyNode<R> parse(Node rootNode) {
+        visitPreOrder(rootNode, this, this::shouldVisitChildren);
         return builder.build();
     }
+
 }
 
 

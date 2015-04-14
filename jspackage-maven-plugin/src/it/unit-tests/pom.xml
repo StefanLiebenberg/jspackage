@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>@project.groupId@.integration-examples</groupId>
+    <version>@project.version@</version>
+    <artifactId>unit-tests</artifactId>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>@project.groupId@</groupId>
+                <artifactId>@project.artifactId@</artifactId>
+                <version>@project.version@</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>run-unit-test</id>
+                        <goals>
+                            <goal>unit-tests</goal>
+                        </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <sourceDirectories>
+                                <sourceDirectory>${project.build.directory}/unpacked-dependencies</sourceDirectory>
+                                <sourceDirectory>${basedir}/src/main/javascript</sourceDirectory>
+                                <sourceDirectory>${basedir}/src/test/javascript</sourceDirectory>
+                            </sourceDirectories>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>jspackage-closure-library</artifactId>
+            <version>@project.version@</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
