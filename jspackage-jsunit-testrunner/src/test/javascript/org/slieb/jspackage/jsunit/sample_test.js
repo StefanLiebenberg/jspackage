@@ -1,4 +1,6 @@
 goog.require('goog.testing.jsunit');
 
 
-goog.exportSymbol("test_X", function () {});
+goog.exportSymbol("test_X", function () {
+    assertTrue(true);
+});

@@ -12,7 +12,6 @@ import com.google.javascript.rhino.SimpleErrorReporter;
 import com.google.javascript.rhino.Token;
 import org.slieb.dependencies.DependencyParser;
 
-import java.io.IOException;
 import java.util.function.Function;
 
 import static com.google.javascript.jscomp.NodeUtil.visitPreOrder;
@@ -38,7 +37,7 @@ public class GoogDependencyParser<R> implements DependencyParser<R, GoogDependen
             SourceFile sourceFile = sourceFileFunction.apply(resource);
             ParserRunner.ParseResult result = ParserRunner.parse(sourceFile, sourceFile.getCode(), config, errorReporter);
             return new Visitor<>(resource).parse(result.ast);
-        } catch (IOException ioException) {
+        } catch (Exception ioException) {
             throw new RuntimeException(String.format("Could not parse dependencies of %s", resource), ioException);
         }
     }

@@ -58,4 +58,14 @@ public class GoogDependencyParserTest {
         assertTrue(node.getRequires().contains("y"));
     }
 
+    @Test
+    public void parseDefineTest() throws Throwable {
+        try (InputStream inputStream = getClass().getResourceAsStream("/closure-library/closure/goog/defineclass_test.js")) {
+            assertNotNull(inputStream);
+            GoogDependencyNode node = parser.parse(fromInputStream("defineclass_test.js", inputStream, defaultCharset()));
+            assertTrue(node.getProvides().contains("goog.defineClassTest"));
+            assertTrue(node.getRequires().contains("goog.testing.jsunit"));
+        }
+    }
+
 }

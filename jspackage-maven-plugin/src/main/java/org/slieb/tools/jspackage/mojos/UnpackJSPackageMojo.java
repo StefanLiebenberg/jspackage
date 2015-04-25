@@ -83,7 +83,8 @@ public class UnpackJSPackageMojo extends AbstractMojo {
     }
 
     private Boolean shouldUnpackDependency(Dependency dependency) {
-        getLog().info("attempting to unpack:"+dependency.getArtifactId()+":"+dependency.getType());
+        getLog().info("attempting to unpack:" + dependency.getArtifactId() + ":" + dependency.getType());
+
         switch (dependency.getType()) {
             case "jar":
             case "js-library":

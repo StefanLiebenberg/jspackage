@@ -33,11 +33,15 @@
                         </goals>
                         <phase>test</phase>
                         <configuration>
+                            <useClassPath>false</useClassPath>
                             <sourceDirectories>
-                                <sourceDirectory>${project.build.directory}/unpacked-dependencies</sourceDirectory>
-                                <sourceDirectory>${basedir}/src/main/javascript</sourceDirectory>
-                                <sourceDirectory>${basedir}/src/test/javascript</sourceDirectory>
+                                <file>${project.build.directory}/unpacked-dependencies</file>
+                                <file>${basedir}/src/main/javascript</file>
+                                <file>${basedir}/src/test/javascript</file>
                             </sourceDirectories>
+                            <testDirectories>
+                                <testDirectory>${basedir}/src/test/javascript</testDirectory>
+                            </testDirectories>
                         </configuration>
                     </execution>
                 </executions>

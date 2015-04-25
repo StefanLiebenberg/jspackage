@@ -38,7 +38,7 @@
                                 ${project.groupId}:${project.artifactId}:${project.version}:test
                             </test>
                             <package>
-                                org.apache.maven.plugins:maven-jar-plugin:jar
+                                org.apache.maven.plugins:maven-jar-plugin:2.6:jar
                             </package>
                             <install>
                                 org.apache.maven.plugins:maven-install-plugin:install

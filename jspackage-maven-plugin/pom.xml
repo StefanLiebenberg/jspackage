@@ -155,6 +155,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slieb</groupId>
+            <artifactId>kute</artifactId>
+            <version>${dep.kute}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.slieb.jspackage</groupId>
             <artifactId>jspackage-jsunit-testrunner</artifactId>
             <version>${project.version}</version>
@@ -164,12 +170,6 @@
             <groupId>org.slieb.jspackage</groupId>
             <artifactId>jspackage-closure-utilities</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.slieb</groupId>
-            <artifactId>kute</artifactId>
-            <version>${dep.kute}</version>
         </dependency>
     </dependencies>
 </project>

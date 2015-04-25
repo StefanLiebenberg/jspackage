@@ -7,3 +7,4 @@ goog.exportSymbol('test_simpleExponential', function () {
     assertEquals(2, simple.exponential(4));
     assertEquals(3, simple.exponential(9));
 });
+
