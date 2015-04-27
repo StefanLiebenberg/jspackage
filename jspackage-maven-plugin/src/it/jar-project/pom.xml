@@ -20,6 +20,11 @@
                 <groupId>@project.groupId@</groupId>
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
+                <configuration>
+                    <testDirectories>
+                        <file>${basedir}/src/test/javascript</file>
+                    </testDirectories>
+                </configuration>
                 <executions>
                     <execution>
                         <id>unpack-dependencies</id>

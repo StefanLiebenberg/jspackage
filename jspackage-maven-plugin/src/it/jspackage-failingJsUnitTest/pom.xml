@@ -5,14 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>@project.groupId@.integration-examples</groupId>
     <version>@project.version@</version>
-    <artifactId>simple-it</artifactId>
+    <artifactId>jspackage-failingJsUnitTest</artifactId>
     <packaging>js-library</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
-
     <build>
         <plugins>
             <plugin>
@@ -24,6 +22,9 @@
                     <sourceDirectories>
                         <file>${basedir}/src/main/javascript</file>
                     </sourceDirectories>
+                    <testDirectories>
+                        <file>${basedir}/src/test/javascript</file>
+                    </testDirectories>
                 </configuration>
             </plugin>
         </plugins>
