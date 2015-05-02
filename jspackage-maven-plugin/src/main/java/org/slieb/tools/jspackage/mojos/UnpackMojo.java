@@ -1,5 +1,6 @@
 package org.slieb.tools.jspackage.mojos;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -14,14 +15,14 @@ import org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 @Mojo(name = "unpack", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE, requiresProject = true)
-public class UnpackJSPackageMojo extends AbstractMojo {
-
+public class UnpackMojo extends AbstractMojo {
 
     @Component
     protected MavenProject project;
@@ -32,12 +33,12 @@ public class UnpackJSPackageMojo extends AbstractMojo {
     @Component
     protected BuildPluginManager pluginManager;
 
-    @Parameter(name = "outputDirectory", defaultValue = "${project.build.directory}/unpacked-dependencies")
-    protected File outputDirectory;
+    @Parameter(name = "unpackDirectory", defaultValue = "${project.build.directory}/unpacked-dependencies")
+    protected File unpackDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        getLog().info("unpacking...");
 
+        getLog().info("unpacking...");
         List<Dependency> unpackDeps = getUnpackDependencies();
 
         getLog().info("found " + unpackDeps.size() + " deps...");
@@ -53,6 +54,7 @@ public class UnpackJSPackageMojo extends AbstractMojo {
     private ExecutionEnvironment execEnv() {
         return new ExecutionEnvironment(project, session, pluginManager);
     }
+
 
     private Element getArtifactItem(Dependency dependency) {
         return element("artifact",
@@ -70,8 +72,9 @@ public class UnpackJSPackageMojo extends AbstractMojo {
     private Xpp3Dom unpackConfiguration() {
         return configuration(
                 element(name("artifactItems"), getUnpackArtifactItems()),
-                element(name("outputDirectory"), outputDirectory.getPath()));
+                element(name("outputDirectory"), unpackDirectory.getPath()));
     }
+
 
     private Element[] getUnpackArtifactItems() {
         return getUnpackDependencies().stream().map(this::getArtifactItem).toArray(Element[]::new);
@@ -82,17 +85,10 @@ public class UnpackJSPackageMojo extends AbstractMojo {
                 .stream().filter(this::shouldUnpackDependency).collect(toList());
     }
 
+    private final static Set<String> UNPACKED_TYPES = ImmutableSet.of("jar", "js-library");
+
     private Boolean shouldUnpackDependency(Dependency dependency) {
-        getLog().info("attempting to unpack:" + dependency.getArtifactId() + ":" + dependency.getType());
-
-        switch (dependency.getType()) {
-            case "jar":
-            case "js-library":
-                return true;
-            default:
-                return false;
-        }
+        return UNPACKED_TYPES.contains(dependency.getType());
     }
-
 
 }

@@ -5,63 +5,53 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>@project.groupId@.integration-examples</groupId>
     <version>@project.version@</version>
-    <artifactId>jar-project</artifactId>
-    <packaging>jar</packaging>
-
+    <artifactId>jspackage-passingJsUnitTest</artifactId>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
-
     <build>
         <plugins>
             <plugin>
                 <groupId>@project.groupId@</groupId>
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
-                <configuration>
-                    <testDirectories>
-                        <file>${basedir}/src/test/javascript</file>
-                    </testDirectories>
-                </configuration>
                 <executions>
                     <execution>
                         <id>unpack-dependencies</id>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                     </execution>
                     <execution>
-                        <id>test-javascripts</id>
-                        <phase>test</phase>
+                        <id>run-unit-test</id>
                         <goals>
-                            <goal>test</goal>
+                            <goal>unit-tests</goal>
                         </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <useClassPath>false</useClassPath>
+                            <sourceDirectories>
+                                <file>${project.build.directory}/unpacked-dependencies</file>
+                                <file>${basedir}/src/main/javascript</file>
+                                <file>${basedir}/src/test/javascript</file>
+                            </sourceDirectories>
+                            <testDirectories>
+                                <testDirectory>${basedir}/src/test/javascript</testDirectory>
+                            </testDirectories>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
-            <groupId>@project.groupId@.integration-examples</groupId>
-            <artifactId>it-js-library-base</artifactId>
-            <version>@project.version@</version>
-        </dependency>
-        <dependency>
             <groupId>@project.groupId@</groupId>
-            <artifactId>jspackage-jsunit-testrunner</artifactId>
+            <artifactId>jspackage-closure-library</artifactId>
             <version>@project.version@</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

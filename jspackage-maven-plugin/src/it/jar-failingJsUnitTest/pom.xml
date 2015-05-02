@@ -5,13 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>@project.groupId@.integration-examples</groupId>
     <version>@project.version@</version>
-    <artifactId>unit-tests</artifactId>
+    <artifactId>jspackage-passingJsUnitTest</artifactId>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
-
     <build>
         <plugins>
             <plugin>
@@ -48,8 +46,6 @@
             </plugin>
         </plugins>
     </build>
-
-
     <dependencies>
         <dependency>
             <groupId>@project.groupId@</groupId>
