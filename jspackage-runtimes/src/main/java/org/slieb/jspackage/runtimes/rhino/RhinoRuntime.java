@@ -2,26 +2,51 @@ package org.slieb.jspackage.runtimes.rhino;
 
 
 import org.mozilla.javascript.*;
+import org.mozilla.javascript.tools.debugger.Main;
 import org.mozilla.javascript.tools.shell.Global;
 import org.slieb.jspackage.runtimes.JavascriptRuntime;
 
 import java.io.Closeable;
 
+import static org.mozilla.javascript.tools.debugger.Main.mainEmbedded;
+
 
 public class RhinoRuntime implements Closeable, JavascriptRuntime {
+
+    public static final Boolean DEBUG = !Boolean.valueOf(System.getProperty("rhino.debug", "false"));
+
+    protected final ContextFactory contextFactory;
 
     protected final Context context;
 
     protected final Global scope;
 
+    protected final Main mainWindow;
+
     public RhinoRuntime() {
-        context = new ContextFactory().enterContext();
-        scope = new Global(context);
+        if (DEBUG) {
+            contextFactory = org.mozilla.javascript.tools.shell.Main.shellContextFactory;
+            context = contextFactory.enterContext();
+            scope = org.mozilla.javascript.tools.shell.Main.getGlobal();
+        } else {
+            contextFactory = new ContextFactory();
+            context = contextFactory.enterContext();
+            scope = new Global(context);
+        }
+
+        if (DEBUG) {
+            mainWindow = mainEmbedded(contextFactory, () -> scope, "debug window");
+        } else {
+            mainWindow = null;
+        }
     }
 
     public void initialize() {
-        context.setOptimizationLevel(-1);
-        context.setLanguageVersion(Context.VERSION_1_3);
+        contextFactory.call(context -> {
+            context.setOptimizationLevel(-1);
+            context.setLanguageVersion(Context.VERSION_DEFAULT);
+            return null;
+        });
     }
 
     public Context getContext() {
@@ -33,6 +58,9 @@ public class RhinoRuntime implements Closeable, JavascriptRuntime {
     }
 
     public void close() {
+        if (DEBUG) {
+            mainWindow.dispose();
+        }
         Context.exit();
     }
 
@@ -71,9 +99,54 @@ public class RhinoRuntime implements Closeable, JavascriptRuntime {
 
     @Override
     public Object execute(String command, String sourceName) {
+        return contextFactory.call(cx -> {
+            Script script = cx.compileString(command, sourceName, 1, null);
+            if (script != null) {
+                return script.exec(cx, scope);
+            } else {
+                return null;
+            }
+        });
+    }
+//
+    public static void main(String[] args) {
 
+        RhinoRuntime runtime = new RhinoRuntime();
+        runtime.initialize();
+        runtime.execute("new Object();\n", "/path.js");
 
-        return this.context.evaluateString(scope, command, sourceName, 0, null);
+//
+//        ContextFactory contextFactory = org.mozilla.javascript.tools.shell.Main.shellContextFactory;
+//        Main main = Main.mainEmbedded(contextFactory, () -> global, "XXX");
+////        main.setBreakOnExceptions(true);
+////        main.setBreakOnEnter(true);
+//
+//        contextFactory.call(cx -> {
+//            cx.setOptimizationLevel(-1);
+//            cx.setLanguageVersion(Context.VERSION_DEFAULT);
+//            cx.initStandardObjects(global);
+//            Script script = cx.compileString("function red() {\n print('x'); \n}; \n", "<command 1>", 1, null);
+//            if (script != null) {
+//                System.out.println("running...");
+//                return script.exec(cx, global);
+//            } else {
+//                return null;
+//            }
+//        });
+//
+//        main.doBreak();
+//
+//        contextFactory.call(cx -> {
+//            Script script = cx.compileString("\n;red();\n", "<command 2>", 1, null);
+//            if (script != null) {
+//                System.out.println("running...");
+//                return script.exec(cx, global);
+//            } else {
+//                return null;
+//            }
+//        });
+//
+//        System.out.println("done?");
     }
 
 }

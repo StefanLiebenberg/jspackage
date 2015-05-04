@@ -86,6 +86,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${dep.guice}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.maven.plugin-testing</groupId>
             <artifactId>maven-plugin-testing-harness</artifactId>
             <version>${dep.maven-plugin-testing-harness}</version>

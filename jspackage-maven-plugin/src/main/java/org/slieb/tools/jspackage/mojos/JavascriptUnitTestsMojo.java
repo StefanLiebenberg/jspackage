@@ -6,9 +6,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.slieb.closure.javascript.GoogDependencyHelper;
 import org.slieb.closure.javascript.GoogDependencyNode;
-import org.slieb.closure.javascript.GoogDependencyParser;
 import org.slieb.closure.javascript.GoogResources;
 import org.slieb.dependencies.DependencyCalculator;
 import org.slieb.jspackage.jsunit.JSUnitHelper;
@@ -16,7 +14,6 @@ import org.slieb.jspackage.runtimes.JavascriptRuntimeUtils;
 import org.slieb.jspackage.runtimes.rhino.EnvJSRuntime;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.Resources;
 import slieb.kute.resources.providers.GroupResourceProvider;
 
 import java.io.File;
@@ -34,15 +31,6 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
 
     @Parameter(name = "testDirectories")
     protected List<File> testDirectories;
-
-
-    public <R extends Resource.Readable> DependencyCalculator<R, GoogDependencyNode<R>> getCalculator(ResourceProvider<? extends R> resourceProvider) {
-        GoogDependencyHelper<R> helper = new GoogDependencyHelper<>();
-        GoogDependencyParser<R> parser = new GoogDependencyParser<>(GoogResources::getSourceFileFromResource);
-        List<R> list = Resources.resourceProviderToList(resourceProvider);
-        return new DependencyCalculator<>(list, parser, helper);
-    }
-
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -66,7 +54,7 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
         ResourceProvider<? extends Resource.Readable> testProvider = filterResources(testResources, extensionFilter("_test.js"));
 
         getLog().info("creating calculator of grouped resources");
-        DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator = getCalculator(resources);
+        DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator = GoogResources.getCalculator(resources);
 
         int total = 0, failure = 0;
 

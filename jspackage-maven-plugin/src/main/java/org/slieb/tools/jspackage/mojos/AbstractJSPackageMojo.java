@@ -9,9 +9,9 @@ import java.net.URI;
 import java.util.List;
 
 public abstract class AbstractJSPackageMojo extends AbstractMojo {
-
-    @Parameter(required = true)
-    protected MavenProject project;
+    
+    @Parameter(required = true, defaultValue = "${project}")
+    private MavenProject project;
 
     @Parameter(required = true)
     protected List<URI> sources;

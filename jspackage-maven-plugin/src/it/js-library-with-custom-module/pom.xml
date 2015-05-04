@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>@project.groupId@.integration-examples</groupId>
     <version>@project.version@</version>
-    <artifactId>it-js-library-base</artifactId>
+    <artifactId>js-library-with-custom-module</artifactId>
     <packaging>js-library</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,12 +19,15 @@
                 <version>@project.version@</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <sourceDirectories>
-                        <file>${basedir}/src/main/javascript</file>
-                    </sourceDirectories>
+                    <guiceModule>com.example.CustomModule</guiceModule>
+                    <sources>
+                        <source>${basedir}/src/main/javascript</source>
+                    </sources>
+                    <testDirectories>
+                        <file>${basedir}/src/test/javascript</file>
+                    </testDirectories>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>
