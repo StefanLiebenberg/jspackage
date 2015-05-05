@@ -59,6 +59,10 @@
                 <version>${plugin.maven-invoker-plugin}</version>
 
                 <configuration>
+                    <failIfNoProjects>true</failIfNoProjects>
+                    <scriptVariables>
+                        <version>${project.version}</version>
+                    </scriptVariables>
                     <skipInstallation>${skipTests}</skipInstallation>
                     <skipInvocation>${skipTests}</skipInvocation>
                     <settingsFile>${project.basedir}/src/it/settings.xml</settingsFile>
@@ -66,8 +70,13 @@
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                     <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                     <setupIncludes>
-                        <setupInclude>simple-it/pom.xml</setupInclude>
+                        <setupInclude>js-library-base/pom.xml</setupInclude>
                     </setupIncludes>
+                    <showErrors>true</showErrors>
+                    <showVersion>true</showVersion>
+                    <debug>true</debug>
+                    <postBuildHookScript>verify.bsh</postBuildHookScript>
+
                 </configuration>
                 <executions>
                     <execution>
@@ -88,6 +97,12 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <version>${dep.guice}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
             <version>${dep.guice}</version>
         </dependency>
 

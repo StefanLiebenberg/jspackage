@@ -2,12 +2,10 @@ package org.slieb.jspackage.runtimes.rhino;
 
 
 import org.apache.commons.io.output.TeeOutputStream;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.mozilla.javascript.tools.debugger.Main;
 import org.mozilla.javascript.tools.shell.Global;
+import org.mozilla.javascript.tools.shell.ShellContextFactory;
 import org.slieb.jspackage.runtimes.JavascriptRuntime;
 
 import java.io.Closeable;
@@ -27,22 +25,18 @@ public class RhinoRuntime implements Closeable, JavascriptRuntime {
     protected final Main mainWindow;
 
     public RhinoRuntime() {
+        scope = new Global();
         if (DEBUG) {
-            contextFactory = org.mozilla.javascript.tools.shell.Main.shellContextFactory;
-            scope = org.mozilla.javascript.tools.shell.Main.getGlobal();
+            contextFactory = new ShellContextFactory();
         } else {
-            Context ctx = Context.enter();
-            scope = new Global();
-            contextFactory = ctx.getFactory();
+            contextFactory = Context.enter().getFactory();
         }
-
         if (DEBUG) {
             mainWindow = mainEmbedded(contextFactory, scope, "Rhino Debug Window");
             mainWindow.setBreakOnExceptions(true);
             scope.setErr(new PrintStream(new TeeOutputStream(System.err, mainWindow.getErr())));
             scope.setOut(new PrintStream(new TeeOutputStream(System.out, mainWindow.getOut())));
             scope.setIn(mainWindow.getIn());
-
         } else {
             mainWindow = null;
         }
@@ -50,21 +44,12 @@ public class RhinoRuntime implements Closeable, JavascriptRuntime {
 
     public void initialize() {
         contextFactory.call(context -> {
-            scope.init(context);
             context.setOptimizationLevel(-1);
-            context.setLanguageVersion(Context.VERSION_DEFAULT);
             context.initStandardObjects(scope);
+            scope.init(context);
             return null;
         });
     }
-
-//    public Context getContext() {
-//        return context;
-//    }
-
-//    public Global getScope() {
-//        return scope;
-//    }
 
     public void close() {
         if (DEBUG) {
@@ -76,29 +61,32 @@ public class RhinoRuntime implements Closeable, JavascriptRuntime {
 
 
     public void putObject(String name, Object object) {
-        ScriptableObject.putProperty(scope, name, object);
+        contextFactory.call(cx -> {
+            ScriptableObject.putProperty(scope, name, object);
+            return null;
+        });
     }
 
     public Object getObject(String name) {
-        return ScriptableObject.getProperty(scope, name);
+        return contextFactory.call(cx -> ScriptableObject.getProperty(scope, name));
     }
 
 
-//    public void putJavaObject(String name, Object object) {
-//        putObject(name, convertJavaObjectToJs(object));
-//    }
+    public void putJavaObject(String name, Object object) {
+        putObject(name, convertJavaObjectToJs(object));
+    }
 
-//    public Object getJavaObject(String name) {
-//        return convertJsObjectToJava(getObject(name), Object.class);
-//    }
+    public Object getJavaObject(String name) {
+        return convertJsObjectToJava(getObject(name), Object.class);
+    }
 
-//    public Function getFunction(String name) {
-//        return (Function) getObject(name);
-//    }
+    public Function getFunction(String name) {
+        return (Function) getObject(name);
+    }
 
-//    public Object callFunction(String name, Scriptable thisObject, Object... args) {
-//        return getFunction(name).call(context, scope, thisObject, args);
-//    }
+    public Object callFunction(String name, Scriptable thisObject, Object... args) {
+        return contextFactory.call(cx -> getFunction(name).call(cx, scope, thisObject, args));
+    }
 
     public Object convertJavaObjectToJs(Object object) {
         return Context.javaToJS(object, scope);

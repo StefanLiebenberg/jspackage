@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -16,6 +17,8 @@ import slieb.kute.resources.providers.GroupResourceProvider;
 import slieb.kute.resources.providers.URLClassLoaderResourceProvider;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
@@ -37,7 +40,6 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
     public String guiceModule;
 
     protected ResourceProvider<? extends Resource.Readable> getSourceResources() {
-
         ImmutableList.Builder<ResourceProvider<? extends Resource.Readable>> builder = ImmutableList.builder();
         getLog().debug("setting resource provider for project sources");
 
@@ -62,12 +64,11 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
 
     protected Injector getInjector() throws MojoFailureException {
         ImmutableList.Builder<Module> modules = new ImmutableList.Builder<>();
-
         modules.add(getDefaultsModule());
-
         if (guiceModule != null) {
             try {
-                Class<?> guiceClass = getClass().getClassLoader().loadClass(guiceModule);
+                Class<?> guiceClass = getCustomClassLoader(true, true).loadClass(guiceModule);
+                System.out.println(guiceClass);
                 Object object = guiceClass.newInstance();
                 if (object instanceof Module) {
                     modules.add((Module) object);
@@ -80,6 +81,39 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
         }
 
         return Guice.createInjector(modules.build());
+    }
 
+    private URLClassLoader loader;
+
+    protected URLClassLoader getCustomClassLoader(Boolean runtime, Boolean test) {
+        if (loader == null) {
+            ImmutableList.Builder<String> list = new ImmutableList.Builder<>();
+            try {
+                list.addAll(project.getCompileClasspathElements());
+                if (runtime) {
+                    list.addAll(project.getRuntimeClasspathElements());
+                }
+                if (test) {
+                    list.addAll(project.getTestClasspathElements());
+                }
+            } catch (DependencyResolutionRequiredException e) {
+                throw new RuntimeException(e);
+            }
+            URL[] urls = list.build().stream().map(this::safeToUrl).distinct().toArray(URL[]::new);
+            System.out.println(urls.length);
+            for (URL url : urls) {
+                System.out.println(url);
+            }
+            loader = new URLClassLoader(urls, getClass().getClassLoader());
+        }
+        return loader;
+    }
+
+    private URL safeToUrl(String path) {
+        try {
+            return new File(path).toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -13,6 +13,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.slieb.closure.javascript.GoogDependencyNode;
 import slieb.kute.api.Resource;
 
@@ -26,7 +27,10 @@ import static slieb.kute.resources.ResourceFilters.extensionFilter;
 import static slieb.kute.resources.Resources.*;
 
 
-@Mojo(name = "compile", defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true)
+@Mojo(name = "compile",
+        defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true,
+        requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME,
+        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class CompileJavascriptMojo extends AbstractPackageMojo {
 
     @Parameter(required = true)
@@ -65,7 +69,9 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
     Provider<CompilerOptions> compilerOptionsProvider;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+
         getInjector().injectMembers(this);
+
         Compiler compiler = compilerProvider.get();
         List<SourceFile> externs = getExterns();
         List<SourceFile> inputs = getInputSourceFiles();
@@ -77,6 +83,7 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         }
 
         if (outputFile.getParentFile().exists() || outputFile.getParentFile().mkdirs()) {
+
             Resource.Writeable outputResource = fileResource(outputFile);
             try {
                 writeResource(outputResource, compiler.toSource());

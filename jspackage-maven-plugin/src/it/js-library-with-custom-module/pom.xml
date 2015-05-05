@@ -23,9 +23,6 @@
                     <sources>
                         <source>${basedir}/src/main/javascript</source>
                     </sources>
-                    <testDirectories>
-                        <file>${basedir}/src/test/javascript</file>
-                    </testDirectories>
                 </configuration>
             </plugin>
         </plugins>
