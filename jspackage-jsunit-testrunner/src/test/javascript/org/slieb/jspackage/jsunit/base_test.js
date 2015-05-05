@@ -1,31 +1,31 @@
-//goog.require('goog.testing.jsunit');
+goog.require('goog.testing.jsunit');
 
 
-//goog.exportSymbol("testBase", function () {
+goog.exportSymbol("testBase", function () {
 
-var baseCtorCalled = false;
-var extendedCtorCalled = false;
-
-debugger;
-
-/**
- * @constructor
- */
-function Base() {
-};
-
-/**
- * @constructor
- * @extends {Base}
- */
-function Extended() {
-    goog.base(this);
-};
-goog.inherits(Extended, Base);
+    var baseCtorCalled = false;
+    var extendedCtorCalled = false;
 
 
-var extended = new Extended();
+    /**
+     * @constructor
+     */
+    function Base() {
+        baseCtorCalled = true;
+    };
 
-assertTrue(baseCtorCalled);
-assertTrue(extendedCtorCalled);
-//});
+    /**
+     * @constructor
+     * @extends {Base}
+     */
+    function Extended() {
+        goog.base(this);
+        extendedCtorCalled = true;
+    };
+    goog.inherits(Extended, Base);
+
+    var extended = new Extended();
+
+    assertTrue(baseCtorCalled);
+    assertTrue(extendedCtorCalled);
+});
