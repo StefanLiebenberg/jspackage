@@ -19,8 +19,7 @@ import static java.util.stream.Collectors.toSet;
 import static slieb.kute.resources.ResourceFilters.extensionFilter;
 
 public class GoogResources {
-
-
+    
     public static <R extends Resource.Readable> DependencyCalculator<R, GoogDependencyNode<R>> getCalculator(ResourceProvider<? extends R> resourceProvider) {
         GoogDependencyHelper<R> helper = new GoogDependencyHelper<>();
         GoogDependencyParser<R> parser = new GoogDependencyParser<>(GoogResources::getSourceFileFromResource);

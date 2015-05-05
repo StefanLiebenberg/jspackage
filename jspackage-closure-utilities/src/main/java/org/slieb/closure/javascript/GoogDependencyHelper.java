@@ -11,7 +11,6 @@ import java.util.Set;
 
 public class GoogDependencyHelper<R> implements DependenciesHelper<GoogDependencyNode<R>> {
 
-
     @Override
     public List<GoogDependencyNode<R>> getBaselist(Collection<GoogDependencyNode<R>> dependencies) {
         ImmutableList.Builder<GoogDependencyNode<R>> listBuilder = ImmutableList.builder();
@@ -26,4 +25,5 @@ public class GoogDependencyHelper<R> implements DependenciesHelper<GoogDependenc
     public Set<GoogDependencyNode<R>> getResolveableSet(Collection<GoogDependencyNode<R>> dependencies) {
         return ImmutableSet.copyOf(dependencies);
     }
+
 }

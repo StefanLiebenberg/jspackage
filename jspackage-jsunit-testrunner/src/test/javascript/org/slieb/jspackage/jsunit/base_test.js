@@ -3,27 +3,29 @@
 
 //goog.exportSymbol("testBase", function () {
 
-    var baseCtorCalled = false;
-    var extendedCtorCalled = false;
+var baseCtorCalled = false;
+var extendedCtorCalled = false;
 
-    /**
-     * @constructor
-     */
-    function Base() {
-    };
+debugger;
 
-    /**
-     * @constructor
-     * @extends {Base}
-     */
-    function Extended() {
-        goog.base(this);
-    };
-    goog.inherits(Extended, Base);
+/**
+ * @constructor
+ */
+function Base() {
+};
+
+/**
+ * @constructor
+ * @extends {Base}
+ */
+function Extended() {
+    goog.base(this);
+};
+goog.inherits(Extended, Base);
 
 
-    var extended = new Extended();
+var extended = new Extended();
 
-    assertTrue(baseCtorCalled);
-    assertTrue(extendedCtorCalled);
+assertTrue(baseCtorCalled);
+assertTrue(extendedCtorCalled);
 //});

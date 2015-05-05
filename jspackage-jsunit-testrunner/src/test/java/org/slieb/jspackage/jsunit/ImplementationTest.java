@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 
 
 @RunWith(JSUnitTestRunner.class)
-@JSUnitTestRunner.Configuration(includes = "^.*_test\\.js$")
+@JSUnitTestRunner.Configuration(includes = "^base_test\\.js$")
 public class ImplementationTest {
 
 }

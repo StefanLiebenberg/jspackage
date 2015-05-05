@@ -69,7 +69,7 @@ public class JSUnitTestRunner extends ParentRunner<JSUnitSingleTestRunner> {
     }
 
     private ResourceProvider<Resource.Readable> getTestProvider(ResourceProvider<Resource.Readable> provider) {
-        return filterResources(provider, extensionFilter("_test.js"));
+        return filterResources(provider, extensionFilter("base_test.js"));
     }
 
     @Override

@@ -40,12 +40,14 @@ public class RhinoRuntime implements Closeable, JavascriptRuntime {
         } else {
             mainWindow = null;
         }
+
     }
 
     public void initialize() {
         contextFactory.call(context -> {
             context.setOptimizationLevel(-1);
             context.initStandardObjects(scope);
+            context.addActivationName("base");
             scope.init(context);
             return null;
         });
