@@ -21,13 +21,13 @@ public class IndexResource extends AbstractHtmlResource {
     }
 
     public String getIndexContent() {
-        StringBuffer stringBuffer = new StringBuffer();
-        resources.stream().parallel()
+        StringBuilder str = new StringBuilder();
+        resources.stream()
                 .map(Resource::getPath)
                 .filter(this::filterResourceByPath)
                 .map(this::getResourceEntryFromPath)
-                .forEach(stringBuffer::append);
-        return stringBuffer.toString();
+                .forEach(str::append);
+        return str.toString();
     }
 
     public Boolean filterResourceByPath(String path) {

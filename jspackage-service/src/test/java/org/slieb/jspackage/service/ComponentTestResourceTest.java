@@ -19,15 +19,16 @@ import static org.junit.Assert.assertNotNull;
 
 public class ComponentTestResourceTest {
 
-    Resource.Readable resourceA, resourceB;
+    Resource.Readable resourceBase, resourceA, resourceB;
 
     ComponentTestResource resource;
 
     @Before
     public void setup() {
-        resourceA = Resources.stringResource("a", "/a.js");
-        resourceB = Resources.stringResource("a", "/b.js");
-        resource = new ComponentTestResource(null, null, "/test.html");
+        resourceBase = Resources.inputStreamResource(() -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"), "/base.js");
+        resourceA = Resources.stringResource("goog.provide('a'); goog.require('b');", "/a.js");
+        resourceB = Resources.stringResource("goog.provide('b');", "/b.js");
+        resource = new ComponentTestResource(resourceA, Resources.providerOf(resourceBase, resourceA, resourceB), "/test.html");
     }
 
     @Test
@@ -39,15 +40,19 @@ public class ComponentTestResourceTest {
         Element head = document.getElementsByTag("head").first();
         assertNotNull(head);
         Elements scripts = document.getElementsByTag("script");
-        assertEquals(2, scripts.size());
+        assertEquals(3, scripts.size());
 
-        Element scriptA = scripts.get(0);
-        assertNotNull(scriptA);
-        assertEquals("/a.js", scriptA.attr("src"));
+        Element scriptBase = scripts.get(0);
+        assertNotNull(scriptBase);
+        assertEquals("/base.js", scriptBase.attr("src"));
 
         Element scriptB = scripts.get(1);
         assertNotNull(scriptB);
         assertEquals("/b.js", scriptB.attr("src"));
+
+        Element scriptA = scripts.get(2);
+        assertNotNull(scriptA);
+        assertEquals("/a.js", scriptA.attr("src"));
     }
 
     @Test

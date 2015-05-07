@@ -1,16 +1,15 @@
 package org.slieb.jspackage.service;
 
 
-import com.google.common.base.Preconditions;
+import org.slieb.jspackage.service.handlers.GeneralExceptionHandler;
+import org.slieb.jspackage.service.handlers.RoutesNotFoundExceptionHandler;
+import org.slieb.jspackage.service.handlers.ServiceRoute;
 import org.slieb.jspackage.service.providers.ServiceProvider;
-import slieb.kute.api.Resource;
 import spark.Spark;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static slieb.kute.resources.Resources.readResource;
 
 public class JSPackageService {
 
@@ -40,30 +39,10 @@ public class JSPackageService {
 
     public void start() throws InterruptedException {
         Spark.port(configuration.getPort());
-        Spark.get("/*", (request, response) -> {
-            String pathInfo = request.pathInfo();
-            Resource.Readable readable = provider.getResourceByName(pathInfo);
-            Preconditions.checkNotNull(readable, "resource not found");
-            response.type(getContentType(request.pathInfo(), request.contentType()));
-            return readResource(readable);
-        });
-
-
-        Spark.exception(RuntimeException.class, (e, request, response) -> {
-            e.printStackTrace();
-
-            switch (e.getMessage()) {
-                case "resource not found":
-                    response.status(404);
-                    break;
-                default:
-                    response.status(500);
-            }
-
-            response.type(getContentType(request.pathInfo(), request.contentType()));
-            response.body("Exception on " + request.pathInfo() + " : " + e.getMessage());
-        });
-        Thread.sleep(2000);
+        Spark.get("/*", new ServiceRoute(provider));
+        Spark.exception(RoutesNotFoundExceptionHandler.ResourceNotFound.class, new RoutesNotFoundExceptionHandler());
+        Spark.exception(RuntimeException.class, new GeneralExceptionHandler());
+        Thread.sleep(1000);
     }
 
     public void stop() {
