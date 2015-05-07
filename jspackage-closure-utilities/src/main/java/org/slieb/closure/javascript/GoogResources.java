@@ -21,10 +21,14 @@ import static slieb.kute.resources.ResourceFilters.extensionFilter;
 public class GoogResources {
     
     public static <R extends Resource.Readable> DependencyCalculator<R, GoogDependencyNode<R>> getCalculator(ResourceProvider<? extends R> resourceProvider) {
+        GoogDependencyParser<R> parser = getDependencyParser();
         GoogDependencyHelper<R> helper = new GoogDependencyHelper<>();
-        GoogDependencyParser<R> parser = new GoogDependencyParser<>(GoogResources::getSourceFileFromResource);
         List<R> list = Resources.resourceProviderToList(resourceProvider);
         return new DependencyCalculator<>(list, parser, helper);
+    }
+
+    public static <R extends Resource.Readable> GoogDependencyParser<R> getDependencyParser() {
+        return new GoogDependencyParser<>(GoogResources::getSourceFileFromResource);
     }
 
     public static ResourceProvider<FileResource> getResourceProviderForSourceDirectories(Collection<File> directories) {

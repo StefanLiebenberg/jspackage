@@ -57,6 +57,12 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
         return new GroupResourceProvider<>(builder.build());
     }
 
+    protected ResourceProvider<? extends Resource.Readable> getSourceResource(List<File> additionalDirectories) {
+        ResourceProvider<? extends Resource.Readable> sourceResources = getSourceResources();
+        ResourceProvider<? extends Resource.Readable> testResources = getResourceProviderForSourceDirectories(additionalDirectories);
+        return new GroupResourceProvider<>(ImmutableList.of(sourceResources, testResources));
+    }
+
 
     protected Module getDefaultsModule() {
         return new DefaultsModule();

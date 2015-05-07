@@ -22,8 +22,7 @@ import static slieb.kute.resources.Resources.filterResources;
 
 
 public class JSUnitSingleTestRunner extends Runner {
-
-
+    
     public final ResourceProvider<Resource.Readable> resourceProvider;
 
     public final Resource.Readable testResource;

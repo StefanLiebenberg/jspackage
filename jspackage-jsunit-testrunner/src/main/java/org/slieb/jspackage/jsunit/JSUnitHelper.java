@@ -7,8 +7,7 @@ import static java.lang.String.format;
 import static org.slieb.jspackage.runtimes.JavascriptRuntimeUtils.*;
 
 public class JSUnitHelper {
-
-
+    
     private JSUnitHelper() {
     }
 

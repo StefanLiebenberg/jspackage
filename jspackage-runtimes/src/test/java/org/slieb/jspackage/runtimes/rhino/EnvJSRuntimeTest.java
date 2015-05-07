@@ -8,9 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.slieb.jspackage.runtimes.JavascriptRuntimeUtils.getIntegerFromJsRuntime;
 import static org.slieb.jspackage.runtimes.JavascriptRuntimeUtils.getStringFromJsRuntime;
 
-/**
- * Created by stefan on 4/10/15.
- */
+
 public class EnvJSRuntimeTest {
 
     EnvJSRuntime runtime;
