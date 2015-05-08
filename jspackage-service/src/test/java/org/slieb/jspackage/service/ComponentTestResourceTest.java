@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
+import org.slieb.closure.javascript.GoogResources;
 import org.slieb.jspackage.service.resources.ComponentTestResource;
 import slieb.kute.api.Resource;
 import slieb.kute.resources.Resources;
@@ -28,7 +29,7 @@ public class ComponentTestResourceTest {
         resourceBase = Resources.inputStreamResource(() -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"), "/base.js");
         resourceA = Resources.stringResource("goog.provide('a'); goog.require('b');", "/a.js");
         resourceB = Resources.stringResource("goog.provide('b');", "/b.js");
-        resource = new ComponentTestResource(resourceA, Resources.providerOf(resourceBase, resourceA, resourceB), "/test.html");
+        resource = new ComponentTestResource(resourceA, GoogResources.getCalculator(Resources.providerOf(resourceBase, resourceA, resourceB)), "/test.html");
     }
 
     @Test

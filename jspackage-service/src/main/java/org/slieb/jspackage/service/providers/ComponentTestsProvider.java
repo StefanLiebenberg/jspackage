@@ -1,6 +1,8 @@
 package org.slieb.jspackage.service.providers;
 
+import org.slieb.closure.javascript.GoogDependencyNode;
 import org.slieb.closure.javascript.GoogResources;
+import org.slieb.dependencies.DependencyCalculator;
 import org.slieb.jspackage.service.resources.ComponentTestResource;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
@@ -12,9 +14,12 @@ public class ComponentTestsProvider implements ResourceProvider<Resource.Readabl
 
     private final ResourceProvider<? extends Resource.Readable> resources;
 
+    private final DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator;
+
 
     public ComponentTestsProvider(ResourceProvider<? extends Resource.Readable> resources) {
         this.resources = resources;
+        this.calculator = GoogResources.getCalculator(this.resources);
     }
 
     @Override
@@ -37,7 +42,7 @@ public class ComponentTestsProvider implements ResourceProvider<Resource.Readabl
     }
 
     private ComponentTestResource componentTestResource(Resource.Readable resource) {
-        return new ComponentTestResource(resource, resources, getComponentTestPath(resource));
+        return new ComponentTestResource(resource, calculator, getComponentTestPath(resource));
     }
 
     private String getComponentTestPath(Resource.Readable readable) {

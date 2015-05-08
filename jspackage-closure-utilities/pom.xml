@@ -33,6 +33,11 @@
             <version>v20150315</version>
         </dependency>
         <dependency>
+            <groupId>org.slieb</groupId>
+            <artifactId>kute</artifactId>
+            <version>${dep.kute}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slieb.jspackage</groupId>
             <artifactId>jspackage-closure-library</artifactId>
             <version>${project.version}</version>
@@ -42,6 +47,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>${dep.mockito}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

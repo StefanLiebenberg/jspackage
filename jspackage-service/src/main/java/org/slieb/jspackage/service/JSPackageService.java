@@ -22,20 +22,7 @@ public class JSPackageService {
         this.provider = new ServiceProvider(configuration.getResourceProvider());
     }
 
-    public String getContentType(String path, String defaultType) {
-        try {
-            String reportedType = Files.probeContentType(Paths.get(path));
-            switch (reportedType) {
-                case "inode/directory":
-                    return defaultType;
-                default:
-                    return reportedType;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return defaultType;
-    }
+
 
     public void start() throws InterruptedException {
         Spark.port(configuration.getPort());

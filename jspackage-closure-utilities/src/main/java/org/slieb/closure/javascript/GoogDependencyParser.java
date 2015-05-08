@@ -26,8 +26,8 @@ public class GoogDependencyParser<R> implements DependencyParser<R, GoogDependen
     private final Function<R, SourceFile> sourceFileFunction;
 
     public GoogDependencyParser(Function<R, SourceFile> sourceFileFunction) {
-        config = createConfig(true, Config.LanguageMode.ECMASCRIPT6_STRICT, true, null);
-        errorReporter = new SimpleErrorReporter();
+        this.config = createConfig(true, Config.LanguageMode.ECMASCRIPT6_STRICT, true, null);
+        this.errorReporter = new SimpleErrorReporter();
         this.sourceFileFunction = sourceFileFunction;
     }
 
