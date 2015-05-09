@@ -26,9 +26,9 @@ public class ComponentTestResourceTest {
 
     @Before
     public void setup() {
-        resourceBase = Resources.inputStreamResource(() -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"), "/base.js");
-        resourceA = Resources.stringResource("goog.provide('a'); goog.require('b');", "/a.js");
-        resourceB = Resources.stringResource("goog.provide('b');", "/b.js");
+        resourceBase = Resources.inputStreamResource("/base.js", () -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"));
+        resourceA = Resources.stringResource("/a.js", "goog.provide('a'); goog.require('b');");
+        resourceB = Resources.stringResource("/b.js", "goog.provide('b');");
         resource = new ComponentTestResource(resourceA, GoogResources.getCalculator(Resources.providerOf(resourceBase, resourceA, resourceB)), "/test.html");
     }
 

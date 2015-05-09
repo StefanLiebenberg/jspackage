@@ -1,4 +1,4 @@
-package org.slieb.closure.javascript.printer;
+package org.slieb.closure.javascript.internal;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
@@ -20,18 +20,16 @@ import static java.util.stream.Collectors.toList;
 public class DepsFileBuilderTest {
 
     private Resource.Readable create(String name, Set<String> requires) {
-        return Resources.stringResource(new StringBuilder()
+        return Resources.stringResource("/" + name + ".js", new StringBuilder()
                 .append("goog.provide('").append(name).append("');\n")
                 .append(Joiner.on("\n").join(requires.stream().map(r -> "goog.require('" + r + "');").collect(toList())))
-                .toString()
-                , "/" + name + ".js");
-
+                .toString());
     }
 
     @Test
     public void testGetDependencyContent() throws Exception {
         Resource.Readable resourceA, resourceB, resourceC, resourceD, baseResource;
-        baseResource = Resources.inputStreamResource(() -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"), "/base.js");
+        baseResource = Resources.inputStreamResource("/base.js", () -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"));
         resourceA = create("a", ImmutableSet.of("b", "c", "d"));
         resourceB = create("b", ImmutableSet.of("c", "d"));
         resourceC = create("c", ImmutableSet.of("d"));

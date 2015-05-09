@@ -1,4 +1,4 @@
-package org.slieb.closure.javascript.printer;
+package org.slieb.closure.javascript.internal;
 
 
 import com.google.common.base.Joiner;

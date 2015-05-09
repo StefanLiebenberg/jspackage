@@ -2,7 +2,7 @@ package org.slieb.jspackage.service.resources;
 
 
 import org.slieb.closure.javascript.GoogDependencyNode;
-import org.slieb.closure.javascript.printer.ComponentTestFileBuilder;
+import org.slieb.closure.javascript.internal.ComponentTestFileBuilder;
 import org.slieb.dependencies.DependencyCalculator;
 import slieb.kute.api.Resource;
 

@@ -27,8 +27,8 @@ public class IndexResourceTest {
 
     @Before
     public void setup() {
-        resourceA = Resources.stringResource("a", "/a.js");
-        resourceB = Resources.stringResource("b", "/b.js");
+        resourceA = Resources.stringResource("/a.js", "a");
+        resourceB = Resources.stringResource("/b.js", "b");
         ResourceProvider<Resource.Readable> resources = providerOf(resourceA, resourceB);
         indexResource = new IndexResource("/", resources);
     }

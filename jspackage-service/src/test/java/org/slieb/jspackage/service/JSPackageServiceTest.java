@@ -31,9 +31,9 @@ public class JSPackageServiceTest {
     @BeforeClass
     public static void setUp() throws Exception {
 
-        readableA = Resources.stringResource("var a = 'A';", "/a.js");
-        readableB = Resources.stringResource("var b = 'B';", "/b.js");
-        readableC = Resources.stringResource("var c = 'C';", "/nested/c_test.js");
+        readableA = Resources.stringResource("/a.js", "var a = 'A';");
+        readableB = Resources.stringResource("/b.js", "var b = 'B';");
+        readableC = Resources.stringResource("/nested/c_test.js", "var c = 'C';");
         provider = Resources.providerOf(readableA, readableB, readableC);
 
         configuration = new JSPackageConfiguration.Builder()

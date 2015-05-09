@@ -26,9 +26,9 @@ public class GoogResourcesTest {
 
     @Before
     public void setup() {
-        readableA = Resources.stringResource("goog.base = function () {};", "/path/a");
-        readableB = Resources.stringResource("goog.provide('b');", "/path/b");
-        readableC = Resources.stringResource("goog.provide('c');", "/path/c");
+        readableA = Resources.stringResource("/path/a", "goog.base = function () {};");
+        readableB = Resources.stringResource("/path/b", "goog.provide('b');");
+        readableC = Resources.stringResource("/path/c", "goog.provide('c');");
         readables = providerOf(readableA, readableB, readableC);
     }
 
@@ -65,7 +65,7 @@ public class GoogResourcesTest {
     @Test
     public void testGetSourceFileFromResource() throws Exception {
         String content = "var x = y;", path = "/path.js";
-        Resource.Readable resource = Resources.stringResource(content, path);
+        Resource.Readable resource = Resources.stringResource(path, content);
         SourceFile sourceFile = GoogResources.getSourceFileFromResource(resource);
         assertNotNull(sourceFile);
         assertEquals(content, sourceFile.getCode());

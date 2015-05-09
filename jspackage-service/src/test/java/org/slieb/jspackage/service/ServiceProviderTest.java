@@ -25,8 +25,8 @@ public class ServiceProviderTest {
 
     @Before
     public void setup() {
-        resourceA = Resources.stringResource("a", "/a_test.js");
-        resourceB = Resources.stringResource("b", "/b_test.js");
+        resourceA = Resources.stringResource("/a_test.js", "a");
+        resourceB = Resources.stringResource("/b_test.js", "b");
         readables = Resources.providerOf(resourceA, resourceB);
         provider = new ServiceProvider(readables);
     }

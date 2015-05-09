@@ -1,7 +1,7 @@
 package org.slieb.jspackage.service.resources;
 
 import org.slieb.closure.javascript.GoogDependencyParser;
-import org.slieb.closure.javascript.printer.DepsFileBuilder;
+import org.slieb.closure.javascript.internal.DepsFileBuilder;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.ResourceFilters;

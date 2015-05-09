@@ -48,7 +48,7 @@ public class ServiceRoute implements Route {
 
             return readResource(getReadable(request));
         } finally {
-            System.out.println((System.nanoTime() - startTime) / 1000000);
+            System.out.println(request.pathInfo() + ": " + (System.nanoTime() - startTime) / 1000000);
         }
     }
 
