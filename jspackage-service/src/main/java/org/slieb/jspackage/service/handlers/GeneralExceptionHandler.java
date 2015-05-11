@@ -10,5 +10,6 @@ public class GeneralExceptionHandler implements ExceptionHandler {
     public void handle(Exception e, Request request, Response response) {
         response.status(500);
         response.body("Error occured: " + e.getMessage());
+        e.printStackTrace();
     }
 }

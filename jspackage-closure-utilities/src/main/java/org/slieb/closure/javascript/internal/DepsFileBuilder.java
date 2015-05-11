@@ -26,6 +26,7 @@ public class DepsFileBuilder {
     }
 
     public String getDependencyContent() {
+        
         Set<GoogDependencyNode<Resource.Readable>> nodes =
                 resourceProvider.stream()
                         .parallel()

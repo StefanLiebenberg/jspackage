@@ -1,28 +1,68 @@
 package org.slieb.closure.javascript.providers;
 
 
+import org.slieb.closure.javascript.GoogDependencyNode;
+import org.slieb.closure.javascript.GoogDependencyParser;
+import org.slieb.closure.javascript.GoogResources;
+import org.slieb.closure.javascript.internal.DepsFileBuilder;
+import org.slieb.dependencies.DependencyCalculator;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
+import slieb.kute.resources.implementations.StringSupplierResource;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-public class ClosureProvider {
-    private ResourceProvider<Resource.Readable> providerProvider;
+public class ClosureProvider implements ResourceProvider<Resource.Readable> {
 
-    private Resource.Readable getDependencyResource(String path, Supplier<String> stringSupplier) {
-        return new Resource.Readable() {
-            @Override
-            public String getPath() {
-                return path;
-            }
+    public static final String DEPS = "/deps.js", DEFINES = "/defines.js";
 
-            @Override
-            public Reader getReader() throws IOException {
-                return new StringReader(stringSupplier.get());
-            }
-        };
+    private final DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator;
+
+    private final ResourceProvider<? extends Resource.Readable> provider;
+
+    private final GoogDependencyParser<Resource.Readable> parser;
+//
+//    private final ResourceProvider<? extends Resource.Readable> templatesProvider;
+//
+//    private final ResourceProvider<? extends Resource.InputStreaming> assetsProvider;
+
+
+    /**
+     * @param provider
+     * @param parser
+     */
+    public ClosureProvider(ResourceProvider<? extends Resource.Readable> provider, GoogDependencyParser<Resource.Readable> parser) {
+        this.provider = provider;
+        this.parser = GoogResources.getDependencyParser();
+        this.calculator = GoogResources.getCalculator(provider);
+//        this.filteredJsFiles = Resources.filterResources(provider, ResourcePredicates.extensionFilter(".js"));
+//        this.filteredSoyFiles = Resources.filterResources(provider, ResourcePredicates.extensionFilter(".soy"));
     }
+
+    private Resource.Readable getDependencyResource() {
+        return new StringSupplierResource("/deps.js", new DepsFileBuilder(provider, parser)::getDependencyContent);
+    }
+
+    private Resource.Readable getDefinesResource() {
+        return new StringSupplierResource("/defines.js", "");
+    }
+
+    @Override
+    public Resource.Readable getResourceByName(String path) {
+        if (DEPS.equals(path)) {
+            return getDependencyResource();
+        }
+
+        if (DEFINES.equals(path)) {
+            return getDefinesResource();
+        }
+
+        return null;
+    }
+
+    @Override
+    public Stream<Resource.Readable> stream() {
+        return Stream.of(getDependencyResource(), getDefinesResource());
+    }
+
 }

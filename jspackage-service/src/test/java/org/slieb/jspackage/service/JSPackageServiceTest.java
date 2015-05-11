@@ -1,6 +1,9 @@
 package org.slieb.jspackage.service;
 
 import org.apache.commons.io.IOUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,6 +14,7 @@ import slieb.kute.resources.Resources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
 import static slieb.kute.resources.Resources.readResource;
@@ -30,7 +34,6 @@ public class JSPackageServiceTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-
         readableA = Resources.stringResource("/a.js", "var a = 'A';");
         readableB = Resources.stringResource("/b.js", "var b = 'B';");
         readableC = Resources.stringResource("/nested/c_test.js", "var c = 'C';");
@@ -72,6 +75,29 @@ public class JSPackageServiceTest {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    @Test
+    public void testIndexing() throws IOException, InterruptedException {
+        try (InputStream inputStream = baseUrl.openStream()) {
+            Document index = Jsoup.parse(inputStream, Charset.defaultCharset().name(), baseUrl.toString());
+            Elements links = index.getElementsByTag("a");
+            assertEquals(6, links.size());
+            assertEquals("/nested", links.get(0).attr("href"));
+            assertEquals("/a.js", links.get(1).attr("href"));
+            assertEquals("/b.js", links.get(2).attr("href"));
+            assertEquals("/cssRenameMap.js", links.get(3).attr("href"));
+            assertEquals("/defines.js", links.get(4).attr("href"));
+            assertEquals("/deps.js", links.get(5).attr("href"));
+        }
+
+        try (InputStream inputStream = new URL(baseUrl, "/nested").openStream()) {
+            Document index = Jsoup.parse(inputStream, Charset.defaultCharset().name(), baseUrl.toString());
+            Elements links = index.getElementsByTag("a");
+            assertEquals(2, links.size());
+            assertEquals("/nested/c_test.html", links.get(0).attr("href"));
+            assertEquals("/nested/c_test.js", links.get(1).attr("href"));
+        }
     }
 
 }

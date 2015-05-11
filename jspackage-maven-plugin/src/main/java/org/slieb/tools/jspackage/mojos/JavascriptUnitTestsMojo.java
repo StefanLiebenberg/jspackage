@@ -22,7 +22,7 @@ import java.io.Reader;
 import java.util.List;
 
 import static org.slieb.closure.javascript.GoogResources.getResourceProviderForSourceDirectories;
-import static slieb.kute.resources.ResourceFilters.extensionFilter;
+import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.filterResources;
 
 

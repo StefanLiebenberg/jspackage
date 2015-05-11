@@ -10,7 +10,6 @@ import org.slieb.jspackage.service.JSPackageConfiguration;
 import org.slieb.jspackage.service.JSPackageService;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @Mojo(name = "service", defaultPhase = LifecyclePhase.TEST)
@@ -19,24 +18,30 @@ public class JSPackageServiceMojo extends AbstractPackageMojo {
     @Parameter(name = "testDirectories")
     protected List<File> testDirectories;
 
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        JSPackageService service = JSPackageService.create(
+    protected JSPackageService service;
+
+    public void start() throws InterruptedException {
+        service = JSPackageService.create(
                 new JSPackageConfiguration.Builder()
                         .withResourceProvider(getSourceResource(testDirectories))
                         .build());
+        service.start();
+    }
 
+    public void stop() {
+        service.stop();
+    }
+
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            service.start();
+            start();
             System.out.println("Press any key to continue.");
             System.in.read();
-        } catch (InterruptedException e) {
-            throw new MojoFailureException("service failed", e);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new MojoFailureException("ioFailure", e);
         } finally {
-            service.stop();
+            stop();
         }
-
     }
 }

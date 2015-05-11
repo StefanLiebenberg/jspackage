@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.slieb.closure.javascript.GoogResources.getCalculator;
-import static slieb.kute.resources.ResourceFilters.extensionFilter;
+import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.*;
 
 

@@ -14,7 +14,8 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 
 import static org.slieb.closure.javascript.GoogResources.getCalculator;
-import static slieb.kute.resources.ResourceFilters.*;
+import static slieb.kute.resources.ResourcePredicates.all;
+import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.filterResources;
 
 
@@ -31,7 +32,7 @@ public class AllTestsResource implements Resource.Readable {
     public AllTestsResource(String path, ResourceProvider<? extends Readable> sources) {
         this.path = path;
         this.sources = sources;
-        this.filterJs = filterResources(this.sources, and(extensionFilter(".js"), not(extensionFilter("_test.js"))));
+        this.filterJs = filterResources(this.sources, all(extensionFilter(".js"), extensionFilter("_test.js").negate()));
         this.filterTests = filterResources(this.sources, extensionFilter("_test.html"));
     }
 

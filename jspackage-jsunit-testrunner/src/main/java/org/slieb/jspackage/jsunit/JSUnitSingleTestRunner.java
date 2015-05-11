@@ -17,13 +17,13 @@ import java.util.concurrent.TimeoutException;
 
 import static org.slieb.jspackage.jsunit.JSUnitHelper.*;
 import static org.slieb.jspackage.runtimes.JavascriptRuntimeUtils.evaluateReader;
-import static slieb.kute.resources.ResourceFilters.*;
+import static slieb.kute.resources.ResourcePredicates.*;
 import static slieb.kute.resources.Resources.filterResources;
 
 
 public class JSUnitSingleTestRunner extends Runner {
-    
-    public final ResourceProvider<Resource.Readable> resourceProvider;
+
+    public final ResourceProvider<? extends Resource.Readable> resourceProvider;
 
     public final Resource.Readable testResource;
 
@@ -35,7 +35,7 @@ public class JSUnitSingleTestRunner extends Runner {
         throw new IllegalStateException("not supported yet");
     }
 
-    public JSUnitSingleTestRunner(ResourceProvider<Resource.Readable> resourceProvider, Resource.Readable testResource, Integer timeoutSeconds) {
+    public JSUnitSingleTestRunner(ResourceProvider<? extends Resource.Readable> resourceProvider, Resource.Readable testResource, Integer timeoutSeconds) {
         this.resourceProvider = resourceProvider;
         this.testResource = testResource;
         this.timeoutSeconds = timeoutSeconds;
@@ -44,15 +44,14 @@ public class JSUnitSingleTestRunner extends Runner {
 
     public JSUnitSingleTestRunner(String testPath, Integer timeout) {
         this.resourceProvider = filterResources(Kute.getDefaultProvider(),
-                and(
+                all(
                         extensionFilter(".js"),
-                        not(
-                                any(
-                                        extensionFilter("env.rhino.js"),
-                                        r -> r.getPath().startsWith("jdk/nashorn"),
-                                        r -> r.getPath().startsWith("com/google/javascript/jscomp")
-                                )
-                        )));
+                        any(
+                                extensionFilter("env.rhino.js"),
+                                r -> r.getPath().startsWith("jdk/nashorn"),
+                                r -> r.getPath().startsWith("com/google/javascript/jscomp")
+                        ).negate()
+                ));
         this.testResource = this.resourceProvider.getResourceByName(testPath);
         this.calculator = GoogResources.getCalculator(resourceProvider);
         this.timeoutSeconds = timeout;

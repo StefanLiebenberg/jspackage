@@ -40,6 +40,7 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
     public String guiceModule;
 
     protected ResourceProvider<? extends Resource.Readable> getSourceResources() {
+
         ImmutableList.Builder<ResourceProvider<? extends Resource.Readable>> builder = ImmutableList.builder();
         getLog().debug("setting resource provider for project sources");
 
@@ -54,6 +55,7 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
         } else {
             getLog().warn("JSPackage source directories have not been specified or is empty.");
         }
+
         return new GroupResourceProvider<>(builder.build());
     }
 

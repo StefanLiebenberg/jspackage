@@ -16,10 +16,10 @@ import java.util.Collection;
 import java.util.List;
 
 import static java.util.stream.Collectors.toSet;
-import static slieb.kute.resources.ResourceFilters.extensionFilter;
+import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 
 public class GoogResources {
-    
+
     public static <R extends Resource.Readable> DependencyCalculator<R, GoogDependencyNode<R>> getCalculator(ResourceProvider<? extends R> resourceProvider) {
         GoogDependencyParser<R> parser = getDependencyParser();
         GoogDependencyHelper<R> helper = new GoogDependencyHelper<>();

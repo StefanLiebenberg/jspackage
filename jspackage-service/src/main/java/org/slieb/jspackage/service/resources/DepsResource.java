@@ -4,9 +4,9 @@ import org.slieb.closure.javascript.GoogDependencyParser;
 import org.slieb.closure.javascript.internal.DepsFileBuilder;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.ResourceFilters;
 
 import static org.slieb.closure.javascript.GoogResources.getDependencyParser;
+import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.filterResources;
 
 
@@ -19,7 +19,7 @@ public class DepsResource extends AbstractHtmlResource {
     private final String path;
 
     public DepsResource(ResourceProvider<? extends Readable> jsReadables, String path) {
-        this.jsReadables = filterResources(jsReadables, ResourceFilters.extensionFilter(".js"));
+        this.jsReadables = filterResources(jsReadables, extensionFilter(".js"));
         this.path = path;
     }
 

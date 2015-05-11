@@ -1,74 +1,67 @@
 package org.slieb.jspackage.service.providers;
 
-import org.slieb.jspackage.service.resources.AllTestsResource;
-import org.slieb.jspackage.service.resources.DepsResource;
-import org.slieb.jspackage.service.resources.IndexResource;
+import com.google.common.collect.ImmutableList;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
+import slieb.kute.resources.Resources;
 
 import java.util.stream.Stream;
 
-
+/**
+ * The plan:
+ * <p>
+ * Sources
+ * - al raw files on classpath
+ * - .html, .js, .images, .css, .gss
+ * <p>
+ * Tools
+ * - fallback to sources. ( requires sources )
+ * - To js compiled soy ( requires sources )
+ * - To css compiled gss files. (requires sources:css )
+ * - Dep.js and defines.js ( requires soy )
+ * <p>
+ * Testing
+ * - .html files for _test.js files ( requires tools:soy )
+ * - all_tests.html file ( requires sources, tests )
+ */
 public class ServiceProvider implements ResourceProvider<Resource.Readable> {
-
-    private final static String INDEX = "/", ALL_TESTS = "/testing/all_tests.html";
 
     private final ResourceProvider<? extends Resource.Readable> sources;
 
-    private final ComponentTestsProvider testsProvider;
+    private final ToolsProvider toolsProvider;
 
+    private final TestsProvider testsProvider;
+
+    private final IndexProvider indexer;
 
     public ServiceProvider(ResourceProvider<? extends Resource.Readable> sources) {
         this.sources = sources;
-        this.testsProvider = new ComponentTestsProvider(this.sources);
+        this.toolsProvider = new ToolsProvider(this.sources);
+        this.testsProvider = new TestsProvider(this.toolsProvider);
+        this.indexer = new IndexProvider(this.testsProvider);
     }
 
-
-    private Resource.Readable getIndexResource() {
-        return new IndexResource(INDEX, this);
-    }
-
-    private AllTestsResource getAllTestsResource() {
-        return new AllTestsResource(ALL_TESTS, this);
-    }
-
-    private DepsResource getDepsResource() {
-        return new DepsResource(sources, getDepsPath());
-    }
-
-    private String getDepsPath() {
-        return sources.stream().map(Resource::getPath).filter(r -> r.endsWith("/deps.js")).findFirst().orElseThrow(() -> new RuntimeException("no deps?"));
-    }
-
-    private Boolean isDepsResource(String path) {
-        return path.endsWith("/deps.js");
+    private Stream<Stream<Resource.Readable>> streams() {
+        return ImmutableList.of(
+                testsProvider.stream(),
+                indexer.stream()
+        ).stream();
     }
 
     @Override
     public Resource.Readable getResourceByName(String path) {
-        Resource.Readable readable = sources.getResourceByName(path);
-        if (readable != null) {
-            if (isDepsResource(path)) {
-                return getDepsResource();
+        return Resources.findFirstResource(streams().map(s -> {
+            Resource.Readable readable = Resources.findResource(s, path);
+            if (readable != null) {
+                return readable;
             }
-            return readable;
-        }
-
-        if (INDEX.equals(path)) {
-            return getIndexResource();
-        }
-
-        if (ALL_TESTS.equals(path)) {
-            return getAllTestsResource();
-        }
-
-        return testsProvider.getResourceByName(path);
+            return null;
+        }));
     }
 
 
     @Override
     public Stream<Resource.Readable> stream() {
-        // not dealing distinct fair here.
-        return Stream.concat(Stream.concat(sources.stream(), testsProvider.stream()), Stream.of(getIndexResource(), getAllTestsResource(), getDepsResource())).distinct();
+        return streams().flatMap(s -> s);
     }
 }

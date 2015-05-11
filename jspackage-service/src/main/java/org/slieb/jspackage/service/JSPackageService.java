@@ -5,11 +5,10 @@ import org.slieb.jspackage.service.handlers.GeneralExceptionHandler;
 import org.slieb.jspackage.service.handlers.RoutesNotFoundExceptionHandler;
 import org.slieb.jspackage.service.handlers.ServiceRoute;
 import org.slieb.jspackage.service.providers.ServiceProvider;
+import slieb.kute.api.Resource;
 import spark.Spark;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 public class JSPackageService {
 
@@ -23,7 +22,6 @@ public class JSPackageService {
     }
 
 
-
     public void start() throws InterruptedException {
         Spark.port(configuration.getPort());
         Spark.get("/*", new ServiceRoute(provider));
@@ -34,6 +32,10 @@ public class JSPackageService {
 
     public void stop() {
         Spark.stop();
+    }
+
+    public Stream<Resource.Readable> stream() {
+        return provider.stream();
     }
 
     public static JSPackageService create(JSPackageConfiguration configuration) {

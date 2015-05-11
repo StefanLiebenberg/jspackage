@@ -24,16 +24,14 @@ public class ServiceRoute implements Route {
         this.provider = provider;
     }
 
+
     @Override
     public Object handle(Request request, Response response) throws Exception {
         long startTime = System.nanoTime();
 
         try {
-
             response.type(getContentType(request, response));
-
             Resource.Readable resource = getReadable(request);
-
             if (resource instanceof Resource.InputStreaming) {
                 Resource.InputStreaming inputStreaming = (Resource.InputStreaming) resource;
 
@@ -41,11 +39,9 @@ public class ServiceRoute implements Route {
                      OutputStream outputStream = response.raw().getOutputStream()) {
                     IOUtils.copy(inputStream, outputStream);
                 }
-
+                
                 return "";
             }
-
-
             return readResource(getReadable(request));
         } finally {
             System.out.println(request.pathInfo() + ": " + (System.nanoTime() - startTime) / 1000000);

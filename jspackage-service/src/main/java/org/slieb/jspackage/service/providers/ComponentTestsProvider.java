@@ -15,8 +15,7 @@ public class ComponentTestsProvider implements ResourceProvider<Resource.Readabl
     private final ResourceProvider<? extends Resource.Readable> resources;
 
     private final DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator;
-
-
+    
     public ComponentTestsProvider(ResourceProvider<? extends Resource.Readable> resources) {
         this.resources = resources;
         this.calculator = GoogResources.getCalculator(this.resources);

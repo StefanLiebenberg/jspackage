@@ -33,9 +33,9 @@
             <version>v20150315</version>
         </dependency>
         <dependency>
-            <groupId>org.slieb</groupId>
-            <artifactId>kute</artifactId>
-            <version>${dep.kute}</version>
+            <groupId>com.google.template</groupId>
+            <artifactId>soy</artifactId>
+            <version>2015-02-11_19-26-11</version>
         </dependency>
         <dependency>
             <groupId>org.slieb.jspackage</groupId>
