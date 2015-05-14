@@ -46,8 +46,8 @@ public class ServiceProviderTest {
         Document document = Jsoup.parse(Resources.readResource(index));
 
         Elements items = document.getElementsByTag("li");
-        assertLinkToResource(resourceA, items.get(0));
-        assertLinkToResource(resourceB, items.get(1));
+        assertLinkToResource(resourceA, items.get(1));
+        assertLinkToResource(resourceB, items.get(3));
     }
 
     @Test

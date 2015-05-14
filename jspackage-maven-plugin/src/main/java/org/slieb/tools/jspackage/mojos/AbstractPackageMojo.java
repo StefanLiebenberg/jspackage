@@ -22,7 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
-import static org.slieb.closure.javascript.GoogResources.getResourceProviderForSourceDirectories;
+import static org.slieb.closure.dependencies.GoogResources.getResourceProviderForSourceDirectories;
 
 
 public abstract class AbstractPackageMojo extends AbstractMojo {

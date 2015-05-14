@@ -4,7 +4,7 @@ package org.slieb.jspackage.jsunit;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mozilla.javascript.Undefined;
-import org.slieb.jspackage.runtimes.rhino.RhinoRuntime;
+import org.slieb.runtimes.rhino.RhinoRuntime;
 
 public class BaseTest {
 

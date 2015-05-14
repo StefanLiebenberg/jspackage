@@ -4,8 +4,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import junit.framework.Assert;
 import org.junit.Test;
-import org.slieb.closure.javascript.GoogDependencyParser;
-import org.slieb.closure.javascript.GoogResources;
+import org.slieb.closure.dependencies.GoogDependencyParser;
+import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.Resources;
@@ -36,7 +36,7 @@ public class DepsFileBuilderTest {
         resourceD = create("d", ImmutableSet.of());
         ResourceProvider<Resource.Readable> provider = Resources.providerOf(resourceA, resourceB, resourceC, resourceD, baseResource);
 
-        GoogDependencyParser<Resource.Readable> parser = GoogResources.getDependencyParser();
+        GoogDependencyParser parser = GoogResources.getDependencyParser();
         String content = new DepsFileBuilder(provider, parser).getDependencyContent();
 
         Assert.assertTrue(content.contains("goog.addDependency('a.js', ['a'], ['b', 'c', 'd']);"));

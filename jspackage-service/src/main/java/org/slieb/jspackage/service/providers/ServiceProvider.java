@@ -1,9 +1,7 @@
 package org.slieb.jspackage.service.providers;
 
-import com.google.common.collect.ImmutableList;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.Resources;
 
 import java.util.stream.Stream;
 
@@ -24,7 +22,7 @@ import java.util.stream.Stream;
  * - .html files for _test.js files ( requires tools:soy )
  * - all_tests.html file ( requires sources, tests )
  */
-public class ServiceProvider implements ResourceProvider<Resource.Readable> {
+public class ServiceProvider extends AbstractStreamsProvider {
 
     private final ResourceProvider<? extends Resource.Readable> sources;
 
@@ -41,27 +39,13 @@ public class ServiceProvider implements ResourceProvider<Resource.Readable> {
         this.indexer = new IndexProvider(this.testsProvider);
     }
 
-    private Stream<Stream<Resource.Readable>> streams() {
-        return ImmutableList.of(
-                testsProvider.stream(),
-                indexer.stream()
-        ).stream();
-    }
-
     @Override
-    public Resource.Readable getResourceByName(String path) {
-        return Resources.findFirstResource(streams().map(s -> {
-            Resource.Readable readable = Resources.findResource(s, path);
-            if (readable != null) {
-                return readable;
-            }
-            return null;
-        }));
+    protected Stream<Stream<? extends Resource.Readable>> streams() {
+        return Stream.of(testsProvider.stream(), indexer.stream());
     }
 
-
-    @Override
-    public Stream<Resource.Readable> stream() {
-        return streams().flatMap(s -> s);
+    public void clear() {
+        this.indexer.clear();
     }
+
 }

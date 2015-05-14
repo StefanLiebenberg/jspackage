@@ -1,11 +1,10 @@
 package org.slieb.closure.javascript.providers;
 
 
-import org.slieb.closure.javascript.GoogDependencyNode;
-import org.slieb.closure.javascript.GoogDependencyParser;
-import org.slieb.closure.javascript.GoogResources;
+import org.slieb.closure.dependencies.GoogDependencyCalculator;
+import org.slieb.closure.dependencies.GoogDependencyParser;
+import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.closure.javascript.internal.DepsFileBuilder;
-import org.slieb.dependencies.DependencyCalculator;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.implementations.StringSupplierResource;
@@ -16,27 +15,21 @@ public class ClosureProvider implements ResourceProvider<Resource.Readable> {
 
     public static final String DEPS = "/deps.js", DEFINES = "/defines.js";
 
-    private final DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator;
+    private final GoogDependencyCalculator calculator;
 
     private final ResourceProvider<? extends Resource.Readable> provider;
 
-    private final GoogDependencyParser<Resource.Readable> parser;
-//
-//    private final ResourceProvider<? extends Resource.Readable> templatesProvider;
-//
-//    private final ResourceProvider<? extends Resource.InputStreaming> assetsProvider;
+    private final GoogDependencyParser parser;
 
 
     /**
      * @param provider
      * @param parser
      */
-    public ClosureProvider(ResourceProvider<? extends Resource.Readable> provider, GoogDependencyParser<Resource.Readable> parser) {
+    public ClosureProvider(ResourceProvider<? extends Resource.Readable> provider, GoogDependencyParser parser) {
         this.provider = provider;
         this.parser = GoogResources.getDependencyParser();
-        this.calculator = GoogResources.getCalculator(provider);
-//        this.filteredJsFiles = Resources.filterResources(provider, ResourcePredicates.extensionFilter(".js"));
-//        this.filteredSoyFiles = Resources.filterResources(provider, ResourcePredicates.extensionFilter(".soy"));
+        this.calculator = GoogResources.getCalculatorCast(provider);
     }
 
     private Resource.Readable getDependencyResource() {

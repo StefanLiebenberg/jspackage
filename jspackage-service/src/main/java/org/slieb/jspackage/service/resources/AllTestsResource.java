@@ -2,7 +2,8 @@ package org.slieb.jspackage.service.resources;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.io.IOUtils;
-import org.slieb.closure.javascript.GoogDependencyNode;
+import org.slieb.closure.dependencies.GoogDependencyNode;
+import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
@@ -13,7 +14,6 @@ import java.io.StringReader;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
-import static org.slieb.closure.javascript.GoogResources.getCalculator;
 import static slieb.kute.resources.ResourcePredicates.all;
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.filterResources;
@@ -56,7 +56,7 @@ public class AllTestsResource implements Resource.Readable {
 
     private String getScriptsContent() {
         StringBuilder builder = new StringBuilder();
-        getCalculator(filterJs).getDependencyResolver()
+        GoogResources.getCalculatorCast(filterJs).getDependencyResolver()
                 .resolveNamespaces(ImmutableList.of("goog.userAgent.product", "goog.testing.MultiTestRunner"))
                 .resolve().stream().map(GoogDependencyNode::getResource).map(this::getScriptPath).forEach(builder::append);
         return builder.toString();

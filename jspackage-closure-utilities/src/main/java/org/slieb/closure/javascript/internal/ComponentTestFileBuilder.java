@@ -1,17 +1,16 @@
 package org.slieb.closure.javascript.internal;
 
 
-import org.slieb.closure.javascript.GoogDependencyNode;
-import org.slieb.dependencies.DependencyCalculator;
+import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import slieb.kute.api.Resource;
 
 public class ComponentTestFileBuilder {
 
     private final Resource.Readable testResource;
 
-    private final DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator;
+    private final GoogDependencyCalculator calculator;
 
-    public ComponentTestFileBuilder(Resource.Readable testResource, DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator) {
+    public ComponentTestFileBuilder(Resource.Readable testResource, GoogDependencyCalculator calculator) {
         this.testResource = testResource;
         this.calculator = calculator;
     }

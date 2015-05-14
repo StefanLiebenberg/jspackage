@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
-import org.slieb.closure.javascript.GoogResources;
+import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.jspackage.service.resources.ComponentTestResource;
 import slieb.kute.api.Resource;
 import slieb.kute.resources.Resources;

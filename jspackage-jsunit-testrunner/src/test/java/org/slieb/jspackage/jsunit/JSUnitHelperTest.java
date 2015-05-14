@@ -5,11 +5,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slieb.jspackage.runtimes.JavascriptRuntime;
+import org.slieb.jsunit.JsUnitHelper;
+import org.slieb.runtimes.JavascriptRuntime;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.slieb.jspackage.jsunit.JSUnitHelper.*;
+import static org.slieb.jsunit.JsUnitHelper.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JSUnitHelperTest {
@@ -17,7 +18,7 @@ public class JSUnitHelperTest {
     @Mock
     private JavascriptRuntime mockRuntime;
 
-    private JSUnitHelper jsUnitHelper;
+    private JsUnitHelper jsUnitHelper;
 
 
     @Before

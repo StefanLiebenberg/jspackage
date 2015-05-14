@@ -2,8 +2,8 @@ package org.slieb.closure.javascript.internal;
 
 
 import com.google.common.base.Joiner;
-import org.slieb.closure.javascript.GoogDependencyNode;
-import org.slieb.closure.javascript.GoogDependencyParser;
+import org.slieb.closure.dependencies.GoogDependencyNode;
+import org.slieb.closure.dependencies.GoogDependencyParser;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
@@ -18,16 +18,16 @@ public class DepsFileBuilder {
 
     private final ResourceProvider<? extends Resource.Readable> resourceProvider;
 
-    private final GoogDependencyParser<Resource.Readable> parser;
+    private final GoogDependencyParser parser;
 
-    public DepsFileBuilder(ResourceProvider<? extends Resource.Readable> resourceProvider, GoogDependencyParser<Resource.Readable> parser) {
+    public DepsFileBuilder(ResourceProvider<? extends Resource.Readable> resourceProvider, GoogDependencyParser parser) {
         this.resourceProvider = resourceProvider;
         this.parser = parser;
     }
 
     public String getDependencyContent() {
-        
-        Set<GoogDependencyNode<Resource.Readable>> nodes =
+
+        Set<GoogDependencyNode> nodes =
                 resourceProvider.stream()
                         .parallel()
                         .filter(r -> r.getPath().endsWith(".js"))
@@ -47,7 +47,7 @@ public class DepsFileBuilder {
         return stringBuffer.toString();
     }
 
-    private String getDependencyLine(GoogDependencyNode<Resource.Readable> dependencyNode, Path basePath) {
+    private String getDependencyLine(GoogDependencyNode dependencyNode, Path basePath) {
         return String.format("goog.addDependency(%s, %s, %s);\n",
                 this.wrapString(getNodePath(dependencyNode.getResource(), basePath)),
                 getStringArray(dependencyNode.getProvides()),

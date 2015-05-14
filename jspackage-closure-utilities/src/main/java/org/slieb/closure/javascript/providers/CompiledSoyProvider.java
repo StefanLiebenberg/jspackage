@@ -1,26 +1,24 @@
 package org.slieb.closure.javascript.providers;
 
+import com.google.common.io.CharSource;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
+import com.google.template.soy.msgs.SoyMsgBundle;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.Resources;
-import slieb.kute.resources.implementations.StringSupplierResource;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 
 /**
  * An expensive provider.
  */
-public class CompiledSoyProvider implements ResourceProvider<StringSupplierResource> {
+public class CompiledSoyProvider implements ResourceProvider<LiveSoyFileResource> {
 
     private final Predicate<Resource> SOY_FILTER = extensionFilter(".soy");
 
@@ -31,12 +29,10 @@ public class CompiledSoyProvider implements ResourceProvider<StringSupplierResou
 
     private final SoyJsSrcOptions jsSrcOptions;
 
-    private final ConcurrentHashMap<String, StringSupplierResource> compiledMap;
 
     public CompiledSoyProvider(ResourceProvider<? extends Resource.Readable> provider, SoyJsSrcOptions options) {
         this.provider = provider;
         this.jsSrcOptions = options;
-        this.compiledMap = new ConcurrentHashMap<>();
     }
 
     public CompiledSoyProvider(ResourceProvider<? extends Resource.Readable> provider) {
@@ -48,64 +44,87 @@ public class CompiledSoyProvider implements ResourceProvider<StringSupplierResou
         this.jsSrcOptions.setShouldProvideRequireJsFunctions(true);
     }
 
-    private Stream<StringSupplierResource> compiledStream() {
-        if (provider.stream().filter(SOY_FILTER).limit(1).count() != 0) {
-            // build a list of pairs. maintaining order of list.
-            final List<Pair> pairs = provider.stream().filter(SOY_FILTER).map(Pair::fromResource).collect(toList());
-            final SoyFileSet.Builder builder = SoyFileSet.builder();
-            // add pairs in order to builder
-            pairs.forEach(p -> builder.add(p.content, p.path));
-            // get list of results, in order of pairs.
-            List<String> result = builder.build().compileToJsSrc(jsSrcOptions, null);
-            // rebuild resources and store to compiledMap.
-            return IntStream.range(0, pairs.size()).boxed()
-                    .map(i -> Resources.stringResource(pairs.get(i).path + ".js", result.get(i)));
-        } else {
-            return Stream.of();
-        }
-    }
-
-    private void clear() {
-        compiledMap.clear();
-    }
-
-    private void compileIfNeeded() {
-        if (compiledMap.isEmpty()) {
-            compiledStream().forEach(r -> compiledMap.put(r.getPath(), r));
-        }
-    }
 
     @Override
-    public Stream<StringSupplierResource> stream() {
-        compileIfNeeded();
-        return compiledMap.values().stream();
+    public Stream<LiveSoyFileResource> stream() {
+        return soyStream().map(this::liveSoyFileResource);
     }
 
+    private Stream<? extends Resource.Readable> soyStream() {
+        return provider.stream().filter(SOY_FILTER);
+    }
+
+    private LiveSoyFileResource liveSoyFileResource(Resource.Readable resource) {
+        String path = getJSNameFromSoyName(resource.getPath());
+        return new LiveSoyFileResource(path, resource, jsSrcOptions, null);
+    }
+
+    private String getSoyNameFromJavascript(String jsName) {
+        return jsName.replace(".soy.js", ".soy");
+    }
+
+    private String getJSNameFromSoyName(String soyName) {
+        return soyName + ".js";
+    }
+
+
     @Override
-    public StringSupplierResource getResourceByName(String path) {
-        compileIfNeeded();
-        if (compiledMap.containsKey(path)) {
-            return compiledMap.get(path);
+    public LiveSoyFileResource getResourceByName(String path) {
+        String soyName = getSoyNameFromJavascript(path);
+        Resource.Readable soyResource = provider.getResourceByName(soyName);
+        if (soyResource != null && SOY_FILTER.test(soyResource)) {
+            return liveSoyFileResource(soyResource);
         }
         return null;
     }
 }
 
 
-class Pair {
-    public final String path, content;
+class LiveSoyFileResource implements Resource.Readable {
 
-    public Pair(String path, String content) {
-        this.path = path;
-        this.content = content;
+    private final Resource.Readable sourceResource;
+
+    private final SoyJsSrcOptions options;
+
+    private final SoyMsgBundle bundle;
+
+    private final SoyFileSet sfs;
+
+    public LiveSoyFileResource(String path, Readable sourceResource, SoyJsSrcOptions options, SoyMsgBundle bundle) {
+        this.sourceResource = sourceResource;
+        this.options = options;
+        this.bundle = bundle;
+        this.sfs = getSingleFileSet(sourceResource);
     }
 
-    public static Pair fromResource(Resource.Readable readable) {
-        try {
-            return new Pair(readable.getPath(), Resources.readResource(readable));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public String getPath() {
+        return sourceResource.getPath();
+    }
 
+    @Override
+    public StringReader getReader() throws IOException {
+        return new StringReader(sfs.compileToJsSrc(options, bundle).get(0));
+    }
+
+    private static SoyFileSet getSingleFileSet(Resource.Readable readable) {
+        SoyFileSet.Builder sfsBuilder = SoyFileSet.builder();
+        sfsBuilder.add(new ResourceCharSource(readable), readable.getPath());
+        return sfsBuilder.build();
     }
 }
+
+class ResourceCharSource extends CharSource {
+
+    private final Resource.Readable readable;
+
+    public ResourceCharSource(Resource.Readable readable) {
+        this.readable = readable;
+    }
+
+    public Reader openStream() throws IOException {
+        return readable.getReader();
+    }
+}
+
+

@@ -5,7 +5,8 @@ import com.google.javascript.jscomp.SourceFile;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.slieb.dependencies.DependencyCalculator;
+import org.slieb.closure.dependencies.GoogDependencyCalculator;
+import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.Resources;
@@ -15,7 +16,6 @@ import java.io.Reader;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static org.slieb.closure.javascript.GoogResources.getCalculator;
 import static slieb.kute.resources.Resources.providerOf;
 
 public class GoogResourcesTest {
@@ -34,8 +34,7 @@ public class GoogResourcesTest {
 
     @Test
     public void testGetCalculator() throws Exception {
-        DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator =
-                getCalculator(readables);
+        GoogDependencyCalculator calculator = GoogResources.getCalculator(readables);
         assertNotNull(calculator);
         Assert.assertEquals(ImmutableList.of(readableA, readableC),
                 calculator.getResourcesFor(readableC));
@@ -45,6 +44,7 @@ public class GoogResourcesTest {
 
 
     @Test(expected = RuntimeException.class)
+
     public void testCalculatorProducesRuntimeError() throws Exception {
 
         Resource.Readable readable = new Resource.Readable() {
@@ -59,7 +59,7 @@ public class GoogResourcesTest {
             }
         };
 
-        getCalculator(providerOf(readable)).getDependencyNodes();
+        GoogResources.getCalculator(providerOf(readable)).getDependencyNodes();
     }
 
     @Test

@@ -4,10 +4,10 @@ import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
-import org.slieb.closure.javascript.GoogDependencyNode;
-import org.slieb.closure.javascript.GoogResources;
+import org.slieb.closure.dependencies.GoogDependencyNode;
+import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.dependencies.DependencyCalculator;
-import org.slieb.jspackage.runtimes.rhino.EnvJSRuntime;
+import org.slieb.runtimes.rhino.EnvJSRuntime;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
@@ -15,8 +15,8 @@ import slieb.kute.api.ResourceProvider;
 import java.io.Reader;
 import java.util.concurrent.TimeoutException;
 
-import static org.slieb.jspackage.jsunit.JSUnitHelper.*;
-import static org.slieb.jspackage.runtimes.JavascriptRuntimeUtils.evaluateReader;
+import static org.slieb.jsunit.JsUnitHelper.*;
+import static org.slieb.runtimes.Runtimes.evaluateReader;
 import static slieb.kute.resources.ResourcePredicates.*;
 import static slieb.kute.resources.Resources.filterResources;
 
@@ -27,7 +27,7 @@ public class JSUnitSingleTestRunner extends Runner {
 
     public final Resource.Readable testResource;
 
-    public final DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator;
+    public final DependencyCalculator<Resource.Readable, GoogDependencyNode> calculator;
 
     public final Integer timeoutSeconds;
 
@@ -39,7 +39,7 @@ public class JSUnitSingleTestRunner extends Runner {
         this.resourceProvider = resourceProvider;
         this.testResource = testResource;
         this.timeoutSeconds = timeoutSeconds;
-        this.calculator = GoogResources.getCalculator(resourceProvider);
+        this.calculator = GoogResources.getCalculatorCast(resourceProvider);
     }
 
     public JSUnitSingleTestRunner(String testPath, Integer timeout) {
@@ -53,7 +53,7 @@ public class JSUnitSingleTestRunner extends Runner {
                         ).negate()
                 ));
         this.testResource = this.resourceProvider.getResourceByName(testPath);
-        this.calculator = GoogResources.getCalculator(resourceProvider);
+        this.calculator = GoogResources.getCalculatorCast(resourceProvider);
         this.timeoutSeconds = timeout;
     }
 
@@ -100,3 +100,4 @@ public class JSUnitSingleTestRunner extends Runner {
         notifier.fireTestFinished(description);
     }
 }
+

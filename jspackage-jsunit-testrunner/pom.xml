@@ -34,14 +34,19 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.slieb</groupId>
+            <artifactId>jsunit-testing-suite</artifactId>
+            <version>${dep.jsunit-testing-suite}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slieb.jspackage</groupId>
             <artifactId>jspackage-closure-utilities</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slieb.jspackage</groupId>
-            <artifactId>jspackages-runtimes</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.slieb</groupId>
+            <artifactId>js-runtimes</artifactId>
+            <version>${dep.js-runtimes}</version>
         </dependency>
         <dependency>
             <groupId>org.slieb.jspackage</groupId>

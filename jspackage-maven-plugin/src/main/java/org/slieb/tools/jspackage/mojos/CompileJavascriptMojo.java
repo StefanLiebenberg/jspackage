@@ -14,7 +14,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.slieb.closure.javascript.GoogDependencyNode;
+import org.slieb.closure.dependencies.GoogDependencyNode;
+import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.api.Resource;
 
 import java.io.File;
@@ -22,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.slieb.closure.javascript.GoogResources.getCalculator;
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.*;
 
@@ -44,20 +44,20 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
     }
 
     public List<SourceFile> getInputSourceFiles() {
-        return
-                getCalculator(filterResources(getSourceResources(), extensionFilter(".js")))
-                        .getDependencyResolver()
-                        .resolveNamespaces(inputs)
-                        .resolve()
-                        .stream()
-                        .map(GoogDependencyNode::getResource)
-                        .map(resource -> {
-                            try {
-                                return SourceFile.fromReader(resource.getPath(), resource.getReader());
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }).collect(Collectors.toList());
+        return GoogResources.getCalculatorCast(
+                filterResources(getSourceResources(), extensionFilter(".js")))
+                .getDependencyResolver()
+                .resolveNamespaces(inputs)
+                .resolve()
+                .stream()
+                .map(GoogDependencyNode::getResource)
+                .map(resource -> {
+                    try {
+                        return SourceFile.fromReader(resource.getPath(), resource.getReader());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).collect(Collectors.toList());
     }
 
 

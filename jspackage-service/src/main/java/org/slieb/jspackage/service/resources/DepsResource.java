@@ -1,18 +1,16 @@
 package org.slieb.jspackage.service.resources;
 
-import org.slieb.closure.javascript.GoogDependencyParser;
+import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.javascript.internal.DepsFileBuilder;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
-import static org.slieb.closure.javascript.GoogResources.getDependencyParser;
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.filterResources;
 
 
 public class DepsResource extends AbstractHtmlResource {
 
-    private static final GoogDependencyParser<Resource.Readable> parser = getDependencyParser();
 
     private final ResourceProvider<? extends Resource.Readable> jsReadables;
 
@@ -25,7 +23,7 @@ public class DepsResource extends AbstractHtmlResource {
 
     @Override
     public String getHtmlContent() {
-        return new DepsFileBuilder(jsReadables, parser).getDependencyContent();
+        return new DepsFileBuilder(jsReadables, GoogDependencyCalculator.PARSER).getDependencyContent();
     }
 
     @Override

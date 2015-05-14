@@ -6,12 +6,11 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.slieb.closure.javascript.GoogDependencyNode;
-import org.slieb.closure.javascript.GoogResources;
-import org.slieb.dependencies.DependencyCalculator;
-import org.slieb.jspackage.jsunit.JSUnitHelper;
-import org.slieb.jspackage.runtimes.JavascriptRuntimeUtils;
-import org.slieb.jspackage.runtimes.rhino.EnvJSRuntime;
+import org.slieb.closure.dependencies.GoogDependencyCalculator;
+import org.slieb.closure.dependencies.GoogResources;
+import org.slieb.jsunit.JsUnitHelper;
+import org.slieb.runtimes.Runtimes;
+import org.slieb.runtimes.rhino.EnvJSRuntime;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.providers.GroupResourceProvider;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import static org.slieb.closure.javascript.GoogResources.getResourceProviderForSourceDirectories;
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.filterResources;
 
@@ -44,7 +42,8 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
             return;
         }
         getLog().info("adding test resources");
-        ResourceProvider<? extends Resource.Readable> testResources = getResourceProviderForSourceDirectories(testDirectories);
+        ResourceProvider<? extends Resource.Readable> testResources =
+                GoogResources.getResourceProviderForSourceDirectories(testDirectories);
 
         getLog().info("grouping resources");
         ResourceProvider<? extends Resource.Readable> resources =
@@ -54,7 +53,7 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
         ResourceProvider<? extends Resource.Readable> testProvider = filterResources(testResources, extensionFilter("_test.js"));
 
         getLog().info("creating calculator of grouped resources");
-        DependencyCalculator<Resource.Readable, GoogDependencyNode<Resource.Readable>> calculator = GoogResources.getCalculator(resources);
+        GoogDependencyCalculator calculator = GoogResources.getCalculatorCast(resources);
 
         int total = 0, failure = 0;
 
@@ -66,7 +65,7 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
                 runtime.initialize();
                 for (Resource.Readable loadResource : calculator.getResourcesFor(testResource)) {
                     try (Reader reader = loadResource.getReader()) {
-                        JavascriptRuntimeUtils.evaluateReader(runtime, reader, loadResource.getPath());
+                        Runtimes.evaluateReader(runtime, reader, loadResource.getPath());
                     } catch (IOException io) {
                         throw new RuntimeException(io);
                     }
@@ -74,16 +73,16 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
 
                 runtime.doLoad();
 
-                if (!JSUnitHelper.isInitialized(runtime)) {
-                    JSUnitHelper.initialize(runtime);
+                if (!JsUnitHelper.isInitialized(runtime)) {
+                    JsUnitHelper.initialize(runtime);
                 }
 
-                while (!JSUnitHelper.isFinished(runtime)) {
+                while (!JsUnitHelper.isFinished(runtime)) {
                     runtime.doWait(100);
                 }
 
-                if (!JSUnitHelper.isSuccess(runtime)) {
-                    getLog().error(JSUnitHelper.getReport(runtime));
+                if (!JsUnitHelper.isSuccess(runtime)) {
+                    getLog().error(JsUnitHelper.getReport(runtime));
                     throw new RuntimeException();
                 }
 
