@@ -16,6 +16,8 @@ import java.io.Reader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static slieb.kute.resources.Resources.inputStreamResource;
+import static slieb.kute.resources.Resources.stringResource;
 
 
 public class ComponentTestResourceTest {
@@ -26,9 +28,9 @@ public class ComponentTestResourceTest {
 
     @Before
     public void setup() {
-        resourceBase = Resources.inputStreamResource("/base.js", () -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"));
-        resourceA = Resources.stringResource("/a.js", "goog.provide('a'); goog.require('b');");
-        resourceB = Resources.stringResource("/b.js", "goog.provide('b');");
+        resourceBase = inputStreamResource("/base.js", () -> getClass().getResourceAsStream("/closure-library/closure/goog/base.js"));
+        resourceA = stringResource("/a.js", "goog.provide('a'); goog.require('b');");
+        resourceB = stringResource("/b.js", "goog.provide('b');");
         resource = new ComponentTestResource(resourceA, GoogResources.getCalculator(Resources.providerOf(resourceBase, resourceA, resourceB)), "/test.html");
     }
 

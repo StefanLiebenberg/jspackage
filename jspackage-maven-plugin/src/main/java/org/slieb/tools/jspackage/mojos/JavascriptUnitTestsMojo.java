@@ -8,16 +8,13 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogResources;
-import org.slieb.jsunit.JsUnitHelper;
-import org.slieb.runtimes.Runtimes;
+import org.slieb.jsunit.TestExecutor;
 import org.slieb.runtimes.rhino.EnvJSRuntime;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.providers.GroupResourceProvider;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.List;
 
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
@@ -61,31 +58,14 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
 
             getLog().info("Running test " + testResource.getPath());
             total++;
+
             try (EnvJSRuntime runtime = new EnvJSRuntime()) {
-                runtime.initialize();
-                for (Resource.Readable loadResource : calculator.getResourcesFor(testResource)) {
-                    try (Reader reader = loadResource.getReader()) {
-                        Runtimes.evaluateReader(runtime, reader, loadResource.getPath());
-                    } catch (IOException io) {
-                        throw new RuntimeException(io);
-                    }
+                TestExecutor testExecutor = new TestExecutor(calculator, testResource, 30);
+                testExecutor.execute();
+                if (!testExecutor.isSuccess()) {
+                    getLog().error(testExecutor.getReport());
+                    failure++;
                 }
-
-                runtime.doLoad();
-
-                if (!JsUnitHelper.isInitialized(runtime)) {
-                    JsUnitHelper.initialize(runtime);
-                }
-
-                while (!JsUnitHelper.isFinished(runtime)) {
-                    runtime.doWait(100);
-                }
-
-                if (!JsUnitHelper.isSuccess(runtime)) {
-                    getLog().error(JsUnitHelper.getReport(runtime));
-                    throw new RuntimeException();
-                }
-
             } catch (Exception exception) {
                 exception.printStackTrace();
                 failure++;
