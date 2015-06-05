@@ -11,10 +11,10 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.slieb.tools.jspackage.internal.DefaultsModule;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.providers.GroupResourceProvider;
-import slieb.kute.resources.providers.URLClassLoaderResourceProvider;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -27,11 +27,16 @@ import static org.slieb.closure.dependencies.GoogResources.getResourceProviderFo
 
 public abstract class AbstractPackageMojo extends AbstractMojo {
 
+    public final static String LOG_PREFIX = "[jspackage]";
+
     @Component
     protected MavenProject project;
 
     @Parameter(name = "sources")
     public List<File> sources;
+
+    @Parameter(name = "testSources")
+    public List<File> testSources;
 
     @Parameter(name = "useClasspath", defaultValue = "false")
     public Boolean useClasspath;
@@ -39,30 +44,58 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
     @Parameter(name = "guiceModule")
     public String guiceModule;
 
-    protected ResourceProvider<? extends Resource.Readable> getSourceResources() {
+    public ResourceProvider<? extends Resource.InputStreaming> getClaspathProvider(Boolean inludeTesting) {
+        return Kute.getProvider(getCustomClassLoader(Boolean.TRUE, inludeTesting));
+    }
 
-        ImmutableList.Builder<ResourceProvider<? extends Resource.Readable>> builder = ImmutableList.builder();
-        getLog().debug("setting resource provider for project sources");
+    public ResourceProvider<? extends Resource.InputStreaming> getTestResources() {
+        return getResourceProviderForSourceDirectories(testSources != null ? testSources : ImmutableList.of());
+    }
 
-        if (useClasspath) {
-            builder.add(new URLClassLoaderResourceProvider((URLClassLoader) getClass().getClassLoader()));
-            getLog().debug("adding classpath dependencies to resource provider");
+    public ResourceProvider<? extends Resource.InputStreaming> getSourceProvider(Boolean includeTesting) {
+        ImmutableList.Builder<ResourceProvider<? extends Resource.InputStreaming>> builder = ImmutableList.builder();
+
+        if (includeTesting) {
+            if (testSources != null && !testSources.isEmpty()) {
+                debug("adding %s source directories to resource provider.", testSources.size());
+                builder.add(getTestResources());
+            } else {
+                warn(String.format("%s no test sources are specified", LOG_PREFIX));
+            }
         }
 
         if (sources != null && !sources.isEmpty()) {
-            getLog().debug("adding " + sources.size() + " source directories to resource provider.");
+            debug("adding %s source directories to resource provider.", sources.size());
             builder.add(getResourceProviderForSourceDirectories(sources));
         } else {
-            getLog().warn("JSPackage source directories have not been specified or is empty.");
+            warn("source directories have not been specified or is empty.", LOG_PREFIX);
         }
-
         return new GroupResourceProvider<>(builder.build());
     }
 
-    protected ResourceProvider<? extends Resource.Readable> getSourceResource(List<File> additionalDirectories) {
-        ResourceProvider<? extends Resource.Readable> sourceResources = getSourceResources();
-        ResourceProvider<? extends Resource.Readable> testResources = getResourceProviderForSourceDirectories(additionalDirectories);
-        return new GroupResourceProvider<>(ImmutableList.of(sourceResources, testResources));
+
+    protected ResourceProvider<? extends Resource.InputStreaming> getSourceProvider(Boolean includeTesting, List<File> additionalDirectories) {
+        ImmutableList.Builder<ResourceProvider<? extends Resource.InputStreaming>> builder = ImmutableList.builder();
+        builder.add(getSourceProvider(includeTesting));
+        if (additionalDirectories != null && !additionalDirectories.isEmpty()) {
+            builder.add(getResourceProviderForSourceDirectories(additionalDirectories));
+        }
+        if (useClasspath) {
+            builder.add(getClaspathProvider(includeTesting));
+        }
+        return new GroupResourceProvider<>(builder.build());
+    }
+
+    protected ResourceProvider<? extends Resource.InputStreaming> getPackageProvider(Boolean includeTesting) {
+        ImmutableList.Builder<ResourceProvider<? extends Resource.InputStreaming>> builder = ImmutableList.builder();
+        builder.add(getSourceProvider(includeTesting));
+
+        // add the classpath loader last, as this is a fifo system and the source directories get priority.
+        if (useClasspath) {
+            debug("adding classpath dependencies to resource provider");
+            builder.add(getClaspathProvider(includeTesting));
+        }
+        return new GroupResourceProvider<>(builder.build());
     }
 
 
@@ -75,8 +108,8 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
         modules.add(getDefaultsModule());
         if (guiceModule != null) {
             try {
+                debug("loading class %s", guiceModule);
                 Class<?> guiceClass = getCustomClassLoader(true, true).loadClass(guiceModule);
-                System.out.println(guiceClass);
                 Object object = guiceClass.newInstance();
                 if (object instanceof Module) {
                     modules.add((Module) object);
@@ -117,11 +150,31 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
         return loader;
     }
 
-    private URL safeToUrl(String path) {
+    private URL safeFileToUrl(File file) {
         try {
-            return new File(path).toURI().toURL();
+            return file.toURI().toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private URL safeToUrl(String path) {
+        return safeFileToUrl(new File(path));
+    }
+
+    protected void info(String info, Object... vars) {
+        getLog().info(LOG_PREFIX + " " + String.format(info, vars));
+    }
+
+    protected void debug(String info, Object... vars) {
+        getLog().debug(LOG_PREFIX + " " + String.format(info, vars));
+    }
+
+    protected void warn(String info, Object... vars) {
+        getLog().warn(LOG_PREFIX + " " + String.format(info, vars));
+    }
+
+    protected void error(String info, Object... vars) {
+        getLog().error(LOG_PREFIX + " " + String.format(info, vars));
     }
 }

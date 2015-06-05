@@ -19,12 +19,12 @@
                 <version>@project.version@</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <sourceDirectories>
-                        <file>${basedir}/src/main/javascript</file>
-                    </sourceDirectories>
-                    <testDirectories>
+                    <sources>
+                        <source>${basedir}/src/main/javascript</source>
+                    </sources>
+                    <testSources>
                         <file>${basedir}/src/test/javascript</file>
-                    </testDirectories>
+                    </testSources>
                 </configuration>
             </plugin>
         </plugins>

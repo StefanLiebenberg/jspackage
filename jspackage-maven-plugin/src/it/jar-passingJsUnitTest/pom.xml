@@ -37,9 +37,9 @@
                                 <source>${basedir}/src/main/javascript</source>
                                 <source>${basedir}/src/test/javascript</source>
                             </sources>
-                            <testDirectories>
-                                <testDirectory>${basedir}/src/test/javascript</testDirectory>
-                            </testDirectories>
+                            <testSources>
+                                <source>${basedir}/src/test/javascript</source>
+                            </testSources>
                         </configuration>
                     </execution>
                 </executions>

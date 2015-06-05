@@ -1,9 +1,9 @@
 import org.junit.runner.RunWith;
-import org.slieb.jspackage.jsunit.JSUnitTestRunner;
-
+import org.slieb.jsunit.JSUnitTestRunner;
+import org.slieb.jsunit.api.JsUnitConfig;
 
 @RunWith(JSUnitTestRunner.class)
-@JSUnitTestRunner.Configuration()
+@JsUnitConfig()
 public class RunJsUnitTests {
 
 }

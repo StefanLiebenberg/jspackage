@@ -74,7 +74,7 @@
                     </setupIncludes>
                     <showErrors>true</showErrors>
                     <showVersion>true</showVersion>
-                    <debug>true</debug>
+                    <!--<debug>true</debug>-->
                     <postBuildHookScript>verify.bsh</postBuildHookScript>
 
                 </configuration>
@@ -90,8 +90,6 @@
             </plugin>
         </plugins>
     </build>
-
-
     <dependencies>
 
 
@@ -192,6 +190,11 @@
             <groupId>org.slieb</groupId>
             <artifactId>kute</artifactId>
             <version>${dep.kute}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slieb</groupId>
+            <artifactId>kute-service</artifactId>
+            <version>${dep.kute-service}</version>
         </dependency>
 
         <dependency>

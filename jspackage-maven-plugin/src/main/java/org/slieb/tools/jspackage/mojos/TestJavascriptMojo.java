@@ -21,9 +21,9 @@ public class TestJavascriptMojo extends AbstractPackageMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-
+        
         JSPackageService service = JSPackageService.create(new Builder()
-                .withResourceProvider(getSourceResource(componentTestSources))
+                .withResourceProvider(getSourceProvider(true, componentTestSources))
                 .build());
 
         try {

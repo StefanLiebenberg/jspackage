@@ -21,22 +21,21 @@
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
                 <configuration>
-                    <testDirectories>
-                        <file>${basedir}/src/test/javascript</file>
-                    </testDirectories>
+                    <sources>
+                        <source>${basedir}/target/unpacked-dependencies</source>
+                    </sources>
+                    <testSources>
+                        <file>${basedir}/src/test/javascript/unit</file>
+                    </testSources>
                 </configuration>
                 <executions>
                     <execution>
                         <id>unpack-dependencies</id>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-javascripts</id>
                         <phase>test</phase>
                         <goals>
-                            <goal>test</goal>
+                            <goal>initialize</goal>
+                            <goal>unpack</goal>
+                            <goal>unit-tests</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -45,9 +44,15 @@
     </build>
 
     <dependencies>
+
         <dependency>
             <groupId>@project.groupId@.integration-examples</groupId>
             <artifactId>it-js-library-base</artifactId>
+            <version>@project.version@</version>
+        </dependency>
+        <dependency>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>jspackage-closure-library</artifactId>
             <version>@project.version@</version>
         </dependency>
         <dependency>

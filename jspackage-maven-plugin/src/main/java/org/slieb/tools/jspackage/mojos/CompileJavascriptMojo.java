@@ -43,9 +43,10 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         return ImmutableList.of();
     }
 
+
     public List<SourceFile> getInputSourceFiles() {
         return GoogResources.getCalculatorCast(
-                filterResources(getSourceResources(), extensionFilter(".js")))
+                filterResources(getSourceProvider(false), extensionFilter(".js")))
                 .getDependencyResolver()
                 .resolveNamespaces(inputs)
                 .resolve()
@@ -69,9 +70,7 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
     Provider<CompilerOptions> compilerOptionsProvider;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-
         getInjector().injectMembers(this);
-
         Compiler compiler = compilerProvider.get();
         List<SourceFile> externs = getExterns();
         List<SourceFile> inputs = getInputSourceFiles();

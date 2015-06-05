@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-            <version>v20150505</version>
+            <version>${dep.closure-compiler}</version>
         </dependency>
         <dependency>
             <groupId>org.slieb</groupId>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.google.template</groupId>
             <artifactId>soy</artifactId>
-            <version>2015-02-11_19-26-11</version>
+            <version>2015-04-10</version>
         </dependency>
         <dependency>
             <groupId>org.slieb.jspackage</groupId>

@@ -5,17 +5,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.jsunit.TestExecutor;
-import org.slieb.runtimes.rhino.EnvJSRuntime;
+import org.slieb.jsunit.internal.DefaultTestConfigurator;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.providers.GroupResourceProvider;
-
-import java.io.File;
-import java.util.List;
 
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 import static slieb.kute.resources.Resources.filterResources;
@@ -24,46 +20,51 @@ import static slieb.kute.resources.Resources.filterResources;
 @Mojo(name = "unit-tests", defaultPhase = LifecyclePhase.TEST)
 public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
 
-    @Parameter(name = "testDirectories")
-    protected List<File> testDirectories;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        getLog().info("Preparing to run tests...");
+        info("Preparing to run tests...");
+        info("scanning for possible source resources");
+        ResourceProvider<? extends Resource.Readable> sourceResources =
+                filterResources(getPackageProvider(false),
+                        DefaultTestConfigurator.DEFAULT_EXCLUDES);
+        info("   found %s possible sources", sourceResources.stream().count());
 
-        getLog().info("adding source resources");
-        ResourceProvider<? extends Resource.Readable> sourceResources = getSourceResources();
+        info("scanning for possible test resources");
+        ResourceProvider<? extends Resource.Readable> testResources = getTestResources();
+        info("   found %s possible test resources", testResources.stream().count());
 
-        if (testDirectories == null || testDirectories.isEmpty()) {
-            getLog().warn("No testDirectories specified, skipping unit tests");
+        if (testResources.stream().limit(1).count() == 0) {
+            warn("No test sources, skipping unit tests...");
             return;
         }
-        getLog().info("adding test resources");
-        ResourceProvider<? extends Resource.Readable> testResources =
-                GoogResources.getResourceProviderForSourceDirectories(testDirectories);
 
-        getLog().info("grouping resources");
+        info("filtering possible sources and possible test sources to get a list of *.js sources that exclude *_test.js files.");
         ResourceProvider<? extends Resource.Readable> resources =
-                filterResources(new GroupResourceProvider<>(ImmutableList.of(sourceResources, testResources)), extensionFilter(".js"));
+                filterResources(new GroupResourceProvider<>(ImmutableList.of(testResources, sourceResources)),
+                        extensionFilter(".js").and(extensionFilter("_test.js").negate()));
+        info("   filtered %s", resources.stream().count());
 
-        getLog().info("filtering testResources to include only _test.js files");
+        info("filtering possible test sources to include only *._test.js files");
         ResourceProvider<? extends Resource.Readable> testProvider = filterResources(testResources, extensionFilter("_test.js"));
+        info("   filtered %s", testProvider.stream().count());
 
-        getLog().info("creating calculator of grouped resources");
+
+        info("creating calculator of grouped resources");
         GoogDependencyCalculator calculator = GoogResources.getCalculatorCast(resources);
 
         int total = 0, failure = 0;
 
         for (Resource.Readable testResource : testProvider) {
 
-            getLog().info("Running test " + testResource.getPath());
+            info("Running test " + testResource.getPath());
             total++;
 
-            try (EnvJSRuntime runtime = new EnvJSRuntime()) {
+            try {
                 TestExecutor testExecutor = new TestExecutor(calculator, testResource, 30);
                 testExecutor.execute();
                 if (!testExecutor.isSuccess()) {
-                    getLog().error(testExecutor.getReport());
+                    error(testExecutor.getReport());
                     failure++;
                 }
             } catch (Exception exception) {
@@ -72,7 +73,7 @@ public class JavascriptUnitTestsMojo extends AbstractPackageMojo {
             }
         }
 
-        getLog().info(String.format("%s Tests run with %s failures", total, failure));
+        info(String.format("%s Tests run with %s failures", total, failure));
         if (failure > 0) {
             throw new MojoFailureException("There were test failures");
         }

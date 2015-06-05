@@ -19,9 +19,9 @@
                 <version>@project.version@</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <sourceDirectories>
+                    <sources>
                         <file>${basedir}/src/main/javascript</file>
-                    </sourceDirectories>
+                    </sources>
                 </configuration>
             </plugin>
         </plugins>
