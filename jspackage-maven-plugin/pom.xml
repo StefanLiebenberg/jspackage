@@ -92,13 +92,11 @@
     </build>
     <dependencies>
 
-
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <version>${dep.guice}</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
@@ -212,6 +210,12 @@
         <dependency>
             <groupId>org.slieb.jspackage</groupId>
             <artifactId>jspackage-closure-utilities</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slieb.jspackage</groupId>
+            <artifactId>jspackage-compile</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

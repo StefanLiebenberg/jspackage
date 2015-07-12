@@ -48,8 +48,8 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
         return mapToSourceFiles(resolver.resolve().stream().map(GoogDependencyNode::getResource));
     }
 
-    public Pair<Compiler, Result> getCompileResult() {
-        if (cache == null) {
+    public Pair<Compiler, Result> compile() {
+        if (cache != null) {
             final Compiler compiler = new Compiler();
             final CompilerOptions options = new CompilerOptions();
             final List<SourceFile> externs = getExterns();
@@ -60,23 +60,28 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
         return cache;
     }
 
+    public void clear() {
+        cache = null;
+    }
+
     @Override
     public Stream<Resource.Readable> stream() {
-        Pair<Compiler, Result> compileResult = getCompileResult();
-        return Stream.of(
-                new CompiledResource("/compile", compileResult.getLeft()),
-                new ResultErrorsResource("/errors", compileResult.getRight()));
+        return Stream.of(getCompiledResource(), getCompileErrorsResource());
     }
 
 
-    @Override
+    public Resource.Readable getCompiledResource() {
+        return new CompiledResource("/compile", compile().getLeft());
+    }
+
+    public Resource.Readable getCompileErrorsResource() {
+        return new ResultErrorsResource("/errors", compile().getRight());
+    }
+
     public Resource.Readable getResourceByName(String path) {
         return Resources.findResource(stream(), path);
     }
 
-    public void clear() {
-        cache = null;
-    }
 }
 
 class CompiledResource implements Resource.Readable {
