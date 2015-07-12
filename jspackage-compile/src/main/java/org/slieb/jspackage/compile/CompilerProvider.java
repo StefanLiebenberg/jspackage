@@ -1,21 +1,21 @@
 package org.slieb.jspackage.compile;
 
 
-import com.google.common.base.Preconditions;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
+import org.slieb.closure.dependencies.GoogDependencyNode;
 import org.slieb.closure.dependencies.GoogResources;
-import org.slieb.jspackage.compile.resources.CompiledJSModuleResource;
-import org.slieb.jspackage.compile.resources.ResultResource;
-import org.slieb.jspackage.compile.resources.SourceMapResource;
+import org.slieb.dependencies.DependencyResolver;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.Resources;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -25,71 +25,100 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
 
     private final Configuration configuration;
 
-    private Pair<List<Pair<Configuration.Module, JSModule>>, Pair<Compiler, Result>> cacheCompileResult;
+    private Pair<Compiler, Result> cache;
 
     public CompilerProvider(Configuration configuration) {
         this.configuration = configuration;
     }
 
-    public List<Pair<Configuration.Module, JSModule>> getModules() {
-        return new ArrayList<>();
+    private List<SourceFile> mapToSourceFiles(Stream<? extends Resource.Readable> nodes) {
+        return nodes.map(GoogResources::getSourceFileFromResource).collect(toList());
     }
 
     private List<SourceFile> getExterns() {
-        return configuration.getExternsProvider().stream().map(GoogResources::getSourceFileFromResource).collect(toList());
+        return mapToSourceFiles(configuration.getExternsProvider().stream());
     }
 
-    private List<JSModule> getJSModules() {
-
-        Preconditions.checkNotNull(configuration.getModules());
-        Preconditions.checkState(Integer.valueOf(1).equals(configuration.getModules().size()), "no more than one module is currently supported");
-
-        JSModule base = new JSModule("common");
+    private List<SourceFile> getInputs() {
         GoogDependencyCalculator calculator = GoogResources.getCalculatorCast(configuration.getSourceProvider());
-
-        Configuration.Module module = configuration.getModules().get(0);
-//        base.add();
-
-        return null;
-
+        DependencyResolver<GoogDependencyNode> resolver = calculator.getDependencyResolver();
+        for (Configuration.Module module : configuration.getModules()) {
+            resolver.resolveNamespaces(module.getInputNamespaces());
+        }
+        return mapToSourceFiles(resolver.resolve().stream().map(GoogDependencyNode::getResource));
     }
 
-    public Pair<List<Pair<Configuration.Module, JSModule>>, Pair<Compiler, Result>> getCompileResult() {
-        if (cacheCompileResult == null) {
-            Compiler compiler = new Compiler();
-            List<SourceFile> externs = getExterns();
-            List<JSModule> jsModules = new ArrayList<>();
-            CompilerOptions options = new CompilerOptions();
-            Result result = compiler.compileModules(externs, jsModules, options);
-
-            List<Pair<Configuration.Module, JSModule>> input = new ArrayList<>();
-            Pair<Compiler, Result> output = new ImmutablePair<>(compiler, result);
-            cacheCompileResult = new ImmutablePair<>(input, output);
+    public Pair<Compiler, Result> getCompileResult() {
+        if (cache == null) {
+            final Compiler compiler = new Compiler();
+            final CompilerOptions options = new CompilerOptions();
+            final List<SourceFile> externs = getExterns();
+            final List<SourceFile> inputs = getInputs();
+            final Result result = compiler.compile(externs, inputs, options);
+            cache = new ImmutablePair<>(compiler, result);
         }
-        return cacheCompileResult;
+        return cache;
     }
 
     @Override
     public Stream<Resource.Readable> stream() {
-        Pair<List<Pair<Configuration.Module, JSModule>>, Pair<Compiler, Result>> compileResult = getCompileResult();
-        Pair<Compiler, Result> output = compileResult.getRight();
-        Result result = output.getRight();
-        Resource.Readable resultResource = new ResultResource("/output/result", result);
-        if (result.success) {
-            Compiler compiler = output.getLeft();
-            List<Pair<Configuration.Module, JSModule>> input = compileResult.getLeft();
-            Stream<Resource.Readable> resourceStream = input.stream().map(pair -> new CompiledJSModuleResource(pair.getLeft().toString(), compiler, pair.getRight()));
-            Resource.Readable sourceMap = new SourceMapResource("/output/sourceMap.js", compiler.getSourceMap());
-            resourceStream = Stream.concat(resourceStream, Stream.of(resultResource, sourceMap));
-            return resourceStream;
-        } else {
-            return Stream.of(resultResource);
-        }
+        Pair<Compiler, Result> compileResult = getCompileResult();
+        return Stream.of(
+                new CompiledResource("/compile", compileResult.getLeft()),
+                new ResultErrorsResource("/errors", compileResult.getRight()));
     }
+
 
     @Override
     public Resource.Readable getResourceByName(String path) {
         return Resources.findResource(stream(), path);
     }
 }
+
+class CompiledResource implements Resource.Readable {
+
+    private final String path;
+    private final Compiler compiler;
+
+    public CompiledResource(String path, Compiler compiler) {
+        this.path = path;
+        this.compiler = compiler;
+    }
+
+    @Override
+    public Reader getReader() throws IOException {
+        return new StringReader(compiler.toSource());
+    }
+
+    @Override
+    public String getPath() {
+        return path;
+    }
+}
+
+class ResultErrorsResource implements Resource.Readable {
+    private final String path;
+    private final Result result;
+
+    public ResultErrorsResource(String path, Result result) {
+        this.path = path;
+        this.result = result;
+    }
+
+    @Override
+    public Reader getReader() throws IOException {
+        StringBuilder builder = new StringBuilder();
+        for (JSError error : result.errors) {
+            builder.append(error.toString()).append("\n");
+        }
+        return new StringReader(builder.toString());
+    }
+
+    @Override
+    public String getPath() {
+        return path;
+    }
+}
+
+
 
