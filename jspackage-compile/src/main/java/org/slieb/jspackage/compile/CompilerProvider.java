@@ -73,6 +73,10 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
     public Resource.Readable getResourceByName(String path) {
         return Resources.findResource(stream(), path);
     }
+
+    public void clear() {
+        cache = null;
+    }
 }
 
 class CompiledResource implements Resource.Readable {
