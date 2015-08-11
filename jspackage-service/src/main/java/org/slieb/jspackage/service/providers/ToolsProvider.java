@@ -71,8 +71,7 @@ public class ToolsProvider extends AbstractStreamsProvider {
     public Stream<Resource.Readable> compiledCssStream() {
         return Stream.empty();
     }
-
-
+    
     public Resource.Readable getDepsResource() {
         return Resources.stringResource("/deps.js", "");
     }
@@ -84,6 +83,5 @@ public class ToolsProvider extends AbstractStreamsProvider {
     public Resource.Readable getDefinesFile() {
         return Resources.stringResource("/defines.js", "");
     }
-
 
 }

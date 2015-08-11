@@ -1,6 +1,7 @@
 package org.slieb.jspackage.compile;
 
 
+import com.google.common.base.Preconditions;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -19,6 +20,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
 
 public class CompilerProvider implements ResourceProvider<Resource.Readable> {
@@ -40,6 +42,9 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
     }
 
     private List<SourceFile> getInputs() {
+        Preconditions.checkNotNull(configuration.getSourceProvider(), "no source provider");
+        Preconditions.checkState(configuration.getSourceProvider().stream().count() > 0, "no inputs");
+
         GoogDependencyCalculator calculator = GoogResources.getCalculatorCast(configuration.getSourceProvider());
         DependencyResolver<GoogDependencyNode> resolver = calculator.getDependencyResolver();
         for (Configuration.Module module : configuration.getModules()) {
@@ -49,7 +54,7 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
     }
 
     public Pair<Compiler, Result> compile() {
-        if (cache != null) {
+        if (cache == null) {
             final Compiler compiler = new Compiler();
             final CompilerOptions options = new CompilerOptions();
             final List<SourceFile> externs = getExterns();
@@ -71,7 +76,8 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
 
 
     public Resource.Readable getCompiledResource() {
-        return new CompiledResource("/compile", compile().getLeft());
+        return new CompiledResource("/compile",
+                checkNotNull(checkNotNull(compile(), "Compile returns nada").getLeft(), "no compile result"));
     }
 
     public Resource.Readable getCompileErrorsResource() {

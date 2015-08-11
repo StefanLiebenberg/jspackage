@@ -28,13 +28,13 @@
         <dep.mojo-executor>2.2.0</dep.mojo-executor>
         <dep.guice>4.0</dep.guice>
         <dep.guava>18.0</dep.guava>
-        <dep.rhino>1.7R4</dep.rhino>
+        <dep.rhino>1.7.7</dep.rhino>
         <dep.commons-io>1.3.2</dep.commons-io>
-        <dep.spark>2.1</dep.spark>
+        <dep.spark>2.2</dep.spark>
 
         <dep.mockito>1.10.19</dep.mockito>
         <dep.junit>4.12</dep.junit>
-        <dep.jsoup>1.7.3</dep.jsoup>
+        <dep.jsoup>1.8.3</dep.jsoup>
 
         <dep.js-runtimes>1.1-SNAPSHOT</dep.js-runtimes>
         <dep.jsunit-testing-suite>1.0-SNAPSHOT</dep.jsunit-testing-suite>

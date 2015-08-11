@@ -51,8 +51,8 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         configuration.setCompilerOptions(compilerOptionsProvider.get());
         configuration.setExterns(Kute.providerOf());
         configuration.setModules(Lists.newArrayList(module));
+        configuration.setSource(getSourceProvider(false));
         CompilerProvider compilerProvider = new CompilerProvider(configuration);
-
         Resource.Readable compiled = compilerProvider.getCompiledResource();
 
         if (outputFile.getParentFile().exists() || outputFile.getParentFile().mkdirs()) {

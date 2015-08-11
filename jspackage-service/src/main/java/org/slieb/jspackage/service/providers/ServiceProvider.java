@@ -30,22 +30,16 @@ public class ServiceProvider extends AbstractStreamsProvider {
 
     private final TestsProvider testsProvider;
 
-    private final IndexProvider indexer;
-
     public ServiceProvider(ResourceProvider<? extends Resource.Readable> sources) {
         this.sources = sources;
         this.toolsProvider = new ToolsProvider(this.sources);
         this.testsProvider = new TestsProvider(this.toolsProvider);
-        this.indexer = new IndexProvider(this.testsProvider);
+        
     }
 
     @Override
     protected Stream<Stream<? extends Resource.Readable>> streams() {
-        return Stream.of(testsProvider.stream(), indexer.stream());
-    }
-
-    public void clear() {
-        this.indexer.clear();
+        return Stream.of(testsProvider.stream());
     }
 
 }

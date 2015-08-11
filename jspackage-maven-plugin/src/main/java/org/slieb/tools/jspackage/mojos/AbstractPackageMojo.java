@@ -141,10 +141,6 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
                 throw new RuntimeException(e);
             }
             URL[] urls = list.build().stream().map(this::safeToUrl).distinct().toArray(URL[]::new);
-            System.out.println(urls.length);
-            for (URL url : urls) {
-                System.out.println(url);
-            }
             loader = new URLClassLoader(urls, getClass().getClassLoader());
         }
         return loader;

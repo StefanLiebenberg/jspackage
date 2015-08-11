@@ -11,7 +11,7 @@ public class JSPackageConfiguration {
 
     private final ResourceProvider<? extends Resource.Readable> resourceProvider;
 
-    private JSPackageConfiguration(Integer port, ResourceProvider<? extends Resource.Readable> resourceProvider) {
+    public JSPackageConfiguration(Integer port, ResourceProvider<? extends Resource.Readable> resourceProvider) {
         this.port = port;
         this.resourceProvider = resourceProvider;
     }
