@@ -1,0 +1,20 @@
+a.l {
+  background: blue;
+}
+a.l-image-absolute {
+  background-image: url(/grass.jpg);
+}
+a.l-image-normal {
+  background-image: url(grass.jpg);
+}
+a.l-image-relative-parent {
+  background-image: url(../grass.jpg);
+}
+a.b {
+  border: 1px inset black;
+}
+div.w {
+  background: black;
+  color: white;
+  padding: 10px;
+}

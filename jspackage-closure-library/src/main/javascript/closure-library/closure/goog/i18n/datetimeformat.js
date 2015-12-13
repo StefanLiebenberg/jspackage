@@ -33,37 +33,42 @@ goog.require('goog.string');
 /**
  * Datetime formatting functions following the pattern specification as defined
  * in JDK, ICU and CLDR, with minor modification for typical usage in JS.
- * Pattern specification: (Refer to JDK/ICU/CLDR)
+ * Pattern specification:
+ * {@link http://userguide.icu-project.org/formatparse/datetime}
  * <pre>
- * Symbol Meaning Presentation        Example
- * ------   -------                 ------------        -------
- * G        era designator          (Text)              AD
- * y#       year                    (Number)            1996
- * Y*       year (week of year)     (Number)            1997
- * u*       extended year           (Number)            4601
- * M        month in year           (Text & Number)     July & 07
- * d        day in month            (Number)            10
- * h        hour in am/pm (1~12)    (Number)            12
- * H        hour in day (0~23)      (Number)            0
- * m        minute in hour          (Number)            30
- * s        second in minute        (Number)            55
- * S        fractional second       (Number)            978
- * E        day of week             (Text)              Tuesday
- * e*       day of week (local 1~7) (Number)            2
- * D*       day in year             (Number)            189
- * F*       day of week in month    (Number)            2 (2nd Wed in July)
- * w        week in year            (Number)            27
- * W*       week in month           (Number)            2
- * a        am/pm marker            (Text)              PM
- * k        hour in day (1~24)      (Number)            24
- * K        hour in am/pm (0~11)    (Number)            0
- * z        time zone               (Text)              Pacific Standard Time
- * Z        time zone (RFC 822)     (Number)            -0800
- * v        time zone (generic)     (Text)              Pacific Time
- * g*       Julian day              (Number)            2451334
- * A*       milliseconds in day     (Number)            69540000
- * '        escape for text         (Delimiter)         'Date='
- * ''       single quote            (Literal)           'o''clock'
+ * Symbol   Meaning                    Presentation       Example
+ * ------   -------                    ------------       -------
+ * G#       era designator             (Text)             AD
+ * y#       year                       (Number)           1996
+ * Y*       year (week of year)        (Number)           1997
+ * u*       extended year              (Number)           4601
+ * Q#       quarter                    (Text)             Q3 & 3rd quarter
+ * M        month in year              (Text & Number)    July & 07
+ * L        month in year (standalone) (Text & Number)    July & 07
+ * d        day in month               (Number)           10
+ * h        hour in am/pm (1~12)       (Number)           12
+ * H        hour in day (0~23)         (Number)           0
+ * m        minute in hour             (Number)           30
+ * s        second in minute           (Number)           55
+ * S        fractional second          (Number)           978
+ * E#       day of week                (Text)             Tue & Tuesday
+ * e*       day of week (local 1~7)    (Number)           2
+ * c#       day of week (standalone)   (Text & Number)    2 & Tues & Tuesday & T
+ * D*       day in year                (Number)           189
+ * F*       day of week in month       (Number)           2 (2nd Wed in July)
+ * w        week in year               (Number)           27
+ * W*       week in month              (Number)           2
+ * a        am/pm marker               (Text)             PM
+ * k        hour in day (1~24)         (Number)           24
+ * K        hour in am/pm (0~11)       (Number)           0
+ * z        time zone                  (Text)             Pacific Standard Time
+ * Z#       time zone (RFC 822)        (Number)           -0800
+ * v#       time zone (generic)        (Text)             America/Los_Angeles
+ * V#       time zone                  (Text)             Los Angeles Time
+ * g*       Julian day                 (Number)           2451334
+ * A*       milliseconds in day        (Number)           69540000
+ * '        escape for text            (Delimiter)        'Date='
+ * ''       single quote               (Literal)          'o''clock'
  *
  * Item marked with '*' are not supported yet.
  * Item marked with '#' works different than java
@@ -78,7 +83,7 @@ goog.require('goog.string');
  * 2 digits. (e.g., if "yyyy" produces "1997", "yy" produces "97".) Unlike other
  * fields, fractional seconds are padded on the right with zero.
  *
- * (Text & Number): 3 or over, use text, otherwise use number. (e.g., "M"
+ * :(Text & Number) 3 or over, use text, otherwise use number. (e.g., "M"
  * produces "1", "MM" produces "01", "MMM" produces "Jan", and "MMMM" produces
  * "January".)
  *
@@ -151,9 +156,9 @@ goog.i18n.DateTimeFormat.TOKENS_ = [
   //quote string
   /^\'(?:[^\']|\'\')*\'/,
   // pattern chars
-  /^(?:G+|y+|M+|k+|S+|E+|a+|h+|K+|H+|c+|L+|Q+|d+|m+|s+|v+|w+|z+|Z+)/,
+  /^(?:G+|y+|M+|k+|S+|E+|a+|h+|K+|H+|c+|L+|Q+|d+|m+|s+|v+|V+|w+|z+|Z+)/,
   // and all the other chars
-  /^[^\'GyMkSEahKHcLQdmsvwzZ]+/  // and all the other chars
+  /^[^\'GyMkSEahKHcLQdmsvVwzZ]+/  // and all the other chars
 ];
 
 
@@ -175,6 +180,10 @@ goog.i18n.DateTimeFormat.PartTypes_ = {
  * @private
  */
 goog.i18n.DateTimeFormat.prototype.applyPattern_ = function(pattern) {
+  if (goog.i18n.DateTimeFormat.removeRlmInPatterns_) {
+    // Remove RLM unicode control character from pattern.
+    pattern = pattern.replace(/\u200f/g, '');
+  }
   // lex the pattern, once for all uses
   while (pattern) {
     for (var i = 0; i < goog.i18n.DateTimeFormat.TOKENS_.length; ++i) {
@@ -308,6 +317,58 @@ goog.i18n.DateTimeFormat.prototype.localizeNumbers_ = function(input) {
 
 
 /**
+ * If the usage of Ascii digits should be enforced regardless of locale.
+ * @type {boolean}
+ * @private
+ */
+goog.i18n.DateTimeFormat.enforceAsciiDigits_ = false;
+
+
+/**
+ * If RLM unicode characters should be removed from date/time patterns (useful
+ * when enforcing ASCII digits for Arabic). See {@code #setEnforceAsciiDigits}.
+ * @type {boolean}
+ * @private
+ */
+goog.i18n.DateTimeFormat.removeRlmInPatterns_ = false;
+
+
+/**
+ * Sets if the usage of Ascii digits in formatting should be enforced in
+ * formatted date/time even for locales where native digits are indicated.
+ * Also sets whether to remove RLM unicode control characters when using
+ * standard enumerated patterns (they exist e.g. in standard d/M/y for Arabic).
+ * Production code should call this once before any {@code DateTimeFormat}
+ * object is instantiated.
+ * Caveats:
+ *    * Enforcing ASCII digits affects all future formatting by new or existing
+ * {@code DateTimeFormat} objects.
+ *    * Removal of RLM characters only applies to {@code DateTimeFormat} objects
+ * instantiated after this call.
+ * @param {boolean} enforceAsciiDigits Whether Ascii digits should be enforced.
+ */
+goog.i18n.DateTimeFormat.setEnforceAsciiDigits = function(
+    enforceAsciiDigits) {
+  goog.i18n.DateTimeFormat.enforceAsciiDigits_ = enforceAsciiDigits;
+
+  // Also setting removal of RLM chracters when forcing ASCII digits since it's
+  // the right thing to do for Arabic standard patterns. One could add an
+  // optional argument here or to the {@code DateTimeFormat} constructor to
+  // enable an alternative behavior.
+  goog.i18n.DateTimeFormat.removeRlmInPatterns_ = enforceAsciiDigits;
+};
+
+
+/**
+ * @return {boolean} Whether enforcing ASCII digits for all locales. See
+ *     {@code #setEnforceAsciiDigits} for more details.
+ */
+goog.i18n.DateTimeFormat.isEnforceAsciiDigits = function() {
+  return goog.i18n.DateTimeFormat.enforceAsciiDigits_;
+};
+
+
+/**
  * Localizes a string potentially containing numbers, replacing ASCII digits
  * with native digits if specified so by the locale. Leaves other characters.
  * @param {number|string} input the string to be localized, using ASCII digits.
@@ -319,7 +380,8 @@ goog.i18n.DateTimeFormat.localizeNumbers =
     function(input, opt_dateTimeSymbols) {
   input = String(input);
   var dateTimeSymbols = opt_dateTimeSymbols || goog.i18n.DateTimeSymbols;
-  if (dateTimeSymbols.ZERODIGIT === undefined) {
+  if (dateTimeSymbols.ZERODIGIT === undefined ||
+      goog.i18n.DateTimeFormat.enforceAsciiDigits_) {
     return input;
   }
 
@@ -730,6 +792,24 @@ goog.i18n.DateTimeFormat.prototype.formatTimeZoneId_ =
 
 
 /**
+ * Generate localized, location dependent time zone id
+ * @param {number} count Number of time pattern char repeats, it controls
+ *     how a field should be formatted.
+ * @param {!goog.date.DateLike} date Whose value being evaluated.
+ * @param {goog.i18n.TimeZone=} opt_timeZone This holds current time zone info.
+ * @return {string} GMT timeZone string.
+ * @private
+ */
+goog.i18n.DateTimeFormat.prototype.formatTimeZoneLocationId_ =
+    function(count, date, opt_timeZone) {
+  opt_timeZone = opt_timeZone ||
+      goog.i18n.TimeZone.createTimeZone(date.getTimezoneOffset());
+  return count <= 2 ? opt_timeZone.getTimeZoneId() :
+             opt_timeZone.getGenericLocation(date);
+};
+
+
+/**
  * Formatting one date field.
  * @param {string} patternStr The pattern string for the field being formatted.
  * @param {!goog.date.DateLike} date represents the real date to be formatted.
@@ -762,6 +842,7 @@ goog.i18n.DateTimeFormat.prototype.formatField_ =
     case 'm': return this.formatMinutes_(count, dateForTime);
     case 's': return this.formatSeconds_(count, dateForTime);
     case 'v': return this.formatTimeZoneId_(date, opt_timeZone);
+    case 'V': return this.formatTimeZoneLocationId_(count, date, opt_timeZone);
     case 'w': return this.formatWeekOfYear_(count, dateForTime);
     case 'z': return this.formatTimeZone_(count, date, opt_timeZone);
     case 'Z': return this.formatTimeZoneRFC_(count, date, opt_timeZone);

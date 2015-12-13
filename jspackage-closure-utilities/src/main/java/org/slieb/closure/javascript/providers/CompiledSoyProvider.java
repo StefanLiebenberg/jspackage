@@ -10,6 +10,7 @@ import slieb.kute.api.ResourceProvider;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -30,7 +31,8 @@ public class CompiledSoyProvider implements ResourceProvider<LiveSoyFileResource
     private final SoyJsSrcOptions jsSrcOptions;
 
 
-    public CompiledSoyProvider(ResourceProvider<? extends Resource.Readable> provider, SoyJsSrcOptions options) {
+    public CompiledSoyProvider(ResourceProvider<? extends Resource.Readable> provider,
+                               SoyJsSrcOptions options) {
         this.provider = provider;
         this.jsSrcOptions = options;
     }
@@ -69,13 +71,9 @@ public class CompiledSoyProvider implements ResourceProvider<LiveSoyFileResource
 
 
     @Override
-    public LiveSoyFileResource getResourceByName(String path) {
-        String soyName = getSoyNameFromJavascript(path);
-        Resource.Readable soyResource = provider.getResourceByName(soyName);
-        if (soyResource != null && SOY_FILTER.test(soyResource)) {
-            return liveSoyFileResource(soyResource);
-        }
-        return null;
+    public Optional<LiveSoyFileResource> getResourceByName(String path) {
+        return provider.getResourceByName(getSoyNameFromJavascript(path)).filter(SOY_FILTER)
+                .map(this::liveSoyFileResource);
     }
 }
 
@@ -90,7 +88,10 @@ class LiveSoyFileResource implements Resource.Readable {
 
     private final SoyFileSet sfs;
 
-    public LiveSoyFileResource(String path, Readable sourceResource, SoyJsSrcOptions options, SoyMsgBundle bundle) {
+    public LiveSoyFileResource(String path,
+                               Readable sourceResource,
+                               SoyJsSrcOptions options,
+                               SoyMsgBundle bundle) {
         this.sourceResource = sourceResource;
         this.options = options;
         this.bundle = bundle;

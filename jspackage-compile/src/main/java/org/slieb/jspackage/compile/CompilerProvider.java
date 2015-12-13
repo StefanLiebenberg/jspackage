@@ -2,22 +2,24 @@ package org.slieb.jspackage.compile;
 
 
 import com.google.common.base.Preconditions;
-import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.*;
+import com.google.javascript.jscomp.Compiler;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slieb.dependencies.DependencyResolver;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogDependencyNode;
 import org.slieb.closure.dependencies.GoogResources;
-import org.slieb.dependencies.DependencyResolver;
+import org.slieb.closure.dependencies.SourceFileResource;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.Resources;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,7 +47,8 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
         Preconditions.checkNotNull(configuration.getSourceProvider(), "no source provider");
         Preconditions.checkState(configuration.getSourceProvider().stream().count() > 0, "no inputs");
 
-        GoogDependencyCalculator calculator = GoogResources.getCalculatorCast(configuration.getSourceProvider());
+        GoogDependencyCalculator calculator = GoogResources.getCalculator(
+                Kute.mapResources(configuration.getSourceProvider(), SourceFileResource::new));
         DependencyResolver<GoogDependencyNode> resolver = calculator.getDependencyResolver();
         for (Configuration.Module module : configuration.getModules()) {
             resolver.resolveNamespaces(module.getInputNamespaces());
@@ -54,13 +57,20 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
     }
 
     public Pair<Compiler, Result> compile() {
-        if (cache == null) {
-            final Compiler compiler = new Compiler();
-            final CompilerOptions options = new CompilerOptions();
-            final List<SourceFile> externs = getExterns();
-            final List<SourceFile> inputs = getInputs();
-            final Result result = compiler.compile(externs, inputs, options);
-            cache = new ImmutablePair<>(compiler, result);
+        try {
+            if (cache == null) {
+                final Compiler compiler = new Compiler();
+                final CompilerOptions options = configuration.getCompilerOptions();
+//            final List<SourceFile> externs = getExterns();
+                final List<SourceFile> externs = AbstractCommandLineRunner.getBuiltinExterns(options);
+                final List<SourceFile> inputs = getInputs();
+                final Result result = compiler.compile(externs, inputs, options);
+                cache = new ImmutablePair<>(compiler, result);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return cache;
     }
@@ -77,15 +87,16 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
 
     public Resource.Readable getCompiledResource() {
         return new CompiledResource("/compile",
-                checkNotNull(checkNotNull(compile(), "Compile returns nada").getLeft(), "no compile result"));
+                                    checkNotNull(checkNotNull(compile(), "Compile returns nada").getLeft(),
+                                                 "no compile result"));
     }
 
     public Resource.Readable getCompileErrorsResource() {
         return new ResultErrorsResource("/errors", compile().getRight());
     }
 
-    public Resource.Readable getResourceByName(String path) {
-        return Resources.findResource(stream(), path);
+    public Optional<Resource.Readable> getResourceByName(String path) {
+        return Kute.findResource(stream(), path);
     }
 
 }
@@ -95,7 +106,8 @@ class CompiledResource implements Resource.Readable {
     private final String path;
     private final Compiler compiler;
 
-    public CompiledResource(String path, Compiler compiler) {
+    public CompiledResource(String path,
+                            Compiler compiler) {
         this.path = path;
         this.compiler = compiler;
     }
@@ -115,7 +127,8 @@ class ResultErrorsResource implements Resource.Readable {
     private final String path;
     private final Result result;
 
-    public ResultErrorsResource(String path, Result result) {
+    public ResultErrorsResource(String path,
+                                Result result) {
         this.path = path;
         this.result = result;
     }

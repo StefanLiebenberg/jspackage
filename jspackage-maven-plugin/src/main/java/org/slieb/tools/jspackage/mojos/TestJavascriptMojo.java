@@ -5,8 +5,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.slieb.jspackage.service.JSPackageConfiguration.Builder;
+import org.slieb.jspackage.service.JSPackageConfigurationBuilder;
 import org.slieb.jspackage.service.JSPackageService;
+import slieb.kute.Kute;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -16,15 +17,23 @@ import java.util.List;
 @Mojo(name = "component-tests", defaultPhase = LifecyclePhase.TEST)
 public class TestJavascriptMojo extends AbstractPackageMojo {
 
+
+    @Parameter(property = "skipTests", defaultValue = "${skipTests}")
+    protected Boolean skipTests = false;
+
+
     @Parameter
     public List<File> componentTestSources;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        
-        JSPackageService service = JSPackageService.create(new Builder()
-                .withResourceProvider(getSourceProvider(true, componentTestSources))
-                .build());
+
+        if (skipTests) return;
+
+        JSPackageService service = JSPackageService.create(
+                new JSPackageConfigurationBuilder()
+                        .withResourceProvider(Kute.asReadableProvider(getSourceProvider(true, componentTestSources)))
+                        .build());
 
         try {
             URL base = new URL("http://localhost:6655");

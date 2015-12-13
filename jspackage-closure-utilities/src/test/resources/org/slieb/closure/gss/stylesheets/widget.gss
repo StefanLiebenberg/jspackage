@@ -1,0 +1,11 @@
+@provide "widget";
+@require "link";
+@require "button";
+
+div.widget {
+    background: black;
+    color: white;
+    padding: 10px;
+}
+
+

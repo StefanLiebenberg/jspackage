@@ -9,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.Resources;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
-import static slieb.kute.resources.Resources.readResource;
+import static slieb.kute.Kute.*;
 
 
 public class JSPackageServiceTest {
@@ -34,12 +33,12 @@ public class JSPackageServiceTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        readableA = Resources.stringResource("/a.js", "var a = 'A';");
-        readableB = Resources.stringResource("/b.js", "var b = 'B';");
-        readableC = Resources.stringResource("/nested/c_test.js", "var c = 'C';");
-        provider = Resources.providerOf(readableA, readableB, readableC);
+        readableA = stringResource("/a.js", "var a = 'A';");
+        readableB = stringResource("/b.js", "var b = 'B';");
+        readableC = stringResource("/nested/c_test.js", "var c = 'C';");
+        provider = providerOf(readableA, readableB, readableC);
 
-        configuration = new JSPackageConfiguration.Builder()
+        configuration = new JSPackageConfigurationBuilder()
                 .withResourceProvider(provider)
                 .build();
         service = JSPackageService.create(configuration);
@@ -62,7 +61,7 @@ public class JSPackageServiceTest {
     }
 
     @Test
-    public void testResourcesProvided() throws Exception {
+    public void testKuteProvided() throws Exception {
         provider.stream()
                 .parallel()
                 .forEach(resource -> {
@@ -82,13 +81,12 @@ public class JSPackageServiceTest {
         try (InputStream inputStream = baseUrl.openStream()) {
             Document index = Jsoup.parse(inputStream, Charset.defaultCharset().name(), baseUrl.toString());
             Elements links = index.getElementsByTag("a");
-            assertEquals(6, links.size());
-            assertEquals("/nested", links.get(0).attr("href"));
-            assertEquals("/a.js", links.get(1).attr("href"));
-            assertEquals("/b.js", links.get(2).attr("href"));
-            assertEquals("/cssRenameMap.js", links.get(3).attr("href"));
-            assertEquals("/defines.js", links.get(4).attr("href"));
-            assertEquals("/deps.js", links.get(5).attr("href"));
+            assertEquals(5, links.size());
+            assertEquals("/build", links.get(0).attr("href"));
+            assertEquals("/nested", links.get(1).attr("href"));
+            assertEquals("/sources", links.get(2).attr("href"));
+            assertEquals("/a.js", links.get(3).attr("href"));
+            assertEquals("/b.js", links.get(4).attr("href"));
         }
 
         try (InputStream inputStream = new URL(baseUrl, "/nested").openStream()) {

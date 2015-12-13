@@ -44,16 +44,18 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
     @Parameter(name = "guiceModule")
     public String guiceModule;
 
-    public ResourceProvider<? extends Resource.InputStreaming> getClaspathProvider(Boolean inludeTesting) {
+    public ResourceProvider<Resource.InputStreaming> getClaspathProvider(Boolean inludeTesting) {
         return Kute.getProvider(getCustomClassLoader(Boolean.TRUE, inludeTesting));
     }
 
-    public ResourceProvider<? extends Resource.InputStreaming> getTestResources() {
-        return getResourceProviderForSourceDirectories(testSources != null ? testSources : ImmutableList.of());
+    public ResourceProvider<Resource.InputStreaming> getTestResources() {
+        return Kute.asInputStreamingProvider(
+                getResourceProviderForSourceDirectories(testSources != null ? testSources : ImmutableList.of()));
     }
 
-    public ResourceProvider<? extends Resource.InputStreaming> getSourceProvider(Boolean includeTesting) {
-        ImmutableList.Builder<ResourceProvider<? extends Resource.InputStreaming>> builder = ImmutableList.builder();
+
+    public ResourceProvider<Resource.InputStreaming> getSourceProvider(Boolean includeTesting) {
+        ImmutableList.Builder<ResourceProvider<Resource.InputStreaming>> builder = ImmutableList.builder();
 
         if (includeTesting) {
             if (testSources != null && !testSources.isEmpty()) {
@@ -66,7 +68,7 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
 
         if (sources != null && !sources.isEmpty()) {
             debug("adding %s source directories to resource provider.", sources.size());
-            builder.add(getResourceProviderForSourceDirectories(sources));
+            builder.add(Kute.asInputStreamingProvider(getResourceProviderForSourceDirectories(sources)));
         } else {
             warn("source directories have not been specified or is empty.", LOG_PREFIX);
         }
@@ -74,11 +76,12 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
     }
 
 
-    protected ResourceProvider<? extends Resource.InputStreaming> getSourceProvider(Boolean includeTesting, List<File> additionalDirectories) {
-        ImmutableList.Builder<ResourceProvider<? extends Resource.InputStreaming>> builder = ImmutableList.builder();
+    protected ResourceProvider<Resource.InputStreaming> getSourceProvider(Boolean includeTesting,
+                                                                          List<File> additionalDirectories) {
+        ImmutableList.Builder<ResourceProvider<Resource.InputStreaming>> builder = ImmutableList.builder();
         builder.add(getSourceProvider(includeTesting));
         if (additionalDirectories != null && !additionalDirectories.isEmpty()) {
-            builder.add(getResourceProviderForSourceDirectories(additionalDirectories));
+            builder.add(Kute.asInputStreamingProvider(getResourceProviderForSourceDirectories(additionalDirectories)));
         }
         if (useClasspath) {
             builder.add(getClaspathProvider(includeTesting));
@@ -86,8 +89,8 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
         return new GroupResourceProvider<>(builder.build());
     }
 
-    protected ResourceProvider<? extends Resource.InputStreaming> getPackageProvider(Boolean includeTesting) {
-        ImmutableList.Builder<ResourceProvider<? extends Resource.InputStreaming>> builder = ImmutableList.builder();
+    protected ResourceProvider<Resource.InputStreaming> getPackageProvider(Boolean includeTesting) {
+        ImmutableList.Builder<ResourceProvider<Resource.InputStreaming>> builder = ImmutableList.builder();
         builder.add(getSourceProvider(includeTesting));
 
         // add the classpath loader last, as this is a fifo system and the source directories get priority.
@@ -126,7 +129,8 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
 
     private URLClassLoader loader;
 
-    protected URLClassLoader getCustomClassLoader(Boolean runtime, Boolean test) {
+    protected URLClassLoader getCustomClassLoader(Boolean runtime,
+                                                  Boolean test) {
         if (loader == null) {
             ImmutableList.Builder<String> list = new ImmutableList.Builder<>();
             try {
@@ -158,19 +162,23 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
         return safeFileToUrl(new File(path));
     }
 
-    protected void info(String info, Object... vars) {
+    protected void info(String info,
+                        Object... vars) {
         getLog().info(LOG_PREFIX + " " + String.format(info, vars));
     }
 
-    protected void debug(String info, Object... vars) {
+    protected void debug(String info,
+                         Object... vars) {
         getLog().debug(LOG_PREFIX + " " + String.format(info, vars));
     }
 
-    protected void warn(String info, Object... vars) {
+    protected void warn(String info,
+                        Object... vars) {
         getLog().warn(LOG_PREFIX + " " + String.format(info, vars));
     }
 
-    protected void error(String info, Object... vars) {
+    protected void error(String info,
+                         Object... vars) {
         getLog().error(LOG_PREFIX + " " + String.format(info, vars));
     }
 }

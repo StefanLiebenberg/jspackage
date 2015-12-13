@@ -1,0 +1,13 @@
+@provide "link";
+a.link {
+  background: blue;
+}
+a.link-image-absolute {
+  background-image: url(http://cdn.example.com/grass.jpg);
+}
+a.link-image-normal {
+  background-image: url(http://cdn.example.com/resources/images/grass.jpg);
+}
+a.link-image-relative-parent {
+  background-image: url(http://cdn.example.com/resources/grass.jpg);
+}

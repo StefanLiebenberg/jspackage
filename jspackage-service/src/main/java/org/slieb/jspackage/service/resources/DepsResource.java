@@ -1,33 +1,44 @@
 package org.slieb.jspackage.service.resources;
 
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.javascript.internal.DepsFileBuilder;
+import org.slieb.closure.dependencies.GoogDependencyCalculator;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
-import static slieb.kute.resources.Resources.filterResources;
 
 
-public class DepsResource extends AbstractHtmlResource {
+public class DepsResource implements Resource.Readable {
 
-
-    private final ResourceProvider<? extends Resource.Readable> jsReadables;
 
     private final String path;
+    private final ResourceProvider<? extends Resource.Readable> filtered;
 
-    public DepsResource(ResourceProvider<? extends Readable> jsReadables, String path) {
-        this.jsReadables = filterResources(jsReadables, extensionFilter(".js"));
+
+    public DepsResource(String path,
+                        ResourceProvider<? extends Readable> provider) {
         this.path = path;
+        this.filtered = Kute.filterResources(provider, extensionFilter(".js"));
+    }
+
+
+    public String getContent() {
+        return new DepsFileBuilder(filtered, GoogDependencyCalculator.PARSER).getDependencyContent();
     }
 
     @Override
-    public String getHtmlContent() {
-        return new DepsFileBuilder(jsReadables, GoogDependencyCalculator.PARSER).getDependencyContent();
+    public Reader getReader() throws IOException {
+        return new StringReader(getContent());
     }
 
     @Override
     public String getPath() {
         return path;
     }
+
 }

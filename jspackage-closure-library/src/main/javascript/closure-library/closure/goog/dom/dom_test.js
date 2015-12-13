@@ -209,6 +209,15 @@ function testSetPropertiesDirectAttributeMap() {
   assertEquals('Should be equal', '#myMap', el.getAttribute('usemap'));
 }
 
+function testSetPropertiesDirectAttributeMapChecksForOwnProperties() {
+  stubs.set(Object.prototype, 'customProp', 'sdflasdf.,m.,<>fsdflas213!@#');
+  var attrs = {'usemap': '#myMap'};
+  var el = goog.dom.createDom(goog.dom.TagName.IMG);
+
+  var res = goog.dom.setProperties(el, attrs);
+  assertEquals('Should be equal', '#myMap', el.getAttribute('usemap'));
+}
+
 function testSetPropertiesAria() {
   var attrs = {
     'aria-hidden': 'true',
@@ -276,8 +285,9 @@ function testGetDocumentHeightInIframe() {
   var doc = goog.dom.getDomHelper(myIframeDoc).getDocument();
   var height = goog.dom.getDomHelper(myIframeDoc).getDocumentHeight();
 
-  // Broken in webkit quirks mode and in IE8+
-  if ((goog.dom.isCss1CompatMode_(doc) || !goog.userAgent.WEBKIT) &&
+  // Broken in webkit/edge quirks mode and in IE8+
+  if ((goog.dom.isCss1CompatMode_(doc) ||
+       !goog.userAgent.WEBKIT && !goog.userAgent.EDGE) &&
       !isIE8OrHigher()) {
     assertEquals('height should be 65', 42 + 23, height);
   }
@@ -927,7 +937,7 @@ function testSetTextContent() {
   assertEquals(s, p1.firstChild.data);
 
   // Text/CharacterData
-  p1.innerHTML = 'before';
+  goog.dom.setTextContent(p1, 'before');
   s = 'after';
   goog.dom.setTextContent(p1.firstChild, s);
   assertEquals('We should have one childNode after setTextContent', 1,
@@ -943,7 +953,7 @@ function testSetTextContent() {
   assertEquals(s, df.firstChild.data);
 
   // clean up
-  p1.innerHTML = '';
+  goog.dom.removeChildren(p1);
 }
 
 function testFindNode() {
@@ -1104,6 +1114,9 @@ function testIsFocusable() {
       goog.dom.isFocusableTabIndex(goog.dom.getElement('tabIndexNegative1')),
       goog.dom.isFocusable(goog.dom.getElement('tabIndexNegative1')));
 
+  // Make sure IE doesn't throw for detached elements. IE can't measure detached
+  // elements, and calling getBoundingClientRect() will throw Unspecified Error.
+  goog.dom.isFocusable(goog.dom.createDom('button'));
 }
 
 function testGetTextContent() {
@@ -1270,6 +1283,11 @@ function testGetFrameContentWindow() {
   var name = iframe.name;
   var iframeWin = goog.dom.getFrameContentWindow(iframe);
   assertEquals(window.frames[name], iframeWin);
+}
+
+function testGetFrameContentWindowNotInitialized() {
+  var iframe = goog.dom.createDom(goog.dom.TagName.IFRAME);
+  assertNull(goog.dom.getFrameContentWindow(iframe));
 }
 
 function testCanHaveChildren() {
@@ -1558,6 +1576,29 @@ function testGetDocumentScrollFromDocumentWithoutABody() {
   assertEquals(0, dh.getDocumentScroll().x);
   assertEquals(0, dh.getDocumentScroll().y);
   // OK if this does not throw.
+}
+
+function testDefaultToScrollingElement() {
+  var fakeDocument = {
+    documentElement: {},
+    body: {}
+  };
+  var dh = new goog.dom.DomHelper(fakeDocument);
+
+  // When scrollingElement isn't supported or is null (no element causes
+  // scrolling), then behavior is UA-dependant for maximum compatibility.
+  assertTrue(dh.getDocumentScrollElement() == fakeDocument.body ||
+      dh.getDocumentScrollElement() == fakeDocument.documentElement);
+  fakeDocument.scrollingElement = null;
+  assertTrue(dh.getDocumentScrollElement() == fakeDocument.body ||
+      dh.getDocumentScrollElement() == fakeDocument.documentElement);
+
+  // But when scrollingElement is set, we use it directly.
+  fakeDocument.scrollingElement = fakeDocument.documentElement;
+  assertEquals(fakeDocument.documentElement, dh.getDocumentScrollElement());
+  fakeDocument.scrollingElement = fakeDocument.body;
+  assertEquals(fakeDocument.body, dh.getDocumentScrollElement());
+
 }
 
 function testActiveElementIE() {

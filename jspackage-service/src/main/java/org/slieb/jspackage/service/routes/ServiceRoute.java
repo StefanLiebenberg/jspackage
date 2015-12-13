@@ -1,6 +1,9 @@
-package org.slieb.jspackage.service.handlers;
+package org.slieb.jspackage.service.routes;
 
 import org.apache.commons.io.IOUtils;
+import org.slieb.jspackage.service.handlers.RoutesNotFoundExceptionHandler;
+import org.slieb.sparks.Sparks;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import spark.Request;
@@ -10,10 +13,6 @@ import spark.Route;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static slieb.kute.resources.Resources.readResource;
 
 
 public class ServiceRoute implements Route {
@@ -26,7 +25,8 @@ public class ServiceRoute implements Route {
 
 
     @Override
-    public Object handle(Request request, Response response) throws Exception {
+    public Object handle(Request request,
+                         Response response) throws Exception {
         long startTime = System.nanoTime();
 
         try {
@@ -39,28 +39,22 @@ public class ServiceRoute implements Route {
                      OutputStream outputStream = response.raw().getOutputStream()) {
                     IOUtils.copy(inputStream, outputStream);
                 }
-                
+
                 return "";
             }
-            return readResource(getReadable(request));
+            return Kute.readResource(getReadable(request));
         } finally {
             System.out.println(request.pathInfo() + ": " + (System.nanoTime() - startTime) / 1000000);
         }
     }
 
     public Resource.Readable getReadable(Request request) throws RoutesNotFoundExceptionHandler.ResourceNotFound {
-        Resource.Readable readable = provider.getResourceByName(request.pathInfo());
-        if (readable != null) {
-            return readable;
-        }
-        throw new RoutesNotFoundExceptionHandler.ResourceNotFound();
+        return provider.getResourceByName(request.pathInfo()).orElseThrow(
+                RoutesNotFoundExceptionHandler.ResourceNotFound::new);
     }
 
-    public String getContentType(Request request, Response response) throws IOException {
-        String path = request.pathInfo();
-        if (path.endsWith("/")) {
-            return "text/html";
-        }
-        return Files.probeContentType(Paths.get(path));
+    public String getContentType(Request request,
+                                 Response response) throws IOException {
+        return Sparks.getContentType(request);
     }
 }

@@ -23,6 +23,9 @@ goog.provide('goog.events.ListenableKey');
 /** @suppress {extraRequire} */
 goog.require('goog.events.EventId');
 
+goog.forwardDeclare('goog.events.EventLike');
+goog.forwardDeclare('goog.events.EventTarget');
+
 
 
 /**
@@ -295,7 +298,7 @@ goog.events.ListenableKey.reserveKey = function() {
 
 /**
  * The source event target.
- * @type {!(Object|goog.events.Listenable|goog.events.EventTarget)}
+ * @type {Object|goog.events.Listenable|goog.events.EventTarget}
  */
 goog.events.ListenableKey.prototype.src;
 
@@ -323,7 +326,7 @@ goog.events.ListenableKey.prototype.capture;
 
 /**
  * The 'this' object for the listener function's scope.
- * @type {Object}
+ * @type {Object|undefined}
  */
 goog.events.ListenableKey.prototype.handler;
 

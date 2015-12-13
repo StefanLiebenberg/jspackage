@@ -10,24 +10,32 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
+/**
+ * /compile/script.min.js
+ * /compile/script.sourceMap.js
+ */
 public class CompileProvider implements ResourceProvider<Resource.Readable> {
 
-    private final ToolsProvider toolsProvider;
+    public final String outputLocation;
 
-    private final Configuration configuration;
+    public final Set<String> inputNamespaces;
 
     private final LazyCompile lazyCompile;
 
+    private final BuildProvider buildProvider;
 
-    public CompileProvider(ToolsProvider toolsProvider, Configuration configuration) {
-        this.lazyCompile = new LazyCompile(toolsProvider, configuration);
-        this.toolsProvider = toolsProvider;
-        this.configuration = configuration;
+    public CompileProvider(ResourceProvider<? extends Resource.Readable> provider,
+                           Set<String> inputNamespaces,
+                           String outputLocation) {
+        this.inputNamespaces = inputNamespaces;
+        this.outputLocation = outputLocation;
+        this.buildProvider = new BuildProvider(provider);
+        this.lazyCompile = new LazyCompile(this.buildProvider, this.inputNamespaces);
     }
 
     @Override
@@ -35,25 +43,19 @@ public class CompileProvider implements ResourceProvider<Resource.Readable> {
         return Stream.of(getCompiledResource());
     }
 
-    private Resource.Readable getCompiledResource() {
-        return new CompileResource(configuration.outputLocation(), lazyCompile);
-    }
-
 
     @Override
-    public Resource.Readable getResourceByName(String path) {
-        if (configuration.outputLocation().equals(path)) {
-            return getCompiledResource();
+    public Optional<Resource.Readable> getResourceByName(String path) {
+        if (outputLocation.equals(path)) {
+            return Optional.of(getCompiledResource());
         }
-        return null;
+        return Optional.empty();
     }
 
-    public interface Configuration {
-
-        String outputLocation();
-
-        Set<String> inputNamespaces();
+    public Resource.Readable getCompiledResource() {
+        return new CompileResource(outputLocation, lazyCompile);
     }
+
 
 }
 
@@ -64,7 +66,8 @@ class CompileResource implements Resource.Readable {
 
     private final LazyCompile lazyCompile;
 
-    public CompileResource(String path, LazyCompile lazyCompile) {
+    public CompileResource(String path,
+                           LazyCompile lazyCompile) {
         this.path = path;
         this.lazyCompile = lazyCompile;
     }
@@ -83,22 +86,22 @@ class CompileResource implements Resource.Readable {
 
 class LazyCompile {
 
-    private final ToolsProvider readables;
+    private final BuildProvider readables;
 
-    private final CompileProvider.Configuration configuration;
+    private final Set<String> inputNamespaces;
 
-    public LazyCompile(ToolsProvider toolsProvider, CompileProvider.Configuration configuration) {
-        this.readables = toolsProvider;
-        this.configuration = configuration;
+    public LazyCompile(BuildProvider buildProvider,
+                       Set<String> inputNamespaces) {
+        this.readables = buildProvider;
+        this.inputNamespaces = inputNamespaces;
     }
 
     private CompilerOptions options() {
-        CompilerOptions options = new CompilerOptions();
-        return options;
+        return new CompilerOptions();
     }
 
     private List<SourceFile> sources() {
-        return toSourceFiles(this.readables.getResourcesForNamespaceSet(configuration.inputNamespaces()).stream());
+        return toSourceFiles(this.readables.getResourcesForNamespaceSet(inputNamespaces).stream());
     }
 
 

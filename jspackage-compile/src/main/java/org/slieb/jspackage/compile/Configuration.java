@@ -20,7 +20,7 @@ public interface Configuration {
 
         List<String> getInputNamespaces();
 
-        Resource.Writeable getOutputResource();
+        Resource.Writable getOutputResource();
     }
 
 }

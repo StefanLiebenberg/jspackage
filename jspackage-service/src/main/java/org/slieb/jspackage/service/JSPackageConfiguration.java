@@ -1,49 +1,46 @@
 package org.slieb.jspackage.service;
 
 
-import com.google.common.base.Preconditions;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
+
+import java.net.URI;
 
 public class JSPackageConfiguration {
 
     private final Integer port;
 
-    private final ResourceProvider<? extends Resource.Readable> resourceProvider;
+    private final ResourceProvider<Resource.Readable> resourceProvider;
 
-    public JSPackageConfiguration(Integer port, ResourceProvider<? extends Resource.Readable> resourceProvider) {
+    public final URI resourcesPath, imagePath;
+
+
+    /**
+     * Use the builder.
+     *
+     * @param port
+     * @param resourceProvider
+     * @param resourcesPath
+     * @param imagePath
+     */
+    protected JSPackageConfiguration(Integer port,
+                                     ResourceProvider<Resource.Readable> resourceProvider,
+                                     URI resourcesPath,
+                                     URI imagePath) {
         this.port = port;
         this.resourceProvider = resourceProvider;
+        this.resourcesPath = resourcesPath;
+        this.imagePath = imagePath;
     }
 
     public Integer getPort() {
         return port;
     }
 
-    public ResourceProvider<? extends Resource.Readable> getResourceProvider() {
+    public ResourceProvider<Resource.Readable> getResourceProvider() {
         return resourceProvider;
     }
 
-    public static class Builder {
 
-        private Integer port = 6655;
-
-        private ResourceProvider<? extends Resource.Readable> resourceProvider;
-
-        public Builder withPort(Integer port) {
-            this.port = port;
-            return this;
-        }
-
-        public Builder withResourceProvider(ResourceProvider<? extends Resource.Readable> resourceProvider) {
-            this.resourceProvider = resourceProvider;
-            return this;
-        }
-
-        public JSPackageConfiguration build() {
-            Preconditions.checkNotNull(port, "Port cannot be null");
-
-            return new JSPackageConfiguration(port, resourceProvider);
-        }
-    }
 }
+

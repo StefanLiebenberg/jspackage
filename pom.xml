@@ -18,27 +18,27 @@
         <dep.maven-plugin-tools>3.4</dep.maven-plugin-tools>
         <dep.maven-dependency-plugin>2.8</dep.maven-dependency-plugin>
         <dep.maven-plugin-testing-harness>3.3.0</dep.maven-plugin-testing-harness>
-        <dep.kute>0.8-SNAPSHOT</dep.kute>
-        <dep.kute-service>1.0</dep.kute-service>
-        <dep.dependency-calculator>0.4-SNAPSHOT</dep.dependency-calculator>
-        <dep.closure-compiler>v20150505</dep.closure-compiler>
-        <dep.closure-dependency-calulcator>1.0</dep.closure-dependency-calulcator>
+        <dep.kute>1.0</dep.kute>
+        <dep.kute-service>1.1-SNAPSHOT</dep.kute-service>
+        <dep.dependency-calculator>0.5-SNAPSHOT</dep.dependency-calculator>
+        <dep.closure-dependency-calculator>1.2-SNAPSHOT</dep.closure-dependency-calculator>
+        <dep.closure-compiler>v20151015</dep.closure-compiler>
         <dep.commons-lang3>3.3.2</dep.commons-lang3>
-
         <dep.mojo-executor>2.2.0</dep.mojo-executor>
         <dep.guice>4.0</dep.guice>
         <dep.guava>18.0</dep.guava>
         <dep.rhino>1.7.7</dep.rhino>
         <dep.commons-io>1.3.2</dep.commons-io>
-        <dep.spark>2.2</dep.spark>
+        <dep.sparkWrapper>1.1</dep.sparkWrapper>
 
+        <dep.closure-stylesheets>20150206</dep.closure-stylesheets>
+        <dep.soy>2015-04-10</dep.soy>
         <dep.mockito>1.10.19</dep.mockito>
         <dep.junit>4.12</dep.junit>
         <dep.jsoup>1.8.3</dep.jsoup>
 
         <dep.js-runtimes>1.1-SNAPSHOT</dep.js-runtimes>
-        <dep.jsunit-testing-suite>1.0-SNAPSHOT</dep.jsunit-testing-suite>
-
+        <dep.jsunit-testing-suite>1.1-SNAPSHOT</dep.jsunit-testing-suite>
         <plugin.maven-invoker-plugin>1.10</plugin.maven-invoker-plugin>
         <plugin.maven-compiler-plugin>3.3</plugin.maven-compiler-plugin>
         <plugin.maven-scm-plugin>1.9.4</plugin.maven-scm-plugin>
@@ -56,6 +56,7 @@
         <module>jspackage-closure-utilities</module>
         <module>jspackage-service</module>
         <module>jspackage-compile</module>
+        <module>jspackage-api</module>
     </modules>
 
     <build>

@@ -29,11 +29,24 @@ goog.testing.asserts.ArrayLike;
 var DOUBLE_EQUALITY_PREDICATE = function(var1, var2) {
   return var1 == var2;
 };
-var JSUNIT_UNDEFINED_VALUE;
+var JSUNIT_UNDEFINED_VALUE = void 0;
 var TO_STRING_EQUALITY_PREDICATE = function(var1, var2) {
   return var1.toString() === var2.toString();
 };
 
+/** @typedef {function(?, ?):boolean} */
+var PredicateFunctionType;
+
+/**
+ * @const {{
+ *   String : PredicateFunctionType,
+ *   Number : PredicateFunctionType,
+ *   Boolean : PredicateFunctionType,
+ *   Date : PredicateFunctionType,
+ *   RegExp : PredicateFunctionType,
+ *   Function : PredicateFunctionType
+ * }}
+ */
 var PRIMITIVE_EQUALITY_PREDICATES = {
   'String': DOUBLE_EQUALITY_PREDICATE,
   'Number': DOUBLE_EQUALITY_PREDICATE,
@@ -311,25 +324,32 @@ var assertNotThrows = function(a, opt_b) {
  *     in a JsUnitException (usually contains a call to an assert).
  * @param {string=} opt_expectedMessage Failure message expected to be given
  *     with the exception.
+ * @return {!goog.testing.JsUnitException} The error thrown by the function.
+ * @throws {goog.testing.JsUnitException} If the function did not throw a
+ *     JsUnitException.
  */
 var assertThrowsJsUnitException = function(callback, opt_expectedMessage) {
-  var failed = false;
   try {
     goog.testing.asserts.callWithoutLogging(callback);
-  } catch (ex) {
-    if (!ex.isJsUnitException) {
+  } catch (e) {
+    if (!e.isJsUnitException) {
       fail('Expected a JsUnitException');
     }
+
     if (typeof opt_expectedMessage != 'undefined' &&
-        ex.message != opt_expectedMessage) {
+        e.message != opt_expectedMessage) {
       fail('Expected message [' + opt_expectedMessage + '] but got [' +
-          ex.message + ']');
+          e.message + ']');
     }
-    failed = true;
+
+    return e;
   }
-  if (!failed) {
-    fail('Expected a failure: ' + opt_expectedMessage);
+
+  var msg = 'Expected a failure';
+  if (typeof opt_expectedMessage != 'undefined') {
+    msg += ': ' + opt_expectedMessage;
   }
+  throw new goog.testing.JsUnitException(msg);
 };
 
 
@@ -945,7 +965,7 @@ var assertEvaluatesToFalse = function(a, opt_b) {
  * comparisons erroneously fail:
  * <pre>
  * assertHTMLEquals('<a href="x" target="y">', '<a target="y" href="x">');
- * assertHTMLEquals('<div classname="a b">', '<div classname="b a">');
+ * assertHTMLEquals('<div class="a b">', '<div class="b a">');
  * assertHTMLEquals('<input disabled>', '<input disabled="disabled">');
  * </pre>
  *

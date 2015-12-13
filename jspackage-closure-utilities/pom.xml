@@ -38,14 +38,14 @@
             <version>${dep.closure-compiler}</version>
         </dependency>
         <dependency>
-            <groupId>org.slieb</groupId>
-            <artifactId>closure-dependency-calculator</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.template</groupId>
             <artifactId>soy</artifactId>
-            <version>2015-04-10</version>
+            <version>${dep.soy}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.closure-stylesheets</groupId>
+            <artifactId>closure-stylesheets</artifactId>
+            <version>${dep.closure-stylesheets}</version>
         </dependency>
         <dependency>
             <groupId>org.slieb.jspackage</groupId>
@@ -62,7 +62,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${dep.junit}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slieb</groupId>
+            <artifactId>closure-dependency-calculator</artifactId>
+            <version>${dep.closure-dependency-calculator}</version>
         </dependency>
     </dependencies>
 

@@ -1,4 +1,5 @@
-package org.slieb.tools.jspackage.internal;
+package slieb.jspackage.api;
+
 
 import com.google.javascript.jscomp.CompilerOptions;
 

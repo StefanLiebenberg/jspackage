@@ -16,7 +16,7 @@
 /**
  * @fileoverview The SafeHtml type and its builders.
  *
- * TODO(user): Link to document stating type contract.
+ * TODO(xtof): Link to document stating type contract.
  */
 
 goog.provide('goog.html.SafeHtml');
@@ -309,9 +309,10 @@ goog.html.SafeHtml.URL_ATTRIBUTES_ = goog.object.createSet('action', 'cite',
  * @private @const {!Object<string,boolean>}
  */
 goog.html.SafeHtml.NOT_ALLOWED_TAG_NAMES_ = goog.object.createSet(
-    goog.dom.TagName.EMBED, goog.dom.TagName.IFRAME, goog.dom.TagName.LINK,
+    goog.dom.TagName.APPLET, goog.dom.TagName.BASE, goog.dom.TagName.EMBED,
+    goog.dom.TagName.IFRAME, goog.dom.TagName.LINK, goog.dom.TagName.MATH,
     goog.dom.TagName.OBJECT, goog.dom.TagName.SCRIPT, goog.dom.TagName.STYLE,
-    goog.dom.TagName.TEMPLATE);
+    goog.dom.TagName.SVG, goog.dom.TagName.TEMPLATE);
 
 
 /**
@@ -351,10 +352,12 @@ goog.html.SafeHtml.AttributeValue_;
  * - For attributes which contain style (style), a goog.html.SafeStyle or a
  *   goog.html.SafeStyle.PropertyMap is required.
  * - For attributes which are interpreted as URLs (e.g. src, href) a
- *   goog.html.SafeUrl or goog.string.Const is required.
- * - For tags which can load code, more specific goog.html.SafeHtml.create*()
- *   functions must be used. Tags which can load code and are not supported by
- *   this function are embed, iframe, link, object, script, style, and template.
+ *   goog.html.SafeUrl, goog.string.Const or string is required. If a string
+ *   is passed, it will be sanitized with SafeUrl.sanitize().
+ * - For tags which can load code or set security relevant page metadata,
+ *   more specific goog.html.SafeHtml.create*() functions must be used. Tags
+ *   which are not supported by this function are applet, base, embed, iframe,
+ *   link, math, object, script, style, svg, and template.
  *
  * @param {string} tagName The name of the tag. Only tag names consisting of
  *     [a-zA-Z0-9-] are allowed. Tag names documented above are disallowed.
@@ -478,12 +481,12 @@ goog.html.SafeHtml.getAttrNameAndValue_ = function(tagName, name, value) {
       value = goog.html.TrustedResourceUrl.unwrap(value);
     } else if (value instanceof goog.html.SafeUrl) {
       value = goog.html.SafeUrl.unwrap(value);
+    } else if (goog.isString(value)) {
+      value = goog.html.SafeUrl.sanitize(value).getTypedStringValue();
     } else {
-      // TODO(user): Allow strings and sanitize them automatically,
-      // so that it's consistent with accepting a map directly for "style".
       throw Error('Attribute "' + name + '" on tag "' + tagName +
-          '" requires goog.html.SafeUrl or goog.string.Const value, "' +
-          value + '" given.');
+          '" requires goog.html.SafeUrl, goog.string.Const, or string,' +
+          ' value "' + value + '" given.');
     }
   }
 
@@ -595,7 +598,7 @@ goog.html.SafeHtml.concatWithDir = function(dir, var_args) {
 /**
  * Type marker for the SafeHtml type, used to implement additional run-time
  * type checking.
- * @const
+ * @const {!Object}
  * @private
  */
 goog.html.SafeHtml.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ = {};

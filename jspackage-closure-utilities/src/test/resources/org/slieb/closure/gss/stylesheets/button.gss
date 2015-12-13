@@ -1,0 +1,5 @@
+@provide "button";
+
+a.button {
+    border: 1px inset black;
+}

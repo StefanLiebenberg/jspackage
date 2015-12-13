@@ -16,11 +16,44 @@ goog.provide('goog.dom.safeTest');
 goog.setTestOnly('goog.dom.safeTest');
 
 goog.require('goog.dom.safe');
+goog.require('goog.dom.safe.InsertAdjacentHtmlPosition');
+goog.require('goog.html.SafeHtml');
 goog.require('goog.html.SafeUrl');
 goog.require('goog.html.TrustedResourceUrl');
 goog.require('goog.html.testing');
 goog.require('goog.string.Const');
+goog.require('goog.testing');
 goog.require('goog.testing.jsunit');
+
+
+var mockWindowOpen;
+
+
+function tearDown() {
+  if (mockWindowOpen) {
+    mockWindowOpen.$tearDown();
+  }
+}
+
+
+function testInsertAdjacentHtml() {
+  var writtenHtml;
+  var writtenPosition;
+  var mockNode =  /** @type {!Node} */ ({
+    'insertAdjacentHTML': function(position, html) {
+      writtenPosition = position;
+      writtenHtml = html;
+    }
+  });
+
+  goog.dom.safe.insertAdjacentHtml(
+      mockNode,
+      goog.dom.safe.InsertAdjacentHtmlPosition.BEFOREBEGIN,
+      goog.html.SafeHtml.create('div', {}, 'foobar'));
+  assertEquals('<div>foobar</div>', writtenHtml);
+  assertEquals('beforebegin', writtenPosition);
+}
+
 
 function testSetInnerHtml() {
   var mockElement =  /** @type {!Element} */ ({
@@ -31,7 +64,6 @@ function testSetInnerHtml() {
   goog.dom.safe.setInnerHtml(mockElement, safeHtml);
   assertEquals(html, mockElement.innerHTML);
 }
-
 
 function testDocumentWrite() {
   var mockDoc = /** @type {!Document} */ ({
@@ -129,4 +161,58 @@ function testSetAnchorHref() {
       goog.string.Const.from('javascript:trusted();'));
   goog.dom.safe.setAnchorHref(mockAnchor, safeUrl);
   assertEquals('javascript:trusted();', mockAnchor.href);
+}
+
+function testSetImageSrc_withSafeUrlObject() {
+  var mockImageElement =  /** @type {!HTMLImageElement} */ ({
+    'src': 'blarg'
+  });
+  goog.dom.safe.setImageSrc(mockImageElement, 'javascript:evil();');
+  assertEquals('about:invalid#zClosurez', mockImageElement.src);
+
+  mockImageElement =  /** @type {!HTMLImageElement} */ ({
+    'src': 'blarg'
+  });
+  var safeUrl = goog.html.SafeUrl.fromConstant(
+      goog.string.Const.from('javascript:trusted();'));
+  goog.dom.safe.setImageSrc(mockImageElement, safeUrl);
+  assertEquals('javascript:trusted();', mockImageElement.src);
+}
+
+function testSetImageSrc_withHttpsUrl() {
+  var mockImageElement =  /** @type {!HTMLImageElement} */ ({
+    'src': 'blarg'
+  });
+
+  var safeUrl = 'https://trusted_url';
+  goog.dom.safe.setImageSrc(mockImageElement, safeUrl);
+  assertEquals(safeUrl, mockImageElement.src);
+}
+
+function testOpenInWindow() {
+  mockWindowOpen = goog.testing.createMethodMock(window, 'open');
+  var fakeWindow = {};
+
+  mockWindowOpen('about:invalid#zClosurez', 'name', 'specs', true).
+      $returns(fakeWindow);
+  mockWindowOpen.$replay();
+  var retVal = goog.dom.safe.openInWindow('javascript:evil();', window,
+      goog.string.Const.from('name'), 'specs', true);
+  mockWindowOpen.$verify();
+  assertEquals('openInWindow should return the created window',
+      fakeWindow, retVal);
+
+  mockWindowOpen.$reset();
+  retVal = null;
+
+  var safeUrl = goog.html.SafeUrl.fromConstant(
+      goog.string.Const.from('javascript:trusted();'));
+  mockWindowOpen('javascript:trusted();', 'name', 'specs', true).
+      $returns(fakeWindow);
+  mockWindowOpen.$replay();
+  retVal = goog.dom.safe.openInWindow(safeUrl, window,
+      goog.string.Const.from('name'), 'specs', true);
+  mockWindowOpen.$verify();
+  assertEquals('openInWindow should return the created window',
+      fakeWindow, retVal);
 }

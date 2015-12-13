@@ -4,6 +4,7 @@ package org.slieb.closure.javascript.providers;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -27,12 +28,12 @@ public class DevelopmentProvider implements ResourceProvider<Resource.Readable> 
 
 
     @Override
-    public Resource.Readable getResourceByName(String path) {
-        return null;
+    public Optional<Resource.Readable> getResourceByName(String path) {
+        return Optional.empty();
     }
 
     @Override
     public Stream<Resource.Readable> stream() {
-        return null;
+        return Stream.empty();
     }
 }

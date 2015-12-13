@@ -16,6 +16,9 @@
                 <groupId>@project.groupId@</groupId>
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
+                <configuration>
+                    <useClasspath>false</useClasspath>
+                </configuration>
                 <executions>
                     <execution>
                         <id>unpack-dependencies</id>
@@ -27,6 +30,7 @@
                     <execution>
                         <id>run-unit-test</id>
                         <goals>
+                            <goal>initialize</goal>
                             <goal>unit-tests</goal>
                         </goals>
                         <phase>test</phase>
@@ -35,7 +39,6 @@
                             <sources>
                                 <source>${project.build.directory}/unpacked-dependencies</source>
                                 <source>${basedir}/src/main/javascript</source>
-                                <source>${basedir}/src/test/javascript</source>
                             </sources>
                             <testSources>
                                 <source>${basedir}/src/test/javascript</source>

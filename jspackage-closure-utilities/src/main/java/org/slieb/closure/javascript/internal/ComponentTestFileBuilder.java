@@ -10,7 +10,8 @@ public class ComponentTestFileBuilder {
 
     private final GoogDependencyCalculator calculator;
 
-    public ComponentTestFileBuilder(Resource.Readable testResource, GoogDependencyCalculator calculator) {
+    public ComponentTestFileBuilder(Resource.Readable testResource,
+                                    GoogDependencyCalculator calculator) {
         this.testResource = testResource;
         this.calculator = calculator;
     }

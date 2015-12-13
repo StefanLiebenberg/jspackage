@@ -6,6 +6,7 @@ import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
 import com.google.javascript.jscomp.CompilerOptions;
+import slieb.jspackage.api.OptionsHandler;
 
 import java.util.Set;
 
@@ -18,7 +19,8 @@ public class DefaultsModule extends AbstractModule {
 
     @Provides
     @Named("compilerOptions")
-    public CompilerOptions compilerOptions(CompilerOptions options, Set<OptionsHandler> optionHandlers) {
+    public CompilerOptions compilerOptions(CompilerOptions options,
+                                           Set<OptionsHandler> optionHandlers) {
         optionHandlers.forEach(handler -> handler.handle(options));
         return options;
     }

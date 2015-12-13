@@ -1,14 +1,17 @@
 package org.slieb.closure.javascript.providers;
 
 
+import org.slieb.closure.javascript.internal.DepsFileBuilder;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogDependencyParser;
 import org.slieb.closure.dependencies.GoogResources;
-import org.slieb.closure.javascript.internal.DepsFileBuilder;
+import org.slieb.closure.dependencies.SourceFileResource;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 import slieb.kute.resources.implementations.StringSupplierResource;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ClosureProvider implements ResourceProvider<Resource.Readable> {
@@ -26,10 +29,11 @@ public class ClosureProvider implements ResourceProvider<Resource.Readable> {
      * @param provider
      * @param parser
      */
-    public ClosureProvider(ResourceProvider<? extends Resource.Readable> provider, GoogDependencyParser parser) {
+    public ClosureProvider(ResourceProvider<Resource.Readable> provider,
+                           GoogDependencyParser parser) {
         this.provider = provider;
         this.parser = GoogResources.getDependencyParser();
-        this.calculator = GoogResources.getCalculatorCast(provider);
+        this.calculator = GoogResources.getCalculator(Kute.mapResources(provider, SourceFileResource::new));
     }
 
     private Resource.Readable getDependencyResource() {
@@ -41,16 +45,16 @@ public class ClosureProvider implements ResourceProvider<Resource.Readable> {
     }
 
     @Override
-    public Resource.Readable getResourceByName(String path) {
+    public Optional<Resource.Readable> getResourceByName(String path) {
         if (DEPS.equals(path)) {
-            return getDependencyResource();
+            return Optional.of(getDependencyResource());
         }
 
         if (DEFINES.equals(path)) {
-            return getDefinesResource();
+            return Optional.of(getDefinesResource());
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override

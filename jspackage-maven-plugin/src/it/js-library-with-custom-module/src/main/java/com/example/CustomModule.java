@@ -6,7 +6,7 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.CompilerPass;
 import com.google.javascript.jscomp.NodeUtil;
 import com.google.javascript.rhino.Node;
-import org.slieb.tools.jspackage.internal.OptionsHandler;
+import org.slieb.tools.jspackage.api.OptionsHandler;
 
 import static com.google.javascript.jscomp.CustomPassExecutionTime.BEFORE_CHECKS;
 
@@ -45,7 +45,8 @@ class CustomPass implements CompilerPass {
     }
 
     @Override
-    public void process(Node externs, Node root) {
+    public void process(Node externs,
+                        Node root) {
         CustomVisitor visitor = visitorProvider.get();
         NodeUtil.visitPreOrder(root, visitor, input -> true);
     }

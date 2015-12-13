@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.io.IOUtils;
 import org.slieb.closure.dependencies.GoogDependencyNode;
 import org.slieb.closure.dependencies.GoogResources;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
@@ -16,7 +17,6 @@ import java.util.Iterator;
 
 import static slieb.kute.resources.ResourcePredicates.all;
 import static slieb.kute.resources.ResourcePredicates.extensionFilter;
-import static slieb.kute.resources.Resources.filterResources;
 
 
 public class AllTestsResource implements Resource.Readable {
@@ -29,11 +29,13 @@ public class AllTestsResource implements Resource.Readable {
     private final ResourceProvider<? extends Readable> filterJs;
     private final ResourceProvider<? extends Readable> filterTests;
 
-    public AllTestsResource(String path, ResourceProvider<? extends Readable> sources) {
+    public AllTestsResource(String path,
+                            ResourceProvider<? extends Readable> sources) {
         this.path = path;
         this.sources = sources;
-        this.filterJs = filterResources(this.sources, all(extensionFilter(".js"), extensionFilter("_test.js").negate()));
-        this.filterTests = filterResources(this.sources, extensionFilter("_test.html"));
+        this.filterJs = Kute.filterResources(this.sources,
+                                             all(extensionFilter(".js"), extensionFilter("_test.js").negate()));
+        this.filterTests = Kute.filterResources(this.sources, extensionFilter("_test.html"));
     }
 
     private String rename(String testpath) {
@@ -56,9 +58,11 @@ public class AllTestsResource implements Resource.Readable {
 
     private String getScriptsContent() {
         StringBuilder builder = new StringBuilder();
-        GoogResources.getCalculatorCast(filterJs).getDependencyResolver()
+        GoogResources.getCalculator(Kute.asReadableProvider(filterJs))
+                .getDependencyResolver()
                 .resolveNamespaces(ImmutableList.of("goog.userAgent.product", "goog.testing.MultiTestRunner"))
-                .resolve().stream().map(GoogDependencyNode::getResource).map(this::getScriptPath).forEach(builder::append);
+                .resolve().stream().map(GoogDependencyNode::getResource).map(this::getScriptPath).forEach(
+                builder::append);
         return builder.toString();
     }
 
@@ -70,8 +74,8 @@ public class AllTestsResource implements Resource.Readable {
     public Reader getReader() throws IOException {
         try (InputStream input = getClass().getResourceAsStream(ALL_TEST)) {
             return new StringReader(IOUtils.toString(input)
-                    .replace("$$ALL_TESTS$$", getAllTestsContent())
-                    .replace("$$SCRIPTS$$", getScriptsContent()));
+                                            .replace("$$ALL_TESTS$$", getAllTestsContent())
+                                            .replace("$$SCRIPTS$$", getScriptsContent()));
         }
     }
 

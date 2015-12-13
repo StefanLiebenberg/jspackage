@@ -13,9 +13,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.sparkjava</groupId>
-            <artifactId>spark-core</artifactId>
-            <version>${dep.spark}</version>
+            <groupId>org.slieb</groupId>
+            <artifactId>spark-wrapper</artifactId>
+            <version>${dep.sparkWrapper}</version>
         </dependency>
         <dependency>
             <groupId>org.slieb</groupId>

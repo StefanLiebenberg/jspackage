@@ -21,7 +21,10 @@
  */
 
 goog.provide('goog.crypt.base64');
+
+goog.require('goog.asserts');
 goog.require('goog.crypt');
+goog.require('goog.string');
 goog.require('goog.userAgent');
 
 // Static lookup maps, lazily populated by init_()
@@ -110,9 +113,10 @@ goog.crypt.base64.HAS_NATIVE_SUPPORT = goog.userAgent.GECKO ||
  * @return {string} The base64 encoded string.
  */
 goog.crypt.base64.encodeByteArray = function(input, opt_webSafe) {
-  if (!goog.isArrayLike(input)) {
-    throw Error('encodeByteArray takes an array as a parameter');
-  }
+  // Assert avoids runtime dependency on goog.isArrayLike, which helps reduce
+  // size of jscompiler output, and which yields slight performance increase.
+  goog.asserts.assert(goog.isArrayLike(input),
+                      'encodeByteArray takes an array as a parameter');
 
   goog.crypt.base64.init_();
 
@@ -191,7 +195,7 @@ goog.crypt.base64.decodeString = function(input, opt_webSafe) {
 
 
 /**
- * Base64-decode a string.
+ * Base64-decode a string to an Array of numbers.
  *
  * In base-64 decoding, groups of four characters are converted into three
  * bytes.  If the encoder did not apply padding, the input length may not
@@ -206,49 +210,111 @@ goog.crypt.base64.decodeString = function(input, opt_webSafe) {
  * @return {!Array<number>} bytes representing the decoded value.
  */
 goog.crypt.base64.decodeStringToByteArray = function(input, opt_webSafe) {
+  var output = [];
+  function pushByte(b) { output.push(b); }
+
+  goog.crypt.base64.decodeStringInternal_(input, pushByte, opt_webSafe);
+
+  return output;
+};
+
+
+/**
+ * Base64-decode a string to a Uint8Array.
+ *
+ * Note that Uint8Array is not supported on older browsers, e.g. IE < 10.
+ * @see http://caniuse.com/uint8array
+ *
+ * In base-64 decoding, groups of four characters are converted into three
+ * bytes.  If the encoder did not apply padding, the input length may not
+ * be a multiple of 4.
+ *
+ * In this case, the last group will have fewer than 4 characters, and
+ * padding will be inferred.  If the group has one or two characters, it decodes
+ * to one byte.  If the group has three characters, it decodes to two bytes.
+ *
+ * @param {string} input Input to decode.
+ * @param {boolean=} opt_webSafe True if we should use the web-safe alphabet.
+ * @return {!Uint8Array} bytes representing the decoded value.
+ */
+goog.crypt.base64.decodeStringToUint8Array = function(input, opt_webSafe) {
+  goog.asserts.assert(
+      !goog.userAgent.IE || goog.userAgent.isVersionOrHigher('10'),
+      'Browser does not support typed arrays');
+  var output = new Uint8Array(Math.ceil(input.length * 3 / 4));
+  var outLen = 0;
+  function pushByte(b) { output[outLen++] = b; }
+
+  goog.crypt.base64.decodeStringInternal_(input, pushByte, opt_webSafe);
+
+  return output.subarray(0, outLen);
+};
+
+
+/**
+ * @param {string} input Input to decode.
+ * @param {function(number):void} pushByte result accumulator.
+ * @param {boolean=} opt_webSafe True if we should use the web-safe alphabet.
+ * @private
+ */
+goog.crypt.base64.decodeStringInternal_ = function(
+    input, pushByte, opt_webSafe) {
   goog.crypt.base64.init_();
 
-  var charToByteMap = opt_webSafe ?
-                      goog.crypt.base64.charToByteMapWebSafe_ :
-                      goog.crypt.base64.charToByteMap_;
+  var charToByteMap = opt_webSafe ? goog.crypt.base64.charToByteMapWebSafe_ :
+                                    goog.crypt.base64.charToByteMap_;
 
-  var output = [];
+  var nextCharIndex = 0;
+  /** @return {?number} The next 6-bit value, or null for end-of-input. */
+  function getByte() {
+    while (nextCharIndex < input.length) {
+      var ch = input.charAt(nextCharIndex++);
+      var b = charToByteMap[ch];
+      if (b != null) {
+        return b;  // Common case: decoded the char.
+      }
+      if (!goog.string.isEmptyOrWhitespace(ch)) {
+        throw Error('Unknown base64 encoding at char: ' + ch);
+      }
+      // We encountered whitespace: loop around to the next input char.
+    }
+    return null;  // No more input remaining.
+  }
 
-  for (var i = 0; i < input.length; ) {
-    var byte1 = charToByteMap[input.charAt(i++)];
+  while (true) {
+    var byte1 = getByte();
+    var byte2 = getByte();
+    var byte3 = getByte();
+    var byte4 = getByte();
 
-    var haveByte2 = i < input.length;
-    var byte2 = haveByte2 ? charToByteMap[input.charAt(i)] : 0;
-    ++i;
-
-    var haveByte3 = i < input.length;
-    var byte3 = haveByte3 ? charToByteMap[input.charAt(i)] : 64;
-    ++i;
-
-    var haveByte4 = i < input.length;
-    var byte4 = haveByte4 ? charToByteMap[input.charAt(i)] : 64;
-    ++i;
-
-    if (byte1 == null || byte2 == null ||
-        byte3 == null || byte4 == null) {
-      throw Error();
+    // The common case is that all four bytes are present, so if we have byte4
+    // we can skip over the truncated input special case handling.
+    if (byte4 == null) {
+      if (byte1 == null) {
+        return;  // Terminal case: no input left to decode.
+      }
+      // Here we know an intermediate number of bytes are missing, so apply the
+      // inferred padding rules per the public API documentation. i.e: 1 byte
+      // missing should yield 2 bytes of output, but 2 or 3 missing bytes yield
+      // a single byte of output. (Recall that 64 corresponds the padding char).
+      byte4 = 64;
+      byte3 = byte3 != null ? byte3 : 64;
+      byte2 = byte2 != null ? byte2 : 0;
     }
 
     var outByte1 = (byte1 << 2) | (byte2 >> 4);
-    output.push(outByte1);
+    pushByte(outByte1);
 
     if (byte3 != 64) {
       var outByte2 = ((byte2 << 4) & 0xF0) | (byte3 >> 2);
-      output.push(outByte2);
+      pushByte(outByte2);
 
       if (byte4 != 64) {
         var outByte3 = ((byte3 << 6) & 0xC0) | byte4;
-        output.push(outByte3);
+        pushByte(outByte3);
       }
     }
   }
-
-  return output;
 };
 
 

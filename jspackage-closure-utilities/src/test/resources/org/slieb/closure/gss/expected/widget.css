@@ -1,0 +1,20 @@
+a.link {
+  background: blue;
+}
+a.link-image-absolute {
+  background-image: url(/grass.jpg);
+}
+a.link-image-normal {
+  background-image: url(grass.jpg);
+}
+a.link-image-relative-parent {
+  background-image: url(../grass.jpg);
+}
+a.button {
+  border: 1px inset black;
+}
+div.widget {
+  background: black;
+  color: white;
+  padding: 10px;
+}

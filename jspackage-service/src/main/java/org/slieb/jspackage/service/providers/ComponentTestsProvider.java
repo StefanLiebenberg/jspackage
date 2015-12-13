@@ -3,21 +3,27 @@ package org.slieb.jspackage.service.providers;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.jspackage.service.resources.ComponentTestResource;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
+import java.util.Optional;
 import java.util.stream.Stream;
+
+import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 
 
 public class ComponentTestsProvider implements ResourceProvider<Resource.Readable> {
 
-    private final ResourceProvider<? extends Resource.Readable> resources;
+    private final ResourceProvider<Resource.Readable> resources;
 
     private final GoogDependencyCalculator calculator;
 
-    public ComponentTestsProvider(ResourceProvider<? extends Resource.Readable> resources) {
+    public ComponentTestsProvider(ResourceProvider<Resource.Readable> resources) {
         this.resources = resources;
-        this.calculator = GoogResources.getCalculatorCast(this.resources);
+        this.calculator = GoogResources.getCalculator(
+                Kute.filterResources(resources,
+                                     extensionFilter(".js")));
     }
 
     @Override
@@ -26,13 +32,10 @@ public class ComponentTestsProvider implements ResourceProvider<Resource.Readabl
     }
 
     @Override
-    public Resource.Readable getResourceByName(String path) {
-        Resource.Readable readable = resources.getResourceByName(reverseComponentTestPath(path));
-        if (readable != null && this.filterResource(readable)) {
-            return componentTestResource(readable);
-        } else {
-            return null;
-        }
+    public Optional<Resource.Readable> getResourceByName(String path) {
+        return resources.getResourceByName(reverseComponentTestPath(path))
+                .filter(this::filterResource)
+                .map(this::componentTestResource);
     }
 
     private Boolean filterResource(Resource.Readable readable) {

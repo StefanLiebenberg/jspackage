@@ -4,6 +4,7 @@ package org.slieb.closure.javascript.internal;
 import com.google.common.base.Joiner;
 import org.slieb.closure.dependencies.GoogDependencyNode;
 import org.slieb.closure.dependencies.GoogDependencyParser;
+import org.slieb.closure.dependencies.SourceFileResource;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
@@ -20,7 +21,8 @@ public class DepsFileBuilder {
 
     private final GoogDependencyParser parser;
 
-    public DepsFileBuilder(ResourceProvider<? extends Resource.Readable> resourceProvider, GoogDependencyParser parser) {
+    public DepsFileBuilder(ResourceProvider<? extends Resource.Readable> resourceProvider,
+                           GoogDependencyParser parser) {
         this.resourceProvider = resourceProvider;
         this.parser = parser;
     }
@@ -31,6 +33,7 @@ public class DepsFileBuilder {
                 resourceProvider.stream()
                         .parallel()
                         .filter(r -> r.getPath().endsWith(".js"))
+                        .map(SourceFileResource::new)
                         .map(parser::parse).collect(toSet());
 
         Path basePath = nodes.stream()
@@ -47,19 +50,22 @@ public class DepsFileBuilder {
         return stringBuffer.toString();
     }
 
-    private String getDependencyLine(GoogDependencyNode dependencyNode, Path basePath) {
+    private String getDependencyLine(GoogDependencyNode dependencyNode,
+                                     Path basePath) {
         return String.format("goog.addDependency(%s, %s, %s);\n",
-                this.wrapString(getNodePath(dependencyNode.getResource(), basePath)),
-                getStringArray(dependencyNode.getProvides()),
-                getStringArray(dependencyNode.getRequires()));
+                             this.wrapString(getNodePath(dependencyNode.getResource(), basePath)),
+                             getStringArray(dependencyNode.getProvides()),
+                             getStringArray(dependencyNode.getRequires()));
     }
 
-    private String getNodePath(Resource resource, Path basePath) {
+    private String getNodePath(Resource resource,
+                               Path basePath) {
         return basePath.getParent().relativize(Paths.get(resource.getPath())).toString();
     }
 
     private String getStringArray(Collection<String> strings) {
-        return String.format("[%s]", Joiner.on(", ").join(strings.stream().map(this::wrapString).toArray(String[]::new)));
+        return String.format("[%s]",
+                             Joiner.on(", ").join(strings.stream().map(this::wrapString).toArray(String[]::new)));
     }
 
     private String wrapString(String content) {
