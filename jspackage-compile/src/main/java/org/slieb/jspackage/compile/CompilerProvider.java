@@ -6,11 +6,10 @@ import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.Compiler;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slieb.dependencies.DependencyResolver;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogDependencyNode;
 import org.slieb.closure.dependencies.GoogResources;
-import org.slieb.closure.dependencies.SourceFileResource;
+import org.slieb.dependencies.DependencyResolver;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
@@ -48,7 +47,7 @@ public class CompilerProvider implements ResourceProvider<Resource.Readable> {
         Preconditions.checkState(configuration.getSourceProvider().stream().count() > 0, "no inputs");
 
         GoogDependencyCalculator calculator = GoogResources.getCalculator(
-                Kute.mapResources(configuration.getSourceProvider(), SourceFileResource::new));
+                Kute.asReadableProvider(configuration.getSourceProvider()));
         DependencyResolver<GoogDependencyNode> resolver = calculator.getDependencyResolver();
         for (Configuration.Module module : configuration.getModules()) {
             resolver.resolveNamespaces(module.getInputNamespaces());

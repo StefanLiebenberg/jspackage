@@ -1,7 +1,6 @@
 package org.slieb.jspackage.service.resources;
 
 import org.slieb.closure.javascript.internal.DepsFileBuilder;
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
@@ -28,7 +27,7 @@ public class DepsResource implements Resource.Readable {
 
 
     public String getContent() {
-        return new DepsFileBuilder(filtered, GoogDependencyCalculator.PARSER).getDependencyContent();
+        return new DepsFileBuilder(filtered).getDependencyContent();
     }
 
     @Override

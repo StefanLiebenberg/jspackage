@@ -21,6 +21,7 @@
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
                 <configuration>
+                    <guiceModule>com.example.CustomModule</guiceModule>
                     <sources>
                         <source>${basedir}/target/unpacked-dependencies</source>
                         <source>${basedir}/src/main/javascript</source>
@@ -78,6 +79,11 @@
         <dependency>
             <groupId>@project.groupId@</groupId>
             <artifactId>jspackage-closure-library</artifactId>
+            <version>@project.version@</version>
+        </dependency>
+        <dependency>
+            <artifactId>jspackage-api</artifactId>
+            <groupId>org.slieb.jspackage</groupId>
             <version>@project.version@</version>
         </dependency>
         <dependency>

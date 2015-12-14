@@ -3,8 +3,7 @@ package org.slieb.closure.javascript.internal;
 
 import com.google.common.base.Joiner;
 import org.slieb.closure.dependencies.GoogDependencyNode;
-import org.slieb.closure.dependencies.GoogDependencyParser;
-import org.slieb.closure.dependencies.SourceFileResource;
+import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.api.Resource;
 import slieb.kute.api.ResourceProvider;
 
@@ -18,13 +17,9 @@ import static java.util.stream.Collectors.toSet;
 public class DepsFileBuilder {
 
     private final ResourceProvider<? extends Resource.Readable> resourceProvider;
-
-    private final GoogDependencyParser parser;
-
-    public DepsFileBuilder(ResourceProvider<? extends Resource.Readable> resourceProvider,
-                           GoogDependencyParser parser) {
+    
+    public DepsFileBuilder(ResourceProvider<? extends Resource.Readable> resourceProvider) {
         this.resourceProvider = resourceProvider;
-        this.parser = parser;
     }
 
     public String getDependencyContent() {
@@ -33,8 +28,7 @@ public class DepsFileBuilder {
                 resourceProvider.stream()
                         .parallel()
                         .filter(r -> r.getPath().endsWith(".js"))
-                        .map(SourceFileResource::new)
-                        .map(parser::parse).collect(toSet());
+                        .map(GoogResources::parse).collect(toSet());
 
         Path basePath = nodes.stream()
                 .filter(GoogDependencyNode::isBaseFile)
