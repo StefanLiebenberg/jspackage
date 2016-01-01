@@ -24,7 +24,8 @@ public class JsonPrinter {
     }
 
     public String printStringMap(Map<String, String> json) {
-        return printObjectMap(json.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> this.toObject(entry.getValue()))));
+        return printObjectMap(json.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> this.toObject(entry.getValue()))));
     }
 
     protected String toValue(Object object) {

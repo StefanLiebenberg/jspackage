@@ -6,8 +6,7 @@ import com.google.common.io.ByteStreams;
 import com.google.javascript.jscomp.CommandLineRunner;
 import org.apache.commons.io.IOUtils;
 import slieb.kute.Kute;
-import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.implementations.StringSupplierResource;
+import slieb.kute.api.Resource;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -18,7 +17,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class ExternsProvider implements ResourceProvider<StringSupplierResource> {
+public class ExternsProvider implements Resource.Provider {
 
     private final ConcurrentHashMap<String, String> map;
 
@@ -52,13 +51,13 @@ public class ExternsProvider implements ResourceProvider<StringSupplierResource>
     }
 
     @Override
-    public Stream<StringSupplierResource> stream() {
+    public Stream<Resource.Readable> stream() {
         buildExterns();
         return map.entrySet().stream().map(e -> Kute.stringResource(e.getKey(), e.getValue()));
     }
 
     @Override
-    public Optional<StringSupplierResource> getResourceByName(String path) {
+    public Optional<Resource.Readable> getResourceByName(String path) {
         buildExterns();
         if (map.containsKey(path)) {
             return Optional.of(Kute.stringResource(path, map.get(path)));

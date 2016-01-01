@@ -11,6 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
+    
     <build>
         <plugins>
             <plugin>
@@ -19,12 +20,16 @@
                 <version>@project.version@</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <sources>
-                        <source>${basedir}/src/main/javascript</source>
-                    </sources>
-                    <testSources>
-                        <file>${basedir}/src/test/javascript</file>
-                    </testSources>
+                    <main>
+                        <sources>
+                            <source>${basedir}/src/main/javascript</source>
+                        </sources>
+                    </main>
+                    <test>
+                        <sources>
+                            <file>${basedir}/src/test/javascript</file>
+                        </sources>
+                    </test>
                 </configuration>
             </plugin>
         </plugins>

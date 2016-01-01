@@ -1,20 +1,25 @@
 package org.slieb.jspackage.compile.resources;
 
+import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.SourceMap;
-import slieb.kute.api.Resource;
+import slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 
 
-public class SourceMapResource implements Resource.Readable {
+public class SourceMapResource implements ContentResource {
+
     private final String path;
     private final SourceMap sourceMap;
 
-    public SourceMapResource(String path, SourceMap sourceMap) {
+    public SourceMapResource(String path,
+                             SourceMap sourceMap) {
         this.path = path;
         this.sourceMap = sourceMap;
+    }
+
+    public SourceMapResource(String path, Compiler compiler) {
+        this(path, compiler.getSourceMap());
     }
 
     @Override
@@ -23,7 +28,7 @@ public class SourceMapResource implements Resource.Readable {
     }
 
     @Override
-    public Reader getReader() throws IOException {
-        return new StringReader(sourceMap.toString());
+    public String getContent() throws IOException {
+        return sourceMap.toString();
     }
 }

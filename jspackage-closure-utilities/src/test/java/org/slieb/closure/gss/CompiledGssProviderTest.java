@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,12 +14,12 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static slieb.kute.Kute.readResource;
+import static slieb.kute.KuteIO.readResource;
 
 
 public class CompiledGssProviderTest extends AbstractCssTest {
 
-    private ResourceProvider<? extends Resource.Readable> provider;
+    private Resource.Provider provider;
 
 
     @Before
@@ -53,7 +52,7 @@ public class CompiledGssProviderTest extends AbstractCssTest {
         renameMap.put("button", "b");
         SubstitutionMapProvider substitutionMapProvider = () -> new ProductionSubstitutionMap(renameMap);
         CompiledGssProvider compiledGssProvider = new CompiledGssProvider(compileMap, substitutionMapProvider,
-                                                                          provider);
+                provider);
         Resource.Readable style = compiledGssProvider.getResourceByName("/output/style.gss").get();
         assertNotNull(style);
         assertNotEquals(readResource(getCssResource("/expected/widget.css")), printPretty(tree(style)));

@@ -8,7 +8,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,14 +15,17 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
-import static slieb.kute.Kute.*;
+import static org.junit.Assert.assertTrue;
+import static org.slieb.throwables.ConsumerWithException.castConsumerWithException;
+import static slieb.kute.Kute.providerOf;
+import static slieb.kute.Kute.stringResource;
 
 
 public class JSPackageServiceTest {
 
     static Resource.Readable readableA, readableB, readableC;
 
-    static ResourceProvider<Resource.Readable> provider;
+    static Resource.Provider provider;
 
     static JSPackageConfiguration configuration;
 
@@ -64,16 +66,14 @@ public class JSPackageServiceTest {
     public void testKuteProvided() throws Exception {
         provider.stream()
                 .parallel()
-                .forEach(resource -> {
-                    try {
-                        URL url = new URL(baseUrl, resource.getPath());
-                        try (InputStream inputStream = url.openStream()) {
-                            assertEquals(readResource(resource), IOUtils.toString(inputStream));
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                .forEach(castConsumerWithException(resource -> {
+                    final URL url = new URL(baseUrl, resource.getPath());
+                    try (InputStream inputStream = url.openStream()) {
+                        resource.useInputStream(resourceInputStream -> {
+                            assertTrue(IOUtils.contentEquals(inputStream, resourceInputStream));
+                        });
                     }
-                });
+                }));
     }
 
     @Test

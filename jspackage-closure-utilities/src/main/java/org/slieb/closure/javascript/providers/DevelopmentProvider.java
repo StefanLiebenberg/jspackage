@@ -2,7 +2,6 @@ package org.slieb.closure.javascript.providers;
 
 
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -14,7 +13,7 @@ import java.util.stream.Stream;
  * - It should provide all sources from sourceProvider.
  * - It should compile and rename soy files to javascript.
  */
-public class DevelopmentProvider implements ResourceProvider<Resource.Readable> {
+public class DevelopmentProvider implements Resource.Provider {
 //
 //    // serve images and css?
 //    private final ResourceProvider<? extends Resource.Readable> assetsProvider;

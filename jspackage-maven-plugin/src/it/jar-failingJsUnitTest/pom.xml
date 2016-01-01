@@ -31,15 +31,23 @@
                         </goals>
                         <phase>test</phase>
                         <configuration>
-                            <useClassPath>false</useClassPath>
-                            <sources>
-                                <file>${project.build.directory}/unpacked-dependencies</file>
-                                <file>${basedir}/src/main/javascript</file>
-                                <file>${basedir}/src/test/javascript</file>
-                            </sources>
-                            <testSources>
-                                <file>${basedir}/src/test/javascript</file>
-                            </testSources>
+                            <main>
+                                <sources>
+                                    <source>file://${project.build.directory}/unpacked-dependencies</source>
+                                    <source>file://${basedir}/src/main/javascript</source>
+                                </sources>
+                                <includes>
+                                    <include>**/*.js</include>
+                                </includes>
+                            </main>
+                            <test>
+                                <sources>
+                                    <file>${basedir}/src/test/javascript</file>
+                                </sources>
+                                <includes>
+                                    <include>**/*_test.js</include>
+                                </includes>
+                            </test>
                         </configuration>
                     </execution>
                 </executions>

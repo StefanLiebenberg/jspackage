@@ -6,9 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Created by stefan on 8/12/15.
- */
+
 public class JsonPrinterTest {
 
     private JsonPrinter jsonPrinter;
@@ -22,13 +20,16 @@ public class JsonPrinterTest {
 
     @Test
     public void testPrintObjectMap() throws Exception {
-        Assert.assertEquals("{\"key\": \"value\"}", jsonPrinter.printObjectMap(ImmutableMap.<String, Object>builder().put("key", "value").build()));
+        Assert.assertEquals("{\"key\": \"value\"}", jsonPrinter.printObjectMap(
+                ImmutableMap.<String, Object>builder().put("key", "value").build()));
     }
 
     @Test
     public void testPrintStringMap() throws Exception {
-        Assert.assertEquals("{\"key\": \"value\"}", jsonPrinter.printStringMap(ImmutableMap.<String, String>builder().put("key", "value").build()));
-        Assert.assertEquals("{\"key2\": 2, \"key\": 1}", jsonPrinter.printStringMap(ImmutableSortedMap.<String, String>naturalOrder().put("key", "1").put("key2", "2").build()));
+        Assert.assertEquals("{\"key\": \"value\"}", jsonPrinter.printStringMap(
+                ImmutableMap.<String, String>builder().put("key", "value").build()));
+        Assert.assertEquals("{\"key2\": 2, \"key\": 1}", jsonPrinter.printStringMap(
+                ImmutableSortedMap.<String, String>naturalOrder().put("key", "1").put("key2", "2").build()));
     }
 
     @Test

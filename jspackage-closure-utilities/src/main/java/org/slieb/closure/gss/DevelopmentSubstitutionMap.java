@@ -43,12 +43,14 @@ public class DevelopmentSubstitutionMap implements SubstitutionMap {
         return getStringValue(ALPHABET, counter++);
     }
 
-    protected static String getStringValue(final String[] alphabet, final Integer position) {
+    protected static String getStringValue(final String[] alphabet,
+                                           final Integer position) {
         if (position < alphabet.length) {
             return alphabet[position];
         } else {
             final int remain = position % alphabet.length;
-            return getStringValue(alphabet, ((position - remain) / alphabet.length) - 1) + getStringValue(alphabet, remain);
+            return getStringValue(alphabet, ((position - remain) / alphabet.length) - 1) + getStringValue(alphabet,
+                                                                                                          remain);
         }
     }
 }

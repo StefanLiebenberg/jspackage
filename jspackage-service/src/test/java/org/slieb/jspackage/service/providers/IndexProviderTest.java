@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
+
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ public class IndexProviderTest {
         a = Kute.stringResource("/nested/a.js", "A");
         b = Kute.stringResource("/nested/b.js", "B");
         c = Kute.stringResource("/nested/above/e.js", "C");
-        ResourceProvider<Resource.Readable> provider = Kute.providerOf(a, b, c);
+        Resource.Provider provider = Kute.providerOf(a, b, c);
         IndexProvider indexer = new IndexProvider(provider);
 
         assertTrue(indexer.getResourceByName("/nested/").isPresent());

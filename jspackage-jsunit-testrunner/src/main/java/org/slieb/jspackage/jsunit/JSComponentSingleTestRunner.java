@@ -5,15 +5,14 @@ import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 public class JSComponentSingleTestRunner extends Runner {
 
-    private final ResourceProvider<Resource.Readable> resourceProvider;
+    private final Resource.Provider resourceProvider;
 
     private final String htmlPath;
 
-    public JSComponentSingleTestRunner(ResourceProvider<Resource.Readable> resourceProvider, String htmlPath) {
+    public JSComponentSingleTestRunner(Resource.Provider resourceProvider, String htmlPath) {
         this.resourceProvider = resourceProvider;
         this.htmlPath = htmlPath;
     }

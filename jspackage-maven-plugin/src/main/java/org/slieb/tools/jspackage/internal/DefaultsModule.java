@@ -7,6 +7,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
 import com.google.javascript.jscomp.CompilerOptions;
 import slieb.jspackage.api.OptionsHandler;
+import slieb.kute.Kute;
 
 import java.util.Set;
 
@@ -23,6 +24,11 @@ public class DefaultsModule extends AbstractModule {
                                            Set<OptionsHandler> optionHandlers) {
         optionHandlers.forEach(handler -> handler.handle(options));
         return options;
+    }
+
+    @Provides
+    public ProviderFactory providerFactory() {
+        return new ProviderFactory(Kute.getDefaultProvider());
     }
 
 }

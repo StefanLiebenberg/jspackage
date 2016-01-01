@@ -1,12 +1,12 @@
 package org.slieb.jspackage.service.providers;
 
 
-import org.slieb.closure.dependencies.*;
+import org.slieb.closure.dependencies.GoogDependencyCalculator;
+import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.jspackage.service.resources.CssRenameMapResource;
 import org.slieb.jspackage.service.resources.DefinesResource;
 import org.slieb.jspackage.service.resources.DepsResource;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,9 +22,9 @@ import java.util.stream.Stream;
  * /build/script.sourceMap.js - A sourceMap for the compiled javascript resource.
  * /build/style.cc.min        - A compiled stylesheet file.
  */
-public class BuildProvider extends AbstractStreamsProvider<Resource.Readable> {
+public class BuildProvider extends AbstractStreamsProvider {
 
-    private final ResourceProvider<? extends Resource.Readable> sources;
+    private final Resource.Provider sources;
 
     private final GoogDependencyCalculator calculator;
 
@@ -34,7 +34,7 @@ public class BuildProvider extends AbstractStreamsProvider<Resource.Readable> {
      * @param sources This should contain all javascript files and gss files that are
      *                considered as part of the class path.
      */
-    public BuildProvider(ResourceProvider<? extends Resource.Readable> sources) {
+    public BuildProvider(Resource.Provider sources) {
         this.sources = sources;
         this.externsProvider = new ExternsProvider();
         this.calculator = GoogResources.getCalculator(this);

@@ -3,23 +3,24 @@ package org.slieb.closure.soy;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import slieb.kute.Kute;
+import slieb.kute.KuteIO;
+import slieb.kute.KuteLambdas;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.ResourcePredicates;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.slieb.throwables.ConsumerWithException.castConsumerWithException;
 
-public class CompiledSoyTemplateProvider implements ResourceProvider<Resource.Readable> {
+public class CompiledSoyTemplateProvider implements Resource.Provider {
 
-    private final ResourceProvider<? extends Resource.Readable> sources, filteredSoyFiles;
+    private final Resource.Provider sources, filteredSoyFiles;
 
-    public CompiledSoyTemplateProvider(ResourceProvider<? extends Resource.Readable> sources) {
+    public CompiledSoyTemplateProvider(Resource.Provider sources) {
         this.sources = sources;
-        this.filteredSoyFiles = Kute.filterResources(sources, ResourcePredicates.extensionFilter(".soy"));
+        this.filteredSoyFiles = Kute.filterResources(sources, KuteLambdas.extensionFilter(".soy"));
     }
 
     @Override
@@ -32,7 +33,7 @@ public class CompiledSoyTemplateProvider implements ResourceProvider<Resource.Re
         SoyJsSrcOptions jsSrcOptions = new SoyJsSrcOptions();
         List<Resource.Readable> readables = sources.stream().collect(toList());
         SoyFileSet.Builder builder = SoyFileSet.builder();
-        readables.forEach(r -> builder.add(Kute.readResourceUnsafe(r), r.getPath()));
+        readables.forEach(castConsumerWithException(r -> builder.add(KuteIO.readResource(r), r.getPath())));
         List<String> paths = readables.stream().map(Resource::getPath).collect(toList());
         List<String> compiled = builder.build().compileToJsSrc(jsSrcOptions, null);
         Stream.Builder<Resource.Readable> stream = Stream.builder();

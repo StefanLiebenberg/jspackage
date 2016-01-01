@@ -8,8 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slieb.jspackage.service.providers.ServiceProvider;
 import slieb.kute.Kute;
+import slieb.kute.KuteIO;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 public class ServiceProviderTest {
 
     Resource.Readable resourceA, resourceB;
-    ResourceProvider<Resource.Readable> readables;
+    Resource.Provider readables;
     ServiceProvider provider;
 
     @Before
@@ -45,7 +45,7 @@ public class ServiceProviderTest {
         Optional<Resource.Readable> optionalIndex = provider.getResourceByName("/");
         assertTrue(optionalIndex.isPresent());
         Resource.Readable index = optionalIndex.get();
-        Document document = Jsoup.parse(Kute.readResource(index));
+        Document document = Jsoup.parse(KuteIO.readResource(index));
         Elements items = document.getElementsByTag("li");
         assertLinkToResource(resourceA, items.get(3));
         assertLinkToResource(resourceB, items.get(5));
@@ -54,7 +54,7 @@ public class ServiceProviderTest {
 //    @Test
 //    public void testHtml() throws IOException {
 //        Resource.Readable testA = provider.getResourceByName("/a_test.html").get();
-//        Document document = Jsoup.parse(Kute.readResource(testA));
+//        Document document = Jsoup.parse(KuteIO.readResource(testA));
 //        Elements scripts = document.getElementsByTag("script");
 //    }
 }

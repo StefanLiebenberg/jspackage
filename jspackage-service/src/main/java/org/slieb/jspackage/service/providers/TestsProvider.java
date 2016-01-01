@@ -1,25 +1,21 @@
 package org.slieb.jspackage.service.providers;
 
 
-import com.google.common.collect.ImmutableList;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.providers.GroupResourceProvider;
 
 import java.util.stream.Stream;
 
 /**
  *
  */
-public class TestsProvider extends AbstractStreamsProvider<Resource.Readable> {
+public class TestsProvider extends AbstractStreamsProvider {
 
-    private final ResourceProvider<Resource.Readable> testsProvider;
+    private final Resource.Provider testsProvider;
 
-    public TestsProvider(ResourceProvider<Resource.Readable> sources,
-                         ResourceProvider<Resource.Readable> toolsProvider) {
-        this.testsProvider = new ComponentTestsProvider(
-                new GroupResourceProvider<>(ImmutableList.of(sources, toolsProvider)));
+    public TestsProvider(Resource.Provider sources,
+                         Resource.Provider toolsProvider) {
+        this.testsProvider = new ComponentTestsProvider(Kute.group(sources, toolsProvider));
     }
 
 

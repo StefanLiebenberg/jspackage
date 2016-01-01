@@ -4,7 +4,6 @@ package org.slieb.jspackage.service.providers;
 import com.google.common.base.Preconditions;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,13 +17,13 @@ import java.util.stream.StreamSupport;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.*;
 
-public class IndexProvider implements ResourceProvider<Resource.Readable> {
+public class IndexProvider implements Resource.Provider {
 
-    private final ResourceProvider<Resource.Readable> sources;
+    private final Resource.Provider sources;
 
     private final ConcurrentHashMap<Path, Set<Path>> map;
 
-    public IndexProvider(ResourceProvider<Resource.Readable> sources) {
+    public IndexProvider(Resource.Provider sources) {
         this.sources = sources;
         this.map = new ConcurrentHashMap<>();
     }

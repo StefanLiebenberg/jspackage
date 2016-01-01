@@ -6,18 +6,17 @@ import com.google.common.css.SubstitutionMapProvider;
 import com.google.common.css.compiler.ast.CssTree;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
+import slieb.kute.KuteLambdas;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 
-public class CompiledGssProvider implements ResourceProvider<GssCompiledResource> {
+public class CompiledGssProvider implements Resource.Provider {
 
-    private final ResourceProvider<? extends Resource.Readable> gssProvider;
+    private final Resource.Provider gssProvider;
 
     private final SubstitutionMapProvider renameMapProvider;
 
@@ -25,14 +24,14 @@ public class CompiledGssProvider implements ResourceProvider<GssCompiledResource
 
     public CompiledGssProvider(Map<String, Set<String>> compilesMap,
                                SubstitutionMapProvider renameMapProvider,
-                               ResourceProvider<? extends Resource.Readable> provider) {
+                               Resource.Provider provider) {
         this.compilesMap = compilesMap;
         this.renameMapProvider = renameMapProvider;
-        this.gssProvider = Kute.filterResources(provider, extensionFilter(".gss"));
+        this.gssProvider = Kute.filterResources(provider, KuteLambdas.extensionFilter(".gss"));
     }
 
     @Override
-    public Optional<GssCompiledResource> getResourceByName(String path) {
+    public Optional<Resource.Readable> getResourceByName(String path) {
 
         if (compilesMap.containsKey(path)) {
             return Optional.of(compileGss(path, compilesMap.get(path)));
@@ -43,14 +42,14 @@ public class CompiledGssProvider implements ResourceProvider<GssCompiledResource
 
 
     @Override
-    public Stream<GssCompiledResource> stream() {
+    public Stream<Resource.Readable> stream() {
         return compilesMap.entrySet().stream().map(entry -> compileGss(entry.getKey(), entry.getValue()));
     }
 
     public GssCompiledResource compileGss(String inputPath,
                                           Set<String> namespaces) {
         return new GssCompiledResource(inputPath, getDependencyProvider(namespaces), this::preProcess, null,
-                                       getJobDescription());
+                getJobDescription());
     }
 
     private GssDependencyProvider getDependencyProvider(Set<String> namespaces) {

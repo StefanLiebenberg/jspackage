@@ -11,86 +11,115 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.slieb.tools.jspackage.internal.DefaultsModule;
+import org.slieb.tools.jspackage.internal.ProviderFactory;
+import org.slieb.tools.jspackage.internal.SourceSet;
+import org.slieb.tools.jspackage.internal.SourceSetSpecifier;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.providers.GroupResourceProvider;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.slieb.closure.dependencies.GoogResources.getResourceProviderForSourceDirectories;
 
 
-public abstract class AbstractPackageMojo extends AbstractMojo {
+public abstract class AbstractPackageMojo extends AbstractMojo implements SourceSetSpecifier {
 
     public final static String LOG_PREFIX = "[jspackage]";
 
     @Component
     protected MavenProject project;
 
-    @Parameter(name = "sources")
-    public List<File> sources;
+    @Parameter(name = "main")
+    public JSPackageSourceSet main;
 
-    @Parameter(name = "testSources")
-    public List<File> testSources;
+    @Parameter(name = "test")
+    public JSPackageSourceSet test;
 
+    @Parameter(name = "externs")
+    private JSPackageSourceSet externs;
+
+    @Nonnull
+    @Override
+    public Optional<SourceSet> getMainSourceSet() {
+        return Optional.ofNullable(main);
+    }
+
+    @Nonnull
+    @Override
+    public Optional<SourceSet> getTestSourceSet() {
+        return Optional.ofNullable(test);
+    }
+
+    @Nonnull
+    @Override
+    public Optional<SourceSet> getExternsSourceSet() {
+        return Optional.ofNullable(externs);
+    }
+
+    @Deprecated
     @Parameter(name = "useClasspath", defaultValue = "false")
     public Boolean useClasspath;
 
     @Parameter(name = "guiceModule")
     public String guiceModule;
 
-    public ResourceProvider<Resource.InputStreaming> getClaspathProvider(Boolean inludeTesting) {
+    public Resource.Provider getClaspathProvider(Boolean inludeTesting) {
         return Kute.getProvider(getCustomClassLoader(Boolean.TRUE, inludeTesting));
     }
 
-    public ResourceProvider<Resource.InputStreaming> getTestResources() {
-        return Kute.asInputStreamingProvider(
-                getResourceProviderForSourceDirectories(testSources != null ? testSources : ImmutableList.of()));
-    }
 
+    @Deprecated
+    public Resource.Provider getSourceProvider(Boolean includeTesting) {
+        Stream.Builder<JSPackageSourceSet> builder = Stream.builder();
 
-    public ResourceProvider<Resource.InputStreaming> getSourceProvider(Boolean includeTesting) {
-        ImmutableList.Builder<ResourceProvider<Resource.InputStreaming>> builder = ImmutableList.builder();
+        if (main != null && !main.getSources().isEmpty()) {
+            debug("adding %s source directories to resource provider.", main.getSources().size());
+            builder.add(main);
+        } else {
+            warn("source directories have not been specified or is empty.", LOG_PREFIX);
+        }
 
         if (includeTesting) {
-            if (testSources != null && !testSources.isEmpty()) {
-                debug("adding %s source directories to resource provider.", testSources.size());
-                builder.add(getTestResources());
+            if (test != null && !test.getSources().isEmpty()) {
+                debug("adding %s source directories to resource provider.", test.getSources().size());
+                builder.add(test);
             } else {
                 warn(String.format("%s no test sources are specified", LOG_PREFIX));
             }
         }
 
-        if (sources != null && !sources.isEmpty()) {
-            debug("adding %s source directories to resource provider.", sources.size());
-            builder.add(Kute.asInputStreamingProvider(getResourceProviderForSourceDirectories(sources)));
-        } else {
-            warn("source directories have not been specified or is empty.", LOG_PREFIX);
-        }
-        return new GroupResourceProvider<>(builder.build());
+        return getSourceProvider(includeTesting, builder.build().toArray(JSPackageSourceSet[]::new));
+    }
+
+    protected Resource.Provider getSourceProvider(Boolean includeTesting, SourceSet... sourceSets) {
+        return new ProviderFactory(getClaspathProvider(includeTesting)).create(sourceSets);
     }
 
 
-    protected ResourceProvider<Resource.InputStreaming> getSourceProvider(Boolean includeTesting,
-                                                                          List<File> additionalDirectories) {
-        ImmutableList.Builder<ResourceProvider<Resource.InputStreaming>> builder = ImmutableList.builder();
+    @Deprecated
+    protected Resource.Provider getSourceProvider(Boolean includeTesting, List<File> additionalDirectories) {
+        ImmutableList.Builder<Resource.Provider> builder = ImmutableList.builder();
         builder.add(getSourceProvider(includeTesting));
         if (additionalDirectories != null && !additionalDirectories.isEmpty()) {
-            builder.add(Kute.asInputStreamingProvider(getResourceProviderForSourceDirectories(additionalDirectories)));
+            builder.add(getResourceProviderForSourceDirectories(additionalDirectories));
         }
         if (useClasspath) {
             builder.add(getClaspathProvider(includeTesting));
         }
-        return new GroupResourceProvider<>(builder.build());
+
+        return Kute.group(builder.build());
     }
 
-    protected ResourceProvider<Resource.InputStreaming> getPackageProvider(Boolean includeTesting) {
-        ImmutableList.Builder<ResourceProvider<Resource.InputStreaming>> builder = ImmutableList.builder();
+    @Deprecated
+    protected Resource.Provider getPackageProvider(Boolean includeTesting) {
+        ImmutableList.Builder<Resource.Provider> builder = ImmutableList.builder();
         builder.add(getSourceProvider(includeTesting));
 
         // add the classpath loader last, as this is a fifo system and the source directories get priority.
@@ -98,7 +127,7 @@ public abstract class AbstractPackageMojo extends AbstractMojo {
             debug("adding classpath dependencies to resource provider");
             builder.add(getClaspathProvider(includeTesting));
         }
-        return new GroupResourceProvider<>(builder.build());
+        return Kute.group(builder.build());
     }
 
 

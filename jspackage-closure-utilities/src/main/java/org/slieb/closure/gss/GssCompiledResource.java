@@ -7,12 +7,11 @@ import com.google.common.css.SourceCode;
 import com.google.common.css.compiler.ast.*;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.PassRunner;
-import slieb.kute.Kute;
+import org.slieb.throwables.FunctionWithException;
+import slieb.kute.KuteIO;
 import slieb.kute.api.Resource;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.List;
 import java.util.function.Function;
 
@@ -22,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 public class GssCompiledResource implements Resource.Readable {
 
     public static final Function<Readable, SourceCode>
-            READABLE_TO_SOURCE_CODE = r -> new SourceCode(r.getPath(), Kute.readResourceUnsafe(r));
+            READABLE_TO_SOURCE_CODE = FunctionWithException.castFunctionWithException(r -> new SourceCode(r.getPath(), KuteIO.readResource(r)));
 
     private final String path;
 
@@ -87,12 +86,16 @@ public class GssCompiledResource implements Resource.Readable {
 
     @Override
     public Reader getReader() throws IOException {
+        return new StringReader(getContent());
+    }
+
+    private String getContent() {
         try {
             final CssTree tree = getCssTree();
             preProccess(tree);
             compile(tree);
             postProccess(tree);
-            return new StringReader(printCssTree(tree));
+            return printCssTree(tree);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -101,6 +104,11 @@ public class GssCompiledResource implements Resource.Readable {
     @Override
     public String getPath() {
         return path;
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(getContent().getBytes());
     }
 }
 

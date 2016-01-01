@@ -5,9 +5,7 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.JSModule;
 import slieb.kute.api.Resource;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 
 public class CompiledJSModuleResource implements Resource.Readable {
 
@@ -17,7 +15,9 @@ public class CompiledJSModuleResource implements Resource.Readable {
 
     private final JSModule jsModule;
 
-    public CompiledJSModuleResource(String path, Compiler compiler, JSModule jsModule) {
+    public CompiledJSModuleResource(String path,
+                                    Compiler compiler,
+                                    JSModule jsModule) {
         this.path = path;
         this.compiler = compiler;
         this.jsModule = jsModule;
@@ -34,5 +34,10 @@ public class CompiledJSModuleResource implements Resource.Readable {
     @Override
     public Reader getReader() throws IOException {
         return new StringReader(getCompiledOutput());
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(getCompiledOutput().getBytes());
     }
 }

@@ -76,7 +76,6 @@
                     <showVersion>true</showVersion>
                     <!--<debug>true</debug>-->
                     <postBuildHookScript>verify.bsh</postBuildHookScript>
-
                 </configuration>
                 <executions>
                     <execution>

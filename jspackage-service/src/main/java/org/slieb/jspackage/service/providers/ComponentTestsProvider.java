@@ -3,27 +3,24 @@ package org.slieb.jspackage.service.providers;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.jspackage.service.resources.ComponentTestResource;
-import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static slieb.kute.resources.ResourcePredicates.extensionFilter;
+import static slieb.kute.Kute.filterResources;
+import static slieb.kute.KuteLambdas.extensionFilter;
 
 
-public class ComponentTestsProvider implements ResourceProvider<Resource.Readable> {
+public class ComponentTestsProvider implements Resource.Provider {
 
-    private final ResourceProvider<Resource.Readable> resources;
+    private final Resource.Provider resources;
 
     private final GoogDependencyCalculator calculator;
 
-    public ComponentTestsProvider(ResourceProvider<Resource.Readable> resources) {
+    public ComponentTestsProvider(Resource.Provider resources) {
         this.resources = resources;
-        this.calculator = GoogResources.getCalculator(
-                Kute.filterResources(resources,
-                                     extensionFilter(".js")));
+        this.calculator = GoogResources.getCalculator(filterResources(resources, extensionFilter(".js")));
     }
 
     @Override
@@ -43,7 +40,7 @@ public class ComponentTestsProvider implements ResourceProvider<Resource.Readabl
     }
 
     private ComponentTestResource componentTestResource(Resource.Readable resource) {
-        return new ComponentTestResource(resource, calculator, getComponentTestPath(resource));
+        return new ComponentTestResource(getComponentTestPath(resource), resource, calculator);
     }
 
     private String getComponentTestPath(Resource.Readable readable) {

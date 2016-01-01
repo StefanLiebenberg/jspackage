@@ -18,10 +18,10 @@
         <dep.maven-plugin-tools>3.4</dep.maven-plugin-tools>
         <dep.maven-dependency-plugin>2.8</dep.maven-dependency-plugin>
         <dep.maven-plugin-testing-harness>3.3.0</dep.maven-plugin-testing-harness>
-        <dep.kute>1.0</dep.kute>
+        <dep.kute>2.1</dep.kute>
         <dep.kute-service>1.1-SNAPSHOT</dep.kute-service>
-        <dep.dependency-calculator>0.6</dep.dependency-calculator>
-        <dep.closure-dependency-calculator>1.2</dep.closure-dependency-calculator>
+        <dep.dependency-calculator>0.7-SNAPSHOT</dep.dependency-calculator>
+        <dep.closure-dependency-calculator>1.3-SNAPSHOT</dep.closure-dependency-calculator>
         <dep.closure-compiler>v20151015</dep.closure-compiler>
         <dep.commons-lang3>3.4</dep.commons-lang3>
         <dep.mojo-executor>2.2.0</dep.mojo-executor>
@@ -38,10 +38,14 @@
         <dep.jsoup>1.8.3</dep.jsoup>
 
         <dep.js-runtimes>1.2</dep.js-runtimes>
-        <dep.jsunit-testing-suite>1.1</dep.jsunit-testing-suite>
+        <dep.jsunit-testing-suite>1.2-SNAPSHOT</dep.jsunit-testing-suite>
         <plugin.maven-invoker-plugin>1.10</plugin.maven-invoker-plugin>
         <plugin.maven-compiler-plugin>3.3</plugin.maven-compiler-plugin>
         <plugin.maven-scm-plugin>1.9.4</plugin.maven-scm-plugin>
+        <plugin.maven-jar-plugin>2.6</plugin.maven-jar-plugin>
+        <plugin.maven-install-plugin>2.5.2</plugin.maven-install-plugin>
+        <plugin.maven-deploy-plugin>2.8.2</plugin.maven-deploy-plugin>
+        <plugin.maven-resources-plugin>2.7</plugin.maven-resources-plugin>
     </properties>
 
     <prerequisites>

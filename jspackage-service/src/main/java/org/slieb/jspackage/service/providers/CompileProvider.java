@@ -4,11 +4,8 @@ import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.SourceFile;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,7 +16,7 @@ import java.util.stream.Stream;
  * /compile/script.min.js
  * /compile/script.sourceMap.js
  */
-public class CompileProvider implements ResourceProvider<Resource.Readable> {
+public class CompileProvider implements Resource.Provider {
 
     public final String outputLocation;
 
@@ -29,7 +26,7 @@ public class CompileProvider implements ResourceProvider<Resource.Readable> {
 
     private final BuildProvider buildProvider;
 
-    public CompileProvider(ResourceProvider<? extends Resource.Readable> provider,
+    public CompileProvider(Resource.Provider provider,
                            Set<String> inputNamespaces,
                            String outputLocation) {
         this.inputNamespaces = inputNamespaces;
@@ -80,6 +77,11 @@ class CompileResource implements Resource.Readable {
     @Override
     public Reader getReader() throws IOException {
         return new StringReader(lazyCompile.getCompileOutput());
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(lazyCompile.getCompileOutput().getBytes());
     }
 }
 

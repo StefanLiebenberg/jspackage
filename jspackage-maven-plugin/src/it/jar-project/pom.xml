@@ -21,12 +21,16 @@
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
                 <configuration>
-                    <sources>
-                        <source>${basedir}/target/unpacked-dependencies</source>
-                    </sources>
-                    <testSources>
-                        <file>${basedir}/src/test/javascript/unit</file>
-                    </testSources>
+                    <main>
+                        <sources>
+                            <source>file://${basedir}/target/unpacked-dependencies</source>
+                        </sources>
+                    </main>
+                    <test>
+                        <sources>
+                            <source>file://${basedir}/src/test/javascript/unit</source>
+                        </sources>
+                    </test>
                 </configuration>
                 <executions>
                     <execution>

@@ -5,7 +5,6 @@ import com.google.common.base.Joiner;
 import org.slieb.closure.dependencies.GoogDependencyNode;
 import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,9 +15,9 @@ import static java.util.stream.Collectors.toSet;
 
 public class DepsFileBuilder {
 
-    private final ResourceProvider<? extends Resource.Readable> resourceProvider;
-    
-    public DepsFileBuilder(ResourceProvider<? extends Resource.Readable> resourceProvider) {
+    private final Resource.Provider resourceProvider;
+
+    public DepsFileBuilder(Resource.Provider resourceProvider) {
         this.resourceProvider = resourceProvider;
     }
 
@@ -36,7 +35,7 @@ public class DepsFileBuilder {
                 .map(Resource::getPath)
                 .map(Paths::get).findFirst().get();
 
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         nodes.stream()
                 .filter(n -> !n.isBaseFile() && !n.getProvides().isEmpty())
                 .map(n -> getDependencyLine(n, basePath))

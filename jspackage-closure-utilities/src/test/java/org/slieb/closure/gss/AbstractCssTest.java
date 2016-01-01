@@ -6,7 +6,6 @@ import com.google.common.css.compiler.ast.GssParserException;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.PrettyPrinter;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.util.Optional;
 
@@ -27,7 +26,7 @@ public abstract class AbstractCssTest {
         return getResource("/org/slieb/closure/gss" + path);
     }
 
-    public CssTree tree(ResourceProvider<Resource.Readable> provider) throws GssParserException {
+    public CssTree tree(Resource.Provider provider) throws GssParserException {
         return new GssParser(provider.stream().map(READABLE_TO_SOURCE_CODE).collect(toList())).parse();
     }
 

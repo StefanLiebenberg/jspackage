@@ -2,21 +2,20 @@ package org.slieb.jspackage.service;
 
 import com.google.common.base.Preconditions;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 
 public class JSPackageConfigurationBuilder {
 
     private Integer port = 6655;
 
-    private ResourceProvider<Resource.Readable> resourceProvider;
+    private Resource.Provider resourceProvider;
 
     public JSPackageConfigurationBuilder withPort(Integer port) {
         this.port = port;
         return this;
     }
 
-    public JSPackageConfigurationBuilder withResourceProvider(ResourceProvider<Resource.Readable> resourceProvider) {
+    public JSPackageConfigurationBuilder withResourceProvider(Resource.Provider resourceProvider) {
         this.resourceProvider = resourceProvider;
         return this;
     }

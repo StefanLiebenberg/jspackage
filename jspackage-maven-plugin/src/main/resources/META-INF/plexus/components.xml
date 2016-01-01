@@ -32,19 +32,19 @@
                             <generate-resources>${project.groupId}:${project.artifactId}:${project.version}:unpack
                             </generate-resources>
                             <process-resources>
-                                org.apache.maven.plugins:maven-resources-plugin:resources
+                                org.apache.maven.plugins:maven-resources-plugin:${plugin.maven-resources-plugin}:resources
                             </process-resources>
                             <test>
                                 ${project.groupId}:${project.artifactId}:${project.version}:unit-tests
                             </test>
                             <package>
-                                org.apache.maven.plugins:maven-jar-plugin:2.6:jar
+                                org.apache.maven.plugins:maven-jar-plugin:${plugin.maven-jar-plugin}:jar
                             </package>
                             <install>
-                                org.apache.maven.plugins:maven-install-plugin:install
+                                org.apache.maven.plugins:maven-install-plugin:${plugin.maven-install-plugin}:install
                             </install>
                             <deploy>
-                                org.apache.maven.plugins:maven-deploy-plugin:deploy
+                                org.apache.maven.plugins:maven-deploy-plugin:${plugin.maven-deploy-plugin}:deploy
                             </deploy>
                         </phases>
                     </lifecycle>

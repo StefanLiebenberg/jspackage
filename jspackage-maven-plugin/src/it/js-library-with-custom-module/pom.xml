@@ -20,11 +20,28 @@
                 <extensions>true</extensions>
                 <configuration>
                     <guiceModule>com.example.CustomModule</guiceModule>
-                    <sources>
-                        <source>${basedir}/src/main/javascript</source>
-                    </sources>
+                    <main>
+                        <sources>
+                            <source>file://${basedir}/src/main/javascript</source>
+                        </sources>
+                    </main>
+                    <compiles>
+                        <compile>
+                            <requires>
+                                <require>continents.js</require>
+                            </requires>
+                        </compile>
+                    </compiles>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>jspackage-closure-library</artifactId>
+            <version>@project.version@</version>
+        </dependency>
+    </dependencies>
 </project>

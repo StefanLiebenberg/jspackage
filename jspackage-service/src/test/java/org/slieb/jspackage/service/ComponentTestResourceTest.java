@@ -32,8 +32,8 @@ public class ComponentTestResourceTest {
                 "/closure-library/closure/goog/base.js"));
         resourceA = stringResource("/a.js", "goog.provide('a'); goog.require('b');");
         resourceB = stringResource("/b.js", "goog.provide('b');");
-        resource = new ComponentTestResource(resourceA, GoogResources.getCalculator(
-                providerOf(resourceBase, resourceA, resourceB)), "/test.html");
+        resource = new ComponentTestResource("/test.html", resourceA, GoogResources.getCalculator(
+                providerOf(resourceBase, resourceA, resourceB)));
     }
 
     @Test

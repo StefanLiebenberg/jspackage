@@ -11,14 +11,12 @@ import org.slieb.tools.jspackage.api.OptionsHandler;
 import static com.google.javascript.jscomp.CustomPassExecutionTime.BEFORE_CHECKS;
 
 public class CustomModule extends AbstractModule {
-
     @Override
     protected void configure() {
         Multibinder.newSetBinder(binder(), OptionsHandler.class)
                 .addBinding()
                 .to(CustomOptionsHandler.class);
     }
-
 }
 
 class CustomOptionsHandler implements OptionsHandler {

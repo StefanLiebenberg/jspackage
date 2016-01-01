@@ -6,40 +6,37 @@ import org.slieb.closure.dependencies.GoogDependencyNode;
 import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
+import slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
-import static slieb.kute.resources.ResourcePredicates.all;
-import static slieb.kute.resources.ResourcePredicates.extensionFilter;
+import static slieb.kute.KuteLambdas.all;
+import static slieb.kute.KuteLambdas.extensionFilter;
 
 
-public class AllTestsResource implements Resource.Readable {
+public class AllTestsResource implements ContentResource {
 
     private static final String ALL_TEST = "/org/slieb/jspackage/service/all_tests.html";
 
     private final String path;
 
-    private final ResourceProvider<? extends Readable> sources;
-    private final ResourceProvider<? extends Readable> filterJs;
-    private final ResourceProvider<? extends Readable> filterTests;
+    private final Resource.Provider sources;
+    private final Resource.Provider filterJs;
+    private final Resource.Provider filterTests;
 
     public AllTestsResource(String path,
-                            ResourceProvider<? extends Readable> sources) {
+                            Resource.Provider sources) {
         this.path = path;
         this.sources = sources;
-        this.filterJs = Kute.filterResources(this.sources,
-                                             all(extensionFilter(".js"), extensionFilter("_test.js").negate()));
+        this.filterJs = Kute.filterResources(this.sources, all(extensionFilter(".js"), extensionFilter("_test.js").negate()::test));
         this.filterTests = Kute.filterResources(this.sources, extensionFilter("_test.html"));
     }
 
     private String rename(String testpath) {
-        return Paths.get(path).relativize(Paths.get(testpath)).toString();
+        return Paths.get(getPath()).relativize(Paths.get(testpath)).toString();
     }
 
     private String getAllTestsContent() {
@@ -58,7 +55,7 @@ public class AllTestsResource implements Resource.Readable {
 
     private String getScriptsContent() {
         StringBuilder builder = new StringBuilder();
-        GoogResources.getCalculator(Kute.asReadableProvider(filterJs))
+        GoogResources.getCalculator(filterJs)
                 .getDependencyResolver()
                 .resolveNamespaces(ImmutableList.of("goog.userAgent.product", "goog.testing.MultiTestRunner"))
                 .resolve().stream().map(GoogDependencyNode::getResource).map(this::getScriptPath).forEach(
@@ -70,12 +67,13 @@ public class AllTestsResource implements Resource.Readable {
         return String.format("<script type='text/javascript' src='%s'></script>", readable.getPath());
     }
 
+
     @Override
-    public Reader getReader() throws IOException {
+    public String getContent() throws IOException {
         try (InputStream input = getClass().getResourceAsStream(ALL_TEST)) {
-            return new StringReader(IOUtils.toString(input)
-                                            .replace("$$ALL_TESTS$$", getAllTestsContent())
-                                            .replace("$$SCRIPTS$$", getScriptsContent()));
+            return IOUtils.toString(input)
+                    .replace("$$ALL_TESTS$$", getAllTestsContent())
+                    .replace("$$SCRIPTS$$", getScriptsContent());
         }
     }
 

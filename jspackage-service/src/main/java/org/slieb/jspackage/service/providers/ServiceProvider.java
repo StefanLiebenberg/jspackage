@@ -2,7 +2,6 @@ package org.slieb.jspackage.service.providers;
 
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.util.stream.Stream;
 
@@ -23,14 +22,14 @@ import java.util.stream.Stream;
  * - .html files for _test.js files ( requires tools:soy )
  * - all_tests.html file ( requires sources, tests )
  */
-public class ServiceProvider extends AbstractStreamsProvider<Resource.Readable> {
+public class ServiceProvider extends AbstractStreamsProvider {
 
-    private final ResourceProvider<Resource.Readable> sources;
+    private final Resource.Provider sources;
     private final BuildProvider toolsProvider;
     private final TestsProvider testsProvider;
     private final IndexProvider indexProvider;
 
-    public ServiceProvider(ResourceProvider<Resource.Readable> sources) {
+    public ServiceProvider(Resource.Provider sources) {
         this.sources = sources;
         this.toolsProvider = new BuildProvider(sources);
         this.testsProvider = new TestsProvider(this.sources, this.toolsProvider);

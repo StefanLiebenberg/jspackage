@@ -1,0 +1,10 @@
+import java.io.*;
+
+File directory = new File(basedir, "target/classes/js/");
+String[] expectedModuleFiles = new String[] {"pkga.js", "pkgb.js"};
+for(int i = 0; i < expectedModuleFiles.length; i++) {
+ File moduleFile = new File(directory, expectedModuleFiles[i]);
+ if(!moduleFile.isFile()) {
+   throw new FileNotFoundException("Could not find module file " + moduleFile.toString());
+ }
+}

@@ -4,40 +4,37 @@ import com.google.common.io.CharSource;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import com.google.template.soy.msgs.SoyMsgBundle;
+import slieb.kute.KuteLambdas;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static slieb.kute.resources.ResourcePredicates.extensionFilter;
 
 /**
  * An expensive provider.
  */
-public class CompiledSoyProvider implements ResourceProvider<LiveSoyFileResource> {
+public class CompiledSoyProvider implements Resource.Provider {
 
-    private final Predicate<Resource> SOY_FILTER = extensionFilter(".soy");
+    private final Predicate<Resource> SOY_FILTER = KuteLambdas.extensionFilter(".soy");
 
     /**
      * The source files.
      */
-    private final ResourceProvider<? extends Resource.Readable> provider;
+    private final Resource.Provider provider;
 
     private final SoyJsSrcOptions jsSrcOptions;
 
 
-    public CompiledSoyProvider(ResourceProvider<? extends Resource.Readable> provider,
+    public CompiledSoyProvider(Resource.Provider provider,
                                SoyJsSrcOptions options) {
         this.provider = provider;
         this.jsSrcOptions = options;
     }
 
-    public CompiledSoyProvider(ResourceProvider<? extends Resource.Readable> provider) {
+    public CompiledSoyProvider(Resource.Provider provider) {
         this(provider, new SoyJsSrcOptions());
         this.jsSrcOptions.setGoogMsgsAreExternal(true);
         this.jsSrcOptions.setShouldDeclareTopLevelNamespaces(true);
@@ -48,7 +45,7 @@ public class CompiledSoyProvider implements ResourceProvider<LiveSoyFileResource
 
 
     @Override
-    public Stream<LiveSoyFileResource> stream() {
+    public Stream<Resource.Readable> stream() {
         return soyStream().map(this::liveSoyFileResource);
     }
 
@@ -71,7 +68,7 @@ public class CompiledSoyProvider implements ResourceProvider<LiveSoyFileResource
 
 
     @Override
-    public Optional<LiveSoyFileResource> getResourceByName(String path) {
+    public Optional<Resource.Readable> getResourceByName(String path) {
         return provider.getResourceByName(getSoyNameFromJavascript(path)).filter(SOY_FILTER)
                 .map(this::liveSoyFileResource);
     }
@@ -105,7 +102,16 @@ class LiveSoyFileResource implements Resource.Readable {
 
     @Override
     public StringReader getReader() throws IOException {
-        return new StringReader(sfs.compileToJsSrc(options, bundle).get(0));
+        return new StringReader(getContent());
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(getContent().getBytes());
+    }
+
+    private String getContent() {
+        return sfs.compileToJsSrc(options, bundle).get(0);
     }
 
     private static SoyFileSet getSingleFileSet(Resource.Readable readable) {

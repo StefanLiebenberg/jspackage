@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.util.Set;
 
@@ -31,8 +30,8 @@ public class DepsFileBuilderTest {
         resourceB = create("b", ImmutableSet.of("c", "d"));
         resourceC = create("c", ImmutableSet.of("d"));
         resourceD = create("d", ImmutableSet.of());
-        ResourceProvider<Resource.Readable> provider = Kute.providerOf(resourceA, resourceB, resourceC, resourceD,
-                                                                       baseResource);
+        Resource.Provider provider = Kute.providerOf(resourceA, resourceB, resourceC, resourceD,
+                                                     baseResource);
 
         String content = new DepsFileBuilder(provider).getDependencyContent();
 

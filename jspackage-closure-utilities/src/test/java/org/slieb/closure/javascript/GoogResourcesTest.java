@@ -8,10 +8,9 @@ import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogResources;
 import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,7 +20,7 @@ public class GoogResourcesTest {
 
     Resource.Readable readableA, readableB, readableC;
 
-    ResourceProvider<Resource.Readable> readables;
+    Resource.Provider readables;
 
     @Before
     public void setup() {
@@ -45,8 +44,9 @@ public class GoogResourcesTest {
     public void testCalculatorProducesRuntimeError() throws Exception {
 
         Resource.Readable readable = new Resource.Readable() {
+
             @Override
-            public Reader getReader() throws IOException {
+            public InputStream getInputStream() throws IOException {
                 throw new IOException("fake io");
             }
 

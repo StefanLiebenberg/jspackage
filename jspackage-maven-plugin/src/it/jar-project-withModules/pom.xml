@@ -22,10 +22,17 @@
                 <version>@project.version@</version>
                 <configuration>
                     <guiceModule>com.example.CustomModule</guiceModule>
-                    <sources>
-                        <source>${basedir}/target/unpacked-dependencies</source>
-                        <source>${basedir}/src/main/javascript</source>
-                    </sources>
+                    <main>
+                        <sources>
+                            <source>file://${basedir}/target/unpacked-dependencies</source>
+                            <source>file://${basedir}/src/main/javascript</source>
+                        </sources>
+                    </main>
+                    <test>
+                        <sources>
+                            <source>file://${basedir}/src/test/javascript</source>
+                        </sources>
+                    </test>
                     <moduleCompiles>
                         <moduleCompile>
                             <directory>${build.outputDirectory}/modules</directory>
@@ -33,22 +40,21 @@
                             <modules>
                                 <module>
                                     <name>PKGA.js</name>
-                                    <namespaces>
-                                        <namespace>com.domain.packageA</namespace>
-                                    </namespaces>
+                                    <requires>
+                                        <require>com.domain.packageA</require>
+                                    </requires>
                                 </module>
                                 <module>
                                     <name>PKGB.js</name>
-                                    <namespaces>
-                                        <namespace>com.domain.packageB</namespace>
-                                    </namespaces>
+                                    <requires>
+                                        <require>com.domain.packageB</require>
+                                    </requires>
                                 </module>
                                 <module>
-                                    <name>CUSTOM_MODULE.js</name>
-                                    <standalone>true</standalone>
-                                    <namespaces>
-                                        <namespace>customModule</namespace>
-                                    </namespaces>
+                                    <name>CUSTOMMODULE.js</name>
+                                    <requires>
+                                        <require>customModule</require>
+                                    </requires>
                                 </module>
                             </modules>
                         </moduleCompile>

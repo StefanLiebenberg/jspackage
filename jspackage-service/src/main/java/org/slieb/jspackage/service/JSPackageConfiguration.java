@@ -2,7 +2,6 @@ package org.slieb.jspackage.service;
 
 
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import java.net.URI;
 
@@ -10,7 +9,7 @@ public class JSPackageConfiguration {
 
     private final Integer port;
 
-    private final ResourceProvider<Resource.Readable> resourceProvider;
+    private final Resource.Provider resourceProvider;
 
     public final URI resourcesPath, imagePath;
 
@@ -24,7 +23,7 @@ public class JSPackageConfiguration {
      * @param imagePath
      */
     protected JSPackageConfiguration(Integer port,
-                                     ResourceProvider<Resource.Readable> resourceProvider,
+                                     Resource.Provider resourceProvider,
                                      URI resourcesPath,
                                      URI imagePath) {
         this.port = port;
@@ -37,7 +36,7 @@ public class JSPackageConfiguration {
         return port;
     }
 
-    public ResourceProvider<Resource.Readable> getResourceProvider() {
+    public Resource.Provider getResourceProvider() {
         return resourceProvider;
     }
 

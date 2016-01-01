@@ -2,15 +2,16 @@ package org.slieb.closure.javascript.internal;
 
 import org.slieb.dependencies.DependencyCalculator;
 import org.slieb.dependencies.DependencyNode;
-import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.resources.implementations.AbstractResource;
+import slieb.kute.resources.ContentResource;
+import slieb.kute.KuteIO;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.Serializable;
+import java.util.Objects;
 
-public class GssResource extends AbstractResource implements Resource.Readable {
+public class GssResource implements ContentResource, Serializable {
+
+    private final String path;
 
     private final String namespace;
 
@@ -19,15 +20,44 @@ public class GssResource extends AbstractResource implements Resource.Readable {
     public GssResource(String path,
                        String namespace,
                        DependencyCalculator<Resource.Readable, DependencyNode<Resource.Readable>> calculator) {
-        super(path);
+        this.path = path;
         this.namespace = namespace;
         this.calculator = calculator;
     }
 
+
     @Override
-    public Reader getReader() throws IOException {
-        return new StringReader(calculator.getResourcesFor(namespace).stream().map(Kute::readResourceUnsafe)
-                                        .reduce("", (s, s2) -> s + "\n" + s2));
+    public String getContent() {
+        return calculator.getResourcesFor(namespace).stream().map(KuteIO::readResourceUnsafe)
+                .reduce("", (s, s2) -> s + "\n" + s2);
     }
 
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public String toString() {
+        return "GssResource{" +
+                "path='" + path + '\'' +
+                ", namespace='" + namespace + '\'' +
+                ", calculator=" + calculator +
+                "} " + super.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GssResource)) return false;
+        GssResource that = (GssResource) o;
+        return Objects.equals(path, that.path) &&
+                Objects.equals(namespace, that.namespace) &&
+                Objects.equals(calculator, that.calculator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path, namespace, calculator);
+    }
 }

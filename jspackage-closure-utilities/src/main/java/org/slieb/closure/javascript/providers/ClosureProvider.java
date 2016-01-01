@@ -4,36 +4,35 @@ package org.slieb.closure.javascript.providers;
 import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.closure.javascript.internal.DepsFileBuilder;
+import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
-import slieb.kute.resources.implementations.StringSupplierResource;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ClosureProvider implements ResourceProvider<Resource.Readable> {
+public class ClosureProvider implements Resource.Provider {
 
     public static final String DEPS = "/deps.js", DEFINES = "/defines.js";
 
     private final GoogDependencyCalculator calculator;
 
-    private final ResourceProvider<? extends Resource.Readable> provider;
+    private final Resource.Provider provider;
 
 
     /**
      * @param provider
      */
-    public ClosureProvider(ResourceProvider<Resource.Readable> provider) {
+    public ClosureProvider(Resource.Provider provider) {
         this.provider = provider;
         this.calculator = GoogResources.getCalculator(provider);
     }
 
     private Resource.Readable getDependencyResource() {
-        return new StringSupplierResource("/deps.js", new DepsFileBuilder(provider)::getDependencyContent);
+        return Kute.stringResource("/deps.js", new DepsFileBuilder(provider)::getDependencyContent);
     }
 
     private Resource.Readable getDefinesResource() {
-        return new StringSupplierResource("/defines.js", "");
+        return Kute.stringResource("/defines.js", "");
     }
 
     @Override

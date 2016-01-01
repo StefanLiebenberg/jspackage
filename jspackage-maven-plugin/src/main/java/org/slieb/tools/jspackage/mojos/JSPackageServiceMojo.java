@@ -8,9 +8,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.slieb.jspackage.service.JSPackageConfiguration;
 import org.slieb.jspackage.service.JSPackageService;
-import slieb.kute.Kute;
 import slieb.kute.api.Resource;
-import slieb.kute.api.ResourceProvider;
 
 import static org.slieb.jspackage.service.JSPackageConfigurationBuilder.aJSPackageConfiguration;
 
@@ -23,7 +21,7 @@ public class JSPackageServiceMojo extends AbstractPackageMojo {
     public Integer port = 6655;
 
     public void start() throws InterruptedException {
-        ResourceProvider<Resource.Readable> resourceProvider = Kute.asReadableProvider(getSourceProvider(true));
+        Resource.Provider resourceProvider = getSourceProvider(true);
         JSPackageConfiguration configuration = aJSPackageConfiguration().withPort(port).withResourceProvider(
                 resourceProvider).build();
         service = new JSPackageService(configuration);

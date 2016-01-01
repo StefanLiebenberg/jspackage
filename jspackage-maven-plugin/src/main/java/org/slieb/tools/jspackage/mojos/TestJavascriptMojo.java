@@ -7,7 +7,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.slieb.jspackage.service.JSPackageConfigurationBuilder;
 import org.slieb.jspackage.service.JSPackageService;
-import slieb.kute.Kute;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -25,6 +24,9 @@ public class TestJavascriptMojo extends AbstractPackageMojo {
     @Parameter
     public List<File> componentTestSources;
 
+
+
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -32,7 +34,7 @@ public class TestJavascriptMojo extends AbstractPackageMojo {
 
         JSPackageService service = JSPackageService.create(
                 new JSPackageConfigurationBuilder()
-                        .withResourceProvider(Kute.asReadableProvider(getSourceProvider(true, componentTestSources)))
+                        .withResourceProvider(getSourceProvider(true, componentTestSources))
                         .build());
 
         try {
