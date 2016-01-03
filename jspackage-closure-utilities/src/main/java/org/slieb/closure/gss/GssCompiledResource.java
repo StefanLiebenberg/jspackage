@@ -7,7 +7,6 @@ import com.google.common.css.SourceCode;
 import com.google.common.css.compiler.ast.*;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.PassRunner;
-import org.slieb.throwables.FunctionWithException;
 import slieb.kute.KuteIO;
 import slieb.kute.api.Resource;
 
@@ -16,12 +15,13 @@ import java.util.List;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
+import static org.slieb.throwables.FunctionWithThrowable.castFunctionWithThrowable;
 
 
 public class GssCompiledResource implements Resource.Readable {
 
     public static final Function<Readable, SourceCode>
-            READABLE_TO_SOURCE_CODE = FunctionWithException.castFunctionWithException(r -> new SourceCode(r.getPath(), KuteIO.readResource(r)));
+            READABLE_TO_SOURCE_CODE = castFunctionWithThrowable(r -> new SourceCode(r.getPath(), KuteIO.readResource(r)));
 
     private final String path;
 

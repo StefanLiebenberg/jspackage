@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.slieb.throwables.FunctionWithException.castFunctionWithException;
+import static org.slieb.throwables.FunctionWithThrowable.castFunctionWithThrowable;
 
 
 public class SingleCompileResourceProvider implements Resource.Provider {
@@ -34,7 +34,7 @@ public class SingleCompileResourceProvider implements Resource.Provider {
     public Stream<Resource.Readable> stream() {
         byte[] checksum = getSourcesChecksum();
         if (cachedResources == null || lastChecksum == null || !Arrays.equals(lastChecksum, checksum)) {
-            cachedResources = compileStream().map(castFunctionWithException(Kute::immutableMemoryResource)).collect(toList());
+            cachedResources = compileStream().map(castFunctionWithThrowable(Kute::immutableMemoryResource)).collect(toList());
             lastChecksum = checksum;
         }
         return cachedResources.stream();

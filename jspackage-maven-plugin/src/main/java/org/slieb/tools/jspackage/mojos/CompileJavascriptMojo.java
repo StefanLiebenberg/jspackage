@@ -18,7 +18,6 @@ import org.slieb.jspackage.compile.result.CompileResult;
 import org.slieb.jspackage.compile.result.ModuleGroupCompilationResult;
 import org.slieb.jspackage.compile.tasks.ModuleCompileTask;
 import org.slieb.jspackage.compile.tasks.SingleCompileTask;
-import org.slieb.throwables.ConsumerWithException;
 import org.slieb.tools.jspackage.internal.SourceSet;
 import slieb.kute.Kute;
 import slieb.kute.KuteIO;
@@ -36,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipInputStream;
 
 import static java.util.stream.Collectors.toSet;
+import static org.slieb.throwables.ConsumerWithThrowable.castConsumerWithThrowable;
 
 @Mojo(name = "compile",
         defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true,
@@ -168,7 +168,7 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
     private void writeModuleSuccessToFile(ModuleGroupCompilationResult.Success success, File dir) {
         success.getModuleUnits().stream()
                 .map(ModuleGroupCompilationResult.ModuleUnitCompilationResult::getResource)
-                .forEach(ConsumerWithException.castConsumerWithException(resource -> writeResource(resource, new File(dir, resource.getPath()))));
+                .forEach(castConsumerWithThrowable(resource -> writeResource(resource, new File(dir, resource.getPath()))));
     }
 
     // todo, common field is hard-coded

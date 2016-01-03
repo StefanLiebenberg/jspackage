@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.slieb</groupId>
-            <artifactId>kute</artifactId>
+            <artifactId>kute-core</artifactId>
             <version>${dep.kute}</version>
         </dependency>
         <dependency>

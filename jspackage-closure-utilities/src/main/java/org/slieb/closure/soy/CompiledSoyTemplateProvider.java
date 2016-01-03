@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.slieb.throwables.ConsumerWithException.castConsumerWithException;
+import static org.slieb.throwables.ConsumerWithThrowable.castConsumerWithThrowable;
 
 public class CompiledSoyTemplateProvider implements Resource.Provider {
 
@@ -33,7 +33,7 @@ public class CompiledSoyTemplateProvider implements Resource.Provider {
         SoyJsSrcOptions jsSrcOptions = new SoyJsSrcOptions();
         List<Resource.Readable> readables = sources.stream().collect(toList());
         SoyFileSet.Builder builder = SoyFileSet.builder();
-        readables.forEach(castConsumerWithException(r -> builder.add(KuteIO.readResource(r), r.getPath())));
+        readables.forEach(castConsumerWithThrowable(r -> builder.add(KuteIO.readResource(r), r.getPath())));
         List<String> paths = readables.stream().map(Resource::getPath).collect(toList());
         List<String> compiled = builder.build().compileToJsSrc(jsSrcOptions, null);
         Stream.Builder<Resource.Readable> stream = Stream.builder();

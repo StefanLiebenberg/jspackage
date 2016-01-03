@@ -16,7 +16,7 @@ import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.slieb.throwables.ConsumerWithException.castConsumerWithException;
+import static org.slieb.throwables.ConsumerWithThrowable.castConsumerWithThrowable;
 import static slieb.kute.Kute.providerOf;
 import static slieb.kute.Kute.stringResource;
 
@@ -66,7 +66,7 @@ public class JSPackageServiceTest {
     public void testKuteProvided() throws Exception {
         provider.stream()
                 .parallel()
-                .forEach(castConsumerWithException(resource -> {
+                .forEach(castConsumerWithThrowable(resource -> {
                     final URL url = new URL(baseUrl, resource.getPath());
                     try (InputStream inputStream = url.openStream()) {
                         resource.useInputStream(resourceInputStream -> {
