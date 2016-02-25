@@ -22,11 +22,11 @@
             <artifactId>kute-core</artifactId>
             <version>${dep.kute}</version>
         </dependency>
-        <dependency>
-            <groupId>org.slieb</groupId>
-            <artifactId>kute-service</artifactId>
-            <version>${dep.kute}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.slieb</groupId>-->
+            <!--<artifactId>kute-service</artifactId>-->
+            <!--<version>${dep.kute}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

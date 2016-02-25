@@ -2,7 +2,7 @@ package org.slieb.jspackage.compile.providers;
 
 
 import org.slieb.jspackage.compile.result.ModuleGroupCompilationResult;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;

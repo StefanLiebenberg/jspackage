@@ -1,7 +1,7 @@
 package org.slieb.jspackage.compile.legacy;
 
 import com.google.javascript.jscomp.CompilerOptions;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.List;
 
@@ -21,5 +21,4 @@ public interface Configuration {
 
         Resource.Writable getOutputResource();
     }
-
 }

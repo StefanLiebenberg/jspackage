@@ -2,8 +2,8 @@ package org.slieb.jspackage.service.providers;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 
 import java.io.IOException;

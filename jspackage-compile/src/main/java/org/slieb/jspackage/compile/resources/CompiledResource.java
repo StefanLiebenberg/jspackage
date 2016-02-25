@@ -1,8 +1,7 @@
 package org.slieb.jspackage.compile.resources;
 
-
 import com.google.javascript.jscomp.Compiler;
-import slieb.kute.resources.ContentResource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
 
@@ -12,7 +11,8 @@ public class CompiledResource implements ContentResource {
 
     private final Compiler compiler;
 
-    public CompiledResource(String path, Compiler compiler) {
+    public CompiledResource(String path,
+                            Compiler compiler) {
         this.path = path;
         this.compiler = compiler;
     }

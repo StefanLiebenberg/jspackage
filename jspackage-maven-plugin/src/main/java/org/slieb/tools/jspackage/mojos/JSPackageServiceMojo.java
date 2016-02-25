@@ -8,7 +8,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.slieb.jspackage.service.JSPackageConfiguration;
 import org.slieb.jspackage.service.JSPackageService;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import static org.slieb.jspackage.service.JSPackageConfigurationBuilder.aJSPackageConfiguration;
 

@@ -1,14 +1,13 @@
 package org.slieb.jspackage.compile;
 
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.slieb.jspackage.compile.nodes.SingleCompileNode;
 import org.slieb.jspackage.compile.providers.SingleCompileResourceProvider;
 import org.slieb.jspackage.compile.tasks.SingleCompileTask;
-import slieb.kute.api.Resource;
-import slieb.kute.providers.ChecksumCachedMapProvider;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.providers.ChecksumCachedProvider;
 
 @Singleton
 public class CompilesProviderFactory {
@@ -20,12 +19,11 @@ public class CompilesProviderFactory {
         this.singleCompileTaskProvider = singleCompileTaskProvider;
     }
 
-    public SingleCompileResourceProvider createSingeCompileProvider(final SingleCompileNode node) {
+    public Resource.Provider createSingeCompileProvider(final SingleCompileNode node) {
         return new SingleCompileResourceProvider(singleCompileTaskProvider.get(), node);
     }
 
     public Resource.Provider createCachedSingleCompileProvider(SingleCompileNode node) {
-        return new ChecksumCachedMapProvider(createSingeCompileProvider(node), node.getSourcesProvider());
+        return new ChecksumCachedProvider(node.getSourcesProvider(), () -> createSingeCompileProvider(node));
     }
-
 }

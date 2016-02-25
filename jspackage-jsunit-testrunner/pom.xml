@@ -34,9 +34,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.slieb</groupId>
-            <artifactId>jsunit-testing-suite</artifactId>
-            <version>${dep.jsunit-testing-suite}</version>
+            <groupId>org.slieb.jspackage</groupId>
+            <artifactId>jspackage-jsunit</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slieb.jspackage</groupId>

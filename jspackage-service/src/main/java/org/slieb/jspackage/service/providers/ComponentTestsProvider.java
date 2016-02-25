@@ -1,16 +1,15 @@
 package org.slieb.jspackage.service.providers;
 
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import org.slieb.closure.dependencies.GoogResources;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.jspackage.dependencies.GoogResources;
 import org.slieb.jspackage.service.resources.ComponentTestResource;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static slieb.kute.Kute.filterResources;
-import static slieb.kute.KuteLambdas.extensionFilter;
-
+import static org.slieb.kute.Kute.filterResources;
+import static org.slieb.kute.KutePredicates.extensionFilter;
 
 public class ComponentTestsProvider implements Resource.Provider {
 
@@ -31,8 +30,8 @@ public class ComponentTestsProvider implements Resource.Provider {
     @Override
     public Optional<Resource.Readable> getResourceByName(String path) {
         return resources.getResourceByName(reverseComponentTestPath(path))
-                .filter(this::filterResource)
-                .map(this::componentTestResource);
+                        .filter(this::filterResource)
+                        .map(this::componentTestResource);
     }
 
     private Boolean filterResource(Resource.Readable readable) {

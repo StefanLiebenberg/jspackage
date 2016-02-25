@@ -3,12 +3,11 @@ package org.slieb.jspackage.compile.providers;
 import org.slieb.jspackage.compile.nodes.ModuleGroupCompileNode;
 import org.slieb.jspackage.compile.result.ModuleGroupCompilationResult;
 import org.slieb.jspackage.compile.tasks.ModuleCompileTask;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import java.util.Optional;
 import java.util.stream.Stream;
-
 
 public class ModuleCompiler implements Resource.Provider {
 
@@ -32,13 +31,13 @@ public class ModuleCompiler implements Resource.Provider {
         switch (moduleCompilationResult.getType()) {
             case SUCCESS:
                 return ((ModuleGroupCompilationResult.Success) moduleCompilationResult).getModuleUnits()
-                        .stream().map(ModuleGroupCompilationResult.ModuleUnitCompilationResult::getResource);
+                                                                                       .stream()
+                                                                                       .map(ModuleGroupCompilationResult
+                                                                                                    .ModuleUnitCompilationResult::getResource);
             case FAILURE:
                 return Stream.empty();
             default:
                 throw new IllegalStateException("not possible");
         }
     }
-
-
 }

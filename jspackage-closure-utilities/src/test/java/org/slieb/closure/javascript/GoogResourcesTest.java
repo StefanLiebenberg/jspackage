@@ -4,17 +4,17 @@ import com.google.common.collect.ImmutableList;
 import com.google.javascript.jscomp.SourceFile;
 import org.junit.Before;
 import org.junit.Test;
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import org.slieb.closure.dependencies.GoogResources;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.jspackage.dependencies.GoogResources;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static slieb.kute.Kute.stringResource;
+import static org.slieb.kute.Kute.stringResource;
 
 public class GoogResourcesTest {
 
@@ -37,7 +37,6 @@ public class GoogResourcesTest {
         assertEquals(ImmutableList.of(readableA, readableC), calculator.getResourcesFor(readableC));
         assertEquals(ImmutableList.of(readableA, readableB), calculator.getResourcesFor(readableB));
     }
-
 
     @Test(expected = RuntimeException.class)
 
@@ -67,6 +66,5 @@ public class GoogResourcesTest {
         assertNotNull(sourceFile);
         assertEquals(content, sourceFile.getCode());
         assertEquals(path, sourceFile.getOriginalPath());
-
     }
 }

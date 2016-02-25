@@ -2,10 +2,9 @@ package org.slieb.jspackage.compile.resources;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.SourceMap;
-import slieb.kute.resources.ContentResource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
-
 
 public class SourceMapResource implements ContentResource {
 
@@ -18,7 +17,8 @@ public class SourceMapResource implements ContentResource {
         this.sourceMap = sourceMap;
     }
 
-    public SourceMapResource(String path, Compiler compiler) {
+    public SourceMapResource(String path,
+                             Compiler compiler) {
         this(path, compiler.getSourceMap());
     }
 

@@ -1,7 +1,7 @@
 package org.slieb.closure.javascript.providers;
 
 
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.Optional;
 import java.util.stream.Stream;

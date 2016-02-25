@@ -4,9 +4,9 @@ import com.google.common.css.JobDescription;
 import com.google.common.css.JobDescriptionBuilder;
 import com.google.common.css.SubstitutionMapProvider;
 import com.google.common.css.compiler.ast.CssTree;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
-import slieb.kute.KuteLambdas;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.KutePredicates;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public class CompiledGssProvider implements Resource.Provider {
                                Resource.Provider provider) {
         this.compilesMap = compilesMap;
         this.renameMapProvider = renameMapProvider;
-        this.gssProvider = Kute.filterResources(provider, KuteLambdas.extensionFilter(".gss"));
+        this.gssProvider = Kute.filterResources(provider, KutePredicates.extensionFilter(".gss"));
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.slieb.jspackage.service.providers;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.SourceFile;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.io.*;
 import java.util.List;

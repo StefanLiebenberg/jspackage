@@ -1,10 +1,9 @@
 package org.slieb.jspackage.compile.resources;
 
 import com.google.javascript.jscomp.Result;
-import slieb.kute.resources.ContentResource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
-
 
 public class DebugResource implements ContentResource {
 
@@ -12,7 +11,8 @@ public class DebugResource implements ContentResource {
 
     private final Result result;
 
-    public DebugResource(String path, Result result) {
+    public DebugResource(String path,
+                         Result result) {
         this.path = path;
         this.result = result;
     }

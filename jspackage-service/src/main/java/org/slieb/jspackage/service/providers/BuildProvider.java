@@ -1,12 +1,12 @@
 package org.slieb.jspackage.service.providers;
 
 
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import org.slieb.closure.dependencies.GoogResources;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.jspackage.dependencies.GoogResources;
 import org.slieb.jspackage.service.resources.CssRenameMapResource;
 import org.slieb.jspackage.service.resources.DefinesResource;
 import org.slieb.jspackage.service.resources.DepsResource;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.*;
 import java.util.stream.Collectors;

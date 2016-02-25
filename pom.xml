@@ -18,9 +18,8 @@
         <dep.maven-plugin-tools>3.4</dep.maven-plugin-tools>
         <dep.maven-dependency-plugin>2.8</dep.maven-dependency-plugin>
         <dep.maven-plugin-testing-harness>3.3.0</dep.maven-plugin-testing-harness>
-        <dep.kute>2.5</dep.kute>
+        <dep.kute>2.6-SNAPSHOT</dep.kute>
         <dep.dependency-calculator>0.7-SNAPSHOT</dep.dependency-calculator>
-        <dep.closure-dependency-calculator>1.3-SNAPSHOT</dep.closure-dependency-calculator>
         <dep.closure-compiler>v20151015</dep.closure-compiler>
         <dep.commons-lang3>3.4</dep.commons-lang3>
         <dep.mojo-executor>2.2.0</dep.mojo-executor>
@@ -35,6 +34,7 @@
         <dep.mockito>2.0.2-beta</dep.mockito>
         <dep.junit>4.12</dep.junit>
         <dep.jsoup>1.8.3</dep.jsoup>
+        <dep.plexus-utils>3.0.22</dep.plexus-utils>
 
         <dep.js-runtimes>1.2</dep.js-runtimes>
         <dep.jsunit-testing-suite>1.2-SNAPSHOT</dep.jsunit-testing-suite>
@@ -60,6 +60,8 @@
         <module>jspackage-service</module>
         <module>jspackage-compile</module>
         <module>jspackage-api</module>
+        <module>jspackage-dependencies</module>
+        <module>jspackage-jsunit</module>
     </modules>
 
     <build>

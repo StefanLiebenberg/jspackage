@@ -1,12 +1,13 @@
 package org.slieb.jspackage.compile.nodes;
 
-
 import com.google.javascript.jscomp.CompilerOptions;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Set;
+
+//import org.slieb.kute.api.Resource;
 
 public class SingleCompileNode extends CompileNode {
 

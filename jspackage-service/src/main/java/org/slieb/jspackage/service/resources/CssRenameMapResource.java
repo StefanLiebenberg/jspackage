@@ -3,7 +3,7 @@ package org.slieb.jspackage.service.resources;
 
 import com.google.common.collect.ImmutableMap;
 import org.slieb.closure.javascript.internal.JsonPrinter;
-import slieb.kute.resources.ContentResource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.util.Map;
 import java.util.Optional;

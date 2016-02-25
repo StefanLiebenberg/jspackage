@@ -1,11 +1,9 @@
 package org.slieb.tools.jspackage.internal;
 
-
-import slieb.kute.Kute;
-import slieb.kute.KuteLambdas;
-import slieb.kute.api.Resource;
-import slieb.kute.api.ResourcePredicate;
-import slieb.kute.providers.FileResourceProvider;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KutePredicates;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.providers.DirectoryProvider;
 
 import java.io.File;
 import java.util.Arrays;
@@ -30,19 +28,18 @@ public class ProviderFactory {
     public Resource.Provider create(SourceSet sourceSet) {
         Resource.Provider provider = createProviderFromSources(sourceSet.getSources());
         return this.createFilter(sourceSet.getIncludes(), sourceSet.getExcludes())
-                .map(predicate -> Kute.filterResources(provider, predicate)).orElse(provider);
+                   .map(predicate -> Kute.filterResources(provider, predicate)).orElse(provider);
     }
 
-
-    private Optional<ResourcePredicate<Resource>> createFilter(Set<String> includes, Set<String> excludes) {
-        return Stream.<ResourcePredicate<Resource>>concat(
-                includes.stream().map(KuteLambdas::patternFilter),
-                excludes.stream().map(KuteLambdas::patternFilter).map(predicate -> predicate.negate()::test))
+    private Optional<Resource.Predicate> createFilter(Set<String> includes,
+                                                      Set<String> excludes) {
+        return Stream.<Resource.Predicate>concat(
+                includes.stream().map(KutePredicates::patternFilter),
+                excludes.stream().map(KutePredicates::patternFilter).map(predicate -> predicate.negate()::test))
                 .reduce(getPredicateBinaryOperator());
     }
 
-
-    private <T extends Resource> BinaryOperator<ResourcePredicate<T>> getPredicateBinaryOperator() {
+    private BinaryOperator<Resource.Predicate> getPredicateBinaryOperator() {
         return (predicateA, predicateB) -> {
             return (resource) -> {
                 return predicateA.test(resource) && predicateB.test(resource);
@@ -50,11 +47,9 @@ public class ProviderFactory {
         };
     }
 
-
     public Resource.Provider createProviderFromSources(Collection<String> stringCollection) {
         return Kute.group(stringCollection.stream().map(this::create).toArray(Resource.Provider[]::new));
     }
-
 
     public Resource.Provider create(String sourceString) {
 
@@ -70,12 +65,10 @@ public class ProviderFactory {
     }
 
     private Resource.Provider createFileProvider(String substring) {
-        return new FileResourceProvider(new File(substring));
+        return new DirectoryProvider(new File(substring));
     }
 
     private Resource.Provider createClasspathProvider(String path) {
         return Kute.filterResources(classpath, (resource) -> resource.getPath().startsWith(path));
     }
-
-
 }

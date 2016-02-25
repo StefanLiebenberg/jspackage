@@ -5,8 +5,8 @@ import com.google.common.css.SubstitutionMapProvider;
 import com.google.common.css.compiler.ast.GssParserException;
 import org.junit.Before;
 import org.junit.Test;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static slieb.kute.KuteIO.readResource;
+import static org.slieb.kute.KuteIO.readResource;
 
 
 public class CompiledGssProviderTest extends AbstractCssTest {

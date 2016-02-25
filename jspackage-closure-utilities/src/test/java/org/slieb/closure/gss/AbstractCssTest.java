@@ -5,21 +5,20 @@ import com.google.common.css.compiler.ast.GssParser;
 import com.google.common.css.compiler.ast.GssParserException;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.PrettyPrinter;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.slieb.closure.gss.GssCompiledResource.READABLE_TO_SOURCE_CODE;
-import static slieb.kute.Kute.inputStreamResource;
-
+import static org.slieb.kute.KuteFactory.inputStreamResource;
 
 public abstract class AbstractCssTest {
 
     public Resource.Readable getResource(String path) {
         return inputStreamResource(path,
                                    () -> Optional.ofNullable(getClass().getResourceAsStream(path))
-                                           .orElseThrow(() -> new RuntimeException("No input stream for " + path)));
+                                                 .orElseThrow(() -> new RuntimeException("No input stream for " + path)));
     }
 
     public Resource.Readable getCssResource(String path) {
@@ -47,5 +46,4 @@ public abstract class AbstractCssTest {
         compactPrinterPass.runPass();
         return compactPrinterPass.getCompactPrintedString();
     }
-
 }

@@ -2,20 +2,19 @@ package org.slieb.jspackage.service.resources;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.io.IOUtils;
-import org.slieb.closure.dependencies.GoogDependencyNode;
-import org.slieb.closure.dependencies.GoogResources;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
-import slieb.kute.resources.ContentResource;
+import org.slieb.jspackage.dependencies.GoogDependencyNode;
+import org.slieb.jspackage.dependencies.GoogResources;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
-import static slieb.kute.KuteLambdas.all;
-import static slieb.kute.KuteLambdas.extensionFilter;
-
+import static org.slieb.kute.KutePredicates.all;
+import static org.slieb.kute.KutePredicates.extensionFilter;
 
 public class AllTestsResource implements ContentResource {
 
@@ -56,9 +55,9 @@ public class AllTestsResource implements ContentResource {
     private String getScriptsContent() {
         StringBuilder builder = new StringBuilder();
         GoogResources.getCalculator(filterJs)
-                .getDependencyResolver()
-                .resolveNamespaces(ImmutableList.of("goog.userAgent.product", "goog.testing.MultiTestRunner"))
-                .resolve().stream().map(GoogDependencyNode::getResource).map(this::getScriptPath).forEach(
+                     .getDependencyResolver()
+                     .resolveNamespaces(ImmutableList.of("goog.userAgent.product", "goog.testing.MultiTestRunner"))
+                     .resolve().stream().map(GoogDependencyNode::getResource).map(this::getScriptPath).forEach(
                 builder::append);
         return builder.toString();
     }
@@ -67,13 +66,12 @@ public class AllTestsResource implements ContentResource {
         return String.format("<script type='text/javascript' src='%s'></script>", readable.getPath());
     }
 
-
     @Override
     public String getContent() throws IOException {
         try (InputStream input = getClass().getResourceAsStream(ALL_TEST)) {
             return IOUtils.toString(input)
-                    .replace("$$ALL_TESTS$$", getAllTestsContent())
-                    .replace("$$SCRIPTS$$", getScriptsContent());
+                          .replace("$$ALL_TESTS$$", getAllTestsContent())
+                          .replace("$$SCRIPTS$$", getScriptsContent());
         }
     }
 

@@ -2,10 +2,10 @@ package org.slieb.closure.soy;
 
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
-import slieb.kute.Kute;
-import slieb.kute.KuteIO;
-import slieb.kute.KuteLambdas;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KuteIO;
+import org.slieb.kute.KutePredicates;
+import org.slieb.kute.api.Resource;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ public class CompiledSoyTemplateProvider implements Resource.Provider {
 
     public CompiledSoyTemplateProvider(Resource.Provider sources) {
         this.sources = sources;
-        this.filteredSoyFiles = Kute.filterResources(sources, KuteLambdas.extensionFilter(".soy"));
+        this.filteredSoyFiles = Kute.filterResources(sources, KutePredicates.extensionFilter(".soy"));
     }
 
     @Override

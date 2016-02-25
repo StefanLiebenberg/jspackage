@@ -1,8 +1,7 @@
 package org.slieb.jspackage.compile.nodes;
 
-
 import com.google.javascript.jscomp.CompilerOptions;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

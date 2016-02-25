@@ -7,8 +7,8 @@ import com.google.common.css.SourceCode;
 import com.google.common.css.compiler.ast.*;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.PassRunner;
-import slieb.kute.KuteIO;
-import slieb.kute.api.Resource;
+import org.slieb.kute.KuteIO;
+import org.slieb.kute.api.Resource;
 
 import java.io.*;
 import java.util.List;

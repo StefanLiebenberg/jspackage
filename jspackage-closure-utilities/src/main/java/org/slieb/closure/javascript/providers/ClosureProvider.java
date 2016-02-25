@@ -1,14 +1,18 @@
 package org.slieb.closure.javascript.providers;
 
+//import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+//import org.slieb.jspackage.dependencies.GoogResources;
 
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.closure.javascript.internal.DepsFileBuilder;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.jspackage.dependencies.GoogResources;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import java.util.Optional;
 import java.util.stream.Stream;
+
+//import org.slieb.kute.Kute;
 
 public class ClosureProvider implements Resource.Provider {
 

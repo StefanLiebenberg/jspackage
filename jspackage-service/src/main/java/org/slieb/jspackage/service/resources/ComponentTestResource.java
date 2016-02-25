@@ -1,10 +1,9 @@
 package org.slieb.jspackage.service.resources;
 
-
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
 import org.slieb.closure.javascript.internal.ComponentTestFileBuilder;
-import slieb.kute.api.Resource;
-import slieb.kute.resources.ContentResource;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -37,8 +36,8 @@ public class ComponentTestResource implements ContentResource, Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ComponentTestResource)) return false;
+        if (this == o) { return true; }
+        if (!(o instanceof ComponentTestResource)) { return false; }
         ComponentTestResource that = (ComponentTestResource) o;
         return Objects.equals(path, that.path) &&
                 Objects.equals(testResource, that.testResource) &&

@@ -3,7 +3,7 @@ package org.slieb.jspackage.service.routes;
 import org.apache.commons.io.IOUtils;
 import org.slieb.jspackage.service.handlers.RoutesNotFoundExceptionHandler;
 import org.slieb.sparks.Sparks;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 import spark.Request;
 import spark.Response;
 import spark.Route;

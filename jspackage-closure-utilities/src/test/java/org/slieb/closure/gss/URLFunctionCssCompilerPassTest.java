@@ -9,7 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
-import static slieb.kute.KuteIO.readResource;
+import static org.slieb.kute.KuteIO.readResource;
 
 
 public class URLFunctionCssCompilerPassTest extends AbstractCssTest {

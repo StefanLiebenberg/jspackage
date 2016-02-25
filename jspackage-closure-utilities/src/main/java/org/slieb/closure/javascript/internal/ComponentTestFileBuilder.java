@@ -1,8 +1,7 @@
 package org.slieb.closure.javascript.internal;
 
-
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import slieb.kute.api.Resource;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.kute.api.Resource;
 
 public class ComponentTestFileBuilder {
 
@@ -20,14 +19,13 @@ public class ComponentTestFileBuilder {
         StringBuilder builder = new StringBuilder()
                 .append("<!DOCTYPE html><html><head>");
         calculator.getResourcesFor(testResource)
-                .stream()
-                .map(this::getResourceIndex)
-                .forEach(builder::append);
+                  .stream()
+                  .map(this::getResourceIndex)
+                  .forEach(builder::append);
         return builder
                 .append("</head></html>")
                 .toString();
     }
-
 
     private String getResourceIndex(Resource.Readable readable) {
         return String.format("<script src='%s'></script>", readable.getPath());

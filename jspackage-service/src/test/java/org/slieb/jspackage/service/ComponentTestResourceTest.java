@@ -7,18 +7,17 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
-import org.slieb.closure.dependencies.GoogResources;
+import org.slieb.jspackage.dependencies.GoogResources;
 import org.slieb.jspackage.service.resources.ComponentTestResource;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.KuteFactory;
+import org.slieb.kute.api.Resource;
 
 import java.io.Reader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static slieb.kute.Kute.providerOf;
-import static slieb.kute.Kute.stringResource;
-
+import static org.slieb.kute.Kute.providerOf;
+import static org.slieb.kute.Kute.stringResource;
 
 public class ComponentTestResourceTest {
 
@@ -28,7 +27,7 @@ public class ComponentTestResourceTest {
 
     @Before
     public void setup() {
-        resourceBase = Kute.inputStreamResource("/base.js", () -> getClass().getResourceAsStream(
+        resourceBase = KuteFactory.inputStreamResource("/base.js", () -> getClass().getResourceAsStream(
                 "/closure-library/closure/goog/base.js"));
         resourceA = stringResource("/a.js", "goog.provide('a'); goog.require('b');");
         resourceB = stringResource("/b.js", "goog.provide('b');");
@@ -66,6 +65,4 @@ public class ComponentTestResourceTest {
         assertNotNull(path);
         assertEquals("/test.html", path);
     }
-
-
 }

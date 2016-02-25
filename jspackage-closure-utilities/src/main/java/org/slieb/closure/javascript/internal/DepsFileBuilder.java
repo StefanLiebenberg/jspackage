@@ -1,10 +1,9 @@
 package org.slieb.closure.javascript.internal;
 
-
 import com.google.common.base.Joiner;
-import org.slieb.closure.dependencies.GoogDependencyNode;
-import org.slieb.closure.dependencies.GoogResources;
-import slieb.kute.api.Resource;
+import org.slieb.jspackage.dependencies.GoogDependencyNode;
+import org.slieb.jspackage.dependencies.GoogResources;
+import org.slieb.kute.api.Resource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,21 +24,21 @@ public class DepsFileBuilder {
 
         Set<GoogDependencyNode> nodes =
                 resourceProvider.stream()
-                        .parallel()
-                        .filter(r -> r.getPath().endsWith(".js"))
-                        .map(GoogResources::parse).collect(toSet());
+                                .parallel()
+                                .filter(r -> r.getPath().endsWith(".js"))
+                                .map(GoogResources::parse).collect(toSet());
 
         Path basePath = nodes.stream()
-                .filter(GoogDependencyNode::isBaseFile)
-                .map(GoogDependencyNode::getResource)
-                .map(Resource::getPath)
-                .map(Paths::get).findFirst().get();
+                             .filter(GoogDependencyNode::isBaseFile)
+                             .map(GoogDependencyNode::getResource)
+                             .map(Resource::getPath)
+                             .map(Paths::get).findFirst().get();
 
         StringBuilder stringBuffer = new StringBuilder();
         nodes.stream()
-                .filter(n -> !n.isBaseFile() && !n.getProvides().isEmpty())
-                .map(n -> getDependencyLine(n, basePath))
-                .forEach(stringBuffer::append);
+             .filter(n -> !n.isBaseFile() && !n.getProvides().isEmpty())
+             .map(n -> getDependencyLine(n, basePath))
+             .forEach(stringBuffer::append);
         return stringBuffer.toString();
     }
 

@@ -1,8 +1,8 @@
 package org.slieb.jspackage.service.providers;
 
 
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import java.util.stream.Stream;
 

@@ -1,17 +1,16 @@
 package org.slieb.jspackage.compile.tasks;
 
-
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import org.slieb.closure.dependencies.GoogDependencyNode;
-import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.jspackage.compile.nodes.SingleCompileNode;
 import org.slieb.jspackage.compile.resources.CompiledResource;
 import org.slieb.jspackage.compile.resources.DebugResource;
 import org.slieb.jspackage.compile.resources.SourceMapResource;
 import org.slieb.jspackage.compile.result.CompileResult;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.jspackage.dependencies.GoogDependencyNode;
+import org.slieb.jspackage.dependencies.GoogResources;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,10 +59,10 @@ public class SingleCompileTask implements Task<SingleCompileNode, CompileResult>
     private List<SourceFile> getInputs(SingleCompileNode compileNode) {
         final GoogDependencyCalculator calculator = createDependencyCalculator(compileNode);
         return calculator.getDependenciesFor(compileNode.getRequiredNamespaces())
-                .stream()
-                .map(GoogDependencyNode::getResource)
-                .map(GoogResources::getSourceFileFromResource)
-                .collect(toList());
+                         .stream()
+                         .map(GoogDependencyNode::getResource)
+                         .map(GoogResources::getSourceFileFromResource)
+                         .collect(toList());
     }
 
     /**
@@ -73,14 +72,12 @@ public class SingleCompileTask implements Task<SingleCompileNode, CompileResult>
     private GoogDependencyCalculator createDependencyCalculator(SingleCompileNode compileNode) {
         final List<GoogDependencyNode> extraBaseList =
                 Stream.of(compileNode.getJsDefines(), compileNode.getCssRenameMap())
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .map(GoogResources::parse)
-                        .collect(Collectors.toList());
+                      .filter(Optional::isPresent)
+                      .map(Optional::get)
+                      .map(GoogResources::parse)
+                      .collect(Collectors.toList());
         return new GoogDependencyCalculator(compileNode.getSourcesProvider(),
-                GoogResources.getDependencyParser(),
-                GoogResources.getHelper(extraBaseList));
+                                            GoogResources.getDependencyParser(),
+                                            GoogResources.getHelper(extraBaseList));
     }
-
-
 }

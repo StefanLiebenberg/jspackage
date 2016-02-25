@@ -4,13 +4,13 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Assert;
 import org.junit.Test;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KuteFactory;
+import org.slieb.kute.api.Resource;
 
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
-
 
 public class DepsFileBuilderTest {
 
@@ -24,7 +24,7 @@ public class DepsFileBuilderTest {
     @Test
     public void testGetDependencyContent() throws Exception {
         Resource.Readable resourceA, resourceB, resourceC, resourceD, baseResource;
-        baseResource = Kute.inputStreamResource("/base.js", () -> getClass().getResourceAsStream(
+        baseResource = KuteFactory.inputStreamResource("/base.js", () -> getClass().getResourceAsStream(
                 "/closure-library/closure/goog/base.js"));
         resourceA = create("a", ImmutableSet.of("b", "c", "d"));
         resourceB = create("b", ImmutableSet.of("c", "d"));
@@ -40,6 +40,5 @@ public class DepsFileBuilderTest {
         Assert.assertTrue(content.contains("goog.addDependency('c.js', ['c'], ['d']);"));
         Assert.assertTrue(content.contains("goog.addDependency('d.js', ['d'], []);"));
         Assert.assertFalse(content.contains("goog.addDependency('base.js', [], []);"));
-
     }
 }

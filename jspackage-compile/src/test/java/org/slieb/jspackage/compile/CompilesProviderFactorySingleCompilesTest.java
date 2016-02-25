@@ -14,12 +14,11 @@ import org.slieb.jspackage.compile.resources.SourceMapResource;
 import org.slieb.jspackage.compile.result.CompileResult;
 import org.slieb.jspackage.compile.tasks.ModuleCompileTask;
 import org.slieb.jspackage.compile.tasks.SingleCompileTask;
-import slieb.kute.Kute;
-import slieb.kute.KutePredicates;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KutePredicates;
+import org.slieb.kute.api.Resource;
 
 import java.io.IOException;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class CompilesProviderFactorySingleCompilesTest {
@@ -48,7 +47,6 @@ public class CompilesProviderFactorySingleCompilesTest {
         CompileResult.Success success = Mockito.mock(CompileResult.Success.class);
         Mockito.when(success.getType()).thenReturn(CompileResult.Type.SUCCESS);
         Mockito.when(mockSingleCompileTask.perform(singleCompileNode)).thenReturn(success);
-
 
         CompiledResource compiled = Mockito.mock(CompiledResource.class);
         Mockito.when(compiled.getContent()).thenReturn("compiled");
@@ -99,7 +97,6 @@ public class CompilesProviderFactorySingleCompilesTest {
         Mockito.when(success.getType()).thenReturn(CompileResult.Type.SUCCESS);
         Mockito.when(mockSingleCompileTask.perform(singleCompileNode)).thenReturn(success);
 
-
         CompiledResource compiled = Mockito.mock(CompiledResource.class);
         Mockito.when(compiled.getContent()).thenReturn("compiled");
         Mockito.when(compiled.getInputStream()).thenCallRealMethod();
@@ -114,13 +111,12 @@ public class CompilesProviderFactorySingleCompilesTest {
 
         Resource.Provider provider = factory.createCachedSingleCompileProvider(singleCompileNode);
 
-
         provider.stream().count();
         provider.stream().count();
         provider.stream().count();
         provider.stream().count();
         provider.stream().count();
 
-// verify compile task only called once.
+        // verify compile task only called once.
     }
 }

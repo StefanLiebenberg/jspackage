@@ -1,7 +1,7 @@
 package org.slieb.jspackage.service;
 
 
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.net.URI;
 

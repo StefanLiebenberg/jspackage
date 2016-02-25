@@ -12,10 +12,10 @@ import org.slieb.jspackage.compile.resources.CompiledResource;
 import org.slieb.jspackage.compile.resources.SourceMapResource;
 import org.slieb.jspackage.compile.result.CompileResult;
 import org.slieb.jspackage.compile.tasks.Task;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
-import slieb.kute.resources.ContentResource;
-import slieb.kute.KuteIO;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KuteIO;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,7 +44,6 @@ public class SingleCompileResourceProviderTest {
 
     @Mock
     CompiledResource mockCompiledResource;
-
 
     SingleCompileResourceProvider provider;
 
@@ -77,7 +76,7 @@ public class SingleCompileResourceProviderTest {
     public Predicate<Resource.Readable> resourceEquals(Resource.Readable resource) {
         return (r) -> {
             try {
-                return Objects.equals(r.getPath(), resource.getPath()) && Arrays.equals(KuteIO.readBytes(r), KuteIO.readBytes(resource));
+                return Objects.equals(r.getPath(), resource.getPath()) && Arrays.equals(KuteIO.toByteArray(r), KuteIO.toByteArray(resource));
             } catch (IOException e) {
                 return false;
             }
@@ -114,14 +113,14 @@ public class SingleCompileResourceProviderTest {
         provider.stream().count();
         Mockito.verify(mockCompileTask, Mockito.times(2)).perform(singleCompileNode);
     }
-
 }
 
 class MutableResource implements ContentResource {
 
     private String path, content;
 
-    public MutableResource(String path, String content) {
+    public MutableResource(String path,
+                           String content) {
         this.path = path;
         this.content = content;
     }

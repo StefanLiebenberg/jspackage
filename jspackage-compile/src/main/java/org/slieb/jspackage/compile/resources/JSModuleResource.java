@@ -2,19 +2,19 @@ package org.slieb.jspackage.compile.resources;
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.JSModule;
-import slieb.kute.resources.ContentResource;
+import org.slieb.kute.resources.ContentResource;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Objects;
-
 
 public class JSModuleResource implements ContentResource, Serializable {
 
     private final Compiler compiler;
     private final JSModule jsModule;
 
-    public JSModuleResource(Compiler compiler, JSModule jsModule) {
+    public JSModuleResource(Compiler compiler,
+                            JSModule jsModule) {
         this.compiler = compiler;
         this.jsModule = jsModule;
     }
@@ -31,8 +31,8 @@ public class JSModuleResource implements ContentResource, Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof JSModuleResource)) return false;
+        if (this == o) { return true; }
+        if (!(o instanceof JSModuleResource)) { return false; }
         JSModuleResource that = (JSModuleResource) o;
         return Objects.equals(compiler, that.compiler) &&
                 Objects.equals(jsModule, that.jsModule);

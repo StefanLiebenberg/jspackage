@@ -3,9 +3,9 @@ package org.slieb.jspackage.compile.providers;
 import org.slieb.jspackage.compile.nodes.SingleCompileNode;
 import org.slieb.jspackage.compile.result.CompileResult;
 import org.slieb.jspackage.compile.tasks.Task;
-import slieb.kute.Kute;
-import slieb.kute.KuteDigest;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KuteDigest;
+import org.slieb.kute.api.Resource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.slieb.throwables.FunctionWithThrowable.castFunctionWithThrowable;
-
 
 public class SingleCompileResourceProvider implements Resource.Provider {
 
@@ -24,11 +23,11 @@ public class SingleCompileResourceProvider implements Resource.Provider {
 
     private final SingleCompileNode compileNode;
 
-    public SingleCompileResourceProvider(Task<SingleCompileNode, CompileResult> compileTask, SingleCompileNode compileNode) {
+    public SingleCompileResourceProvider(Task<SingleCompileNode, CompileResult> compileTask,
+                                         SingleCompileNode compileNode) {
         this.compileTask = compileTask;
         this.compileNode = compileNode;
     }
-
 
     @Override
     public Stream<Resource.Readable> stream() {

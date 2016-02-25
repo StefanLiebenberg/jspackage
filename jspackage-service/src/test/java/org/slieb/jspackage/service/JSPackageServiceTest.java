@@ -7,7 +7,7 @@ import org.jsoup.select.Elements;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +17,8 @@ import java.nio.charset.Charset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.slieb.throwables.ConsumerWithThrowable.castConsumerWithThrowable;
-import static slieb.kute.Kute.providerOf;
-import static slieb.kute.Kute.stringResource;
-
+import static org.slieb.kute.Kute.providerOf;
+import static org.slieb.kute.Kute.stringResource;
 
 public class JSPackageServiceTest {
 
@@ -97,5 +96,4 @@ public class JSPackageServiceTest {
             assertEquals("/nested/c_test.js", links.get(1).attr("href"));
         }
     }
-
 }

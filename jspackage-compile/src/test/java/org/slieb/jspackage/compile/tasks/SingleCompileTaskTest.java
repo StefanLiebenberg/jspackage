@@ -10,8 +10,8 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slieb.jspackage.compile.nodes.SingleCompileNode;
 import org.slieb.jspackage.compile.result.CompileResult;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -23,7 +23,6 @@ public class SingleCompileTaskTest {
 
     @Mock
     private SingleCompileNode compileNode;
-
 
     private Resource.Provider sources, externs;
     private CompilerOptions options;

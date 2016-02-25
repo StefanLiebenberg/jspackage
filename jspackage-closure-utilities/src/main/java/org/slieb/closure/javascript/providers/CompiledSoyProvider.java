@@ -4,8 +4,8 @@ import com.google.common.io.CharSource;
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.jssrc.SoyJsSrcOptions;
 import com.google.template.soy.msgs.SoyMsgBundle;
-import slieb.kute.KuteLambdas;
-import slieb.kute.api.Resource;
+import org.slieb.kute.KutePredicates;
+import org.slieb.kute.api.Resource;
 
 import java.io.*;
 import java.util.Optional;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  */
 public class CompiledSoyProvider implements Resource.Provider {
 
-    private final Predicate<Resource> SOY_FILTER = KuteLambdas.extensionFilter(".soy");
+    private final Predicate<Resource> SOY_FILTER = KutePredicates.extensionFilter(".soy");
 
     /**
      * The source files.

@@ -2,9 +2,9 @@ package org.slieb.closure.javascript.internal;
 
 import org.slieb.dependencies.DependencyCalculator;
 import org.slieb.dependencies.DependencyNode;
-import slieb.kute.api.Resource;
-import slieb.kute.resources.ContentResource;
-import slieb.kute.KuteIO;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.resources.ContentResource;
+import org.slieb.kute.KuteIO;
 
 import java.io.Serializable;
 import java.util.Objects;

@@ -6,17 +6,16 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import org.slieb.closure.dependencies.GoogResources;
-import org.slieb.jsunit.TestExecutor;
-import org.slieb.jsunit.internal.DefaultTestConfigurator;
-import slieb.kute.Kute;
-import slieb.kute.KuteLambdas;
-import slieb.kute.api.Resource;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.jspackage.dependencies.GoogResources;
+import org.slieb.jspackage.jsunit.TestExecutor;
+import org.slieb.jspackage.jsunit.internal.DefaultTestConfigurator;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KutePredicates;
+import org.slieb.kute.api.Resource;
 
-import static slieb.kute.Kute.filterResources;
-import static slieb.kute.KuteLambdas.extensionFilter;
-
+import static org.slieb.kute.Kute.filterResources;
+import static org.slieb.kute.KutePredicates.extensionFilter;
 
 @Mojo(name = "unit-tests", defaultPhase = LifecyclePhase.TEST)
 public class JSUnitTestsMojo extends AbstractPackageMojo {
@@ -47,17 +46,16 @@ public class JSUnitTestsMojo extends AbstractPackageMojo {
         }
 
         info("filtering possible sources and possible test sources to get a list of *.js sources that exclude *_test" +
-                ".js files.");
+                     ".js files.");
         Resource.Provider resources =
                 filterResources(Kute.group(testResources, sourceResources),
-                        KuteLambdas.all(extensionFilter(".js"), extensionFilter("_test.js").negate()::test));
+                                KutePredicates.all(extensionFilter(".js"), extensionFilter("_test.js").negate()::test));
         info("   filtered %s", resources.stream().count());
 
         info("filtering possible test sources to include only *._test.js files");
         Resource.Provider testProvider = filterResources(testResources,
-                extensionFilter("_test.js"));
+                                                         extensionFilter("_test.js"));
         info("   filtered %s", testProvider.stream().count());
-
 
         info("creating calculator of grouped resources");
         GoogDependencyCalculator calculator = GoogResources.getCalculator(resources);
@@ -87,7 +85,6 @@ public class JSUnitTestsMojo extends AbstractPackageMojo {
             throw new MojoFailureException("There were test failures");
         }
     }
-
 
     public Resource.Provider getTestResources() {
         return Kute.emptyProvider();

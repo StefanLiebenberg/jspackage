@@ -18,11 +18,11 @@ import org.slieb.jspackage.compile.result.CompileResult;
 import org.slieb.jspackage.compile.result.ModuleGroupCompilationResult;
 import org.slieb.jspackage.compile.tasks.ModuleCompileTask;
 import org.slieb.jspackage.compile.tasks.SingleCompileTask;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KuteIO;
+import org.slieb.kute.api.Resource;
+import org.slieb.kute.providers.ZipStreamResourceProvider;
 import org.slieb.tools.jspackage.internal.SourceSet;
-import slieb.kute.Kute;
-import slieb.kute.KuteIO;
-import slieb.kute.api.Resource;
-import slieb.kute.providers.ZipStreamResourceProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,13 +75,11 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         return Kute.group(getDefaultExterns(), getSourceProvider(false, sourceSets));
     }
 
-
     public void execute() throws MojoExecutionException, MojoFailureException {
         getInjector().injectMembers(this);
         performModuleCompiles();
         performSingleCompiles();
     }
-
 
     private void performSingleCompiles() {
         if (compiles != null && !compiles.isEmpty()) {
@@ -98,21 +96,21 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
             case SUCCESS:
                 CompileResult.Success success = (CompileResult.Success) compileResult;
                 singleCompileConfig.getOutput()
-                        .ifPresent(file -> {
-                            try {
-                                writeResource(success.getCompiledResource(), file);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                                   .ifPresent(file -> {
+                                       try {
+                                           writeResource(success.getCompiledResource(), file);
+                                       } catch (IOException e) {
+                                           throw new RuntimeException(e);
+                                       }
+                                   });
                 singleCompileConfig.getSourceMapOutput()
-                        .ifPresent(file -> {
-                            try {
-                                writeResource(success.getSourceMapResource(), file);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                                   .ifPresent(file -> {
+                                       try {
+                                           writeResource(success.getSourceMapResource(), file);
+                                       } catch (IOException e) {
+                                           throw new RuntimeException(e);
+                                       }
+                                   });
                 break;
             case FAILURE:
                 throw new IllegalStateException(String.format("There was a failure compiling %s", singleCompileConfig));
@@ -125,8 +123,8 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         final CompilerOptions options = compilerOptionsProvider.get();
         final Set<String> requiresSet = singleCompileConfig.getRequires().stream().collect(Collectors.toSet());
         return new SingleCompileNode(sources, externs, options, requiresSet,
-                singleCompileConfig.getJsDefinesFile().map(Kute::fileResource).orElse(null),
-                singleCompileConfig.getCssRenameMap().map(Kute::fileResource).orElse(null));
+                                     singleCompileConfig.getJsDefinesFile().map(Kute::fileResource).orElse(null),
+                                     singleCompileConfig.getCssRenameMap().map(Kute::fileResource).orElse(null));
     }
 
     @SafeVarargs
@@ -134,14 +132,12 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         return Arrays.stream(optionals).filter(Optional::isPresent).map(Optional::get).toArray(SourceSet[]::new);
     }
 
-
     private void performModuleCompiles() {
         if (moduleCompiles != null && !moduleCompiles.isEmpty()) {
             getLog().info(String.format("found %s module compiles to perform", moduleCompiles.size()));
             moduleCompiles.forEach(this::performModuleCompile);
         }
     }
-
 
     private void performModuleCompile(ModulesCompilesConfig modulesCompilesConfig) {
         getLog().info("performing module compile");
@@ -152,8 +148,8 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
                 ModuleGroupCompilationResult.Success success = (ModuleGroupCompilationResult.Success) result;
                 getLog().error("Success:");
                 modulesCompilesConfig.getDirectory()
-                        .filter(dir -> dir.exists() || dir.mkdirs())
-                        .ifPresent(dir -> writeModuleSuccessToFile(success, dir));
+                                     .filter(dir -> dir.exists() || dir.mkdirs())
+                                     .ifPresent(dir -> writeModuleSuccessToFile(success, dir));
                 break;
             case FAILURE:
                 ModuleGroupCompilationResult.Failure failure = (ModuleGroupCompilationResult.Failure) result;
@@ -165,10 +161,11 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         }
     }
 
-    private void writeModuleSuccessToFile(ModuleGroupCompilationResult.Success success, File dir) {
+    private void writeModuleSuccessToFile(ModuleGroupCompilationResult.Success success,
+                                          File dir) {
         success.getModuleUnits().stream()
-                .map(ModuleGroupCompilationResult.ModuleUnitCompilationResult::getResource)
-                .forEach(castConsumerWithThrowable(resource -> writeResource(resource, new File(dir, resource.getPath()))));
+               .map(ModuleGroupCompilationResult.ModuleUnitCompilationResult::getResource)
+               .forEach(castConsumerWithThrowable(resource -> writeResource(resource, new File(dir, resource.getPath()))));
     }
 
     // todo, common field is hard-coded
@@ -178,15 +175,14 @@ public class CompileJavascriptMojo extends AbstractPackageMojo {
         Resource.Provider externsProvider = getExternsProvider(flattenToArray(getExternsSourceSet(), modulesCompilesConfig.getExternsSourceSet()));
         Resource.Provider sources = getSourceProvider(false, flattenToArray(getMainSourceSet(), modulesCompilesConfig.getMainSourceSet()));
         return new ModuleGroupCompileNode(sources, externsProvider, options, getSingleModuleCompileNodes(modulesCompilesConfig),
-                modulesCompilesConfig.getCommonModule().orElse("common"),
-                modulesCompilesConfig.getJsDefines().map(Kute::fileResource).orElse(null),
-                modulesCompilesConfig.getCssRenameMap().map(Kute::fileResource).orElse(null));
+                                          modulesCompilesConfig.getCommonModule().orElse("common"),
+                                          modulesCompilesConfig.getJsDefines().map(Kute::fileResource).orElse(null),
+                                          modulesCompilesConfig.getCssRenameMap().map(Kute::fileResource).orElse(null));
     }
-
 
     private Set<SingleModuleCompileNode> getSingleModuleCompileNodes(ModulesCompilesConfig modulesCompilesConfig) {
         return modulesCompilesConfig.getModules().stream()
-                .map(this::convertCompileConfigIntoCompileNode).collect(toSet());
+                                    .map(this::convertCompileConfigIntoCompileNode).collect(toSet());
     }
 
     private SingleModuleCompileNode convertCompileConfigIntoCompileNode(ModuleConfig moduleConfig) {

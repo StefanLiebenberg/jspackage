@@ -1,10 +1,9 @@
 package org.slieb.jspackage.compile.providers;
 
 import org.slieb.jspackage.compile.result.CompileResult;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.stream.Stream;
-
 
 public class SuccessResourceProvider implements Resource.Provider {
 

@@ -7,9 +7,9 @@ import org.jsoup.select.Elements;
 import org.junit.Before;
 import org.junit.Test;
 import org.slieb.jspackage.service.providers.ServiceProvider;
-import slieb.kute.Kute;
-import slieb.kute.KuteIO;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.KuteIO;
+import org.slieb.kute.api.Resource;
 
 import java.io.IOException;
 import java.util.Optional;

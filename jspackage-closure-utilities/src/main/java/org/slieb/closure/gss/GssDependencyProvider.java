@@ -1,13 +1,13 @@
 package org.slieb.closure.gss;
 
 import com.google.common.collect.ImmutableSet;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static slieb.kute.Kute.findResource;
+import static org.slieb.kute.Kute.findResource;
 
 
 public class GssDependencyProvider implements Resource.Provider{

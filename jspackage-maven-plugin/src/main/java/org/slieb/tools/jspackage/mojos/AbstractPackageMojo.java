@@ -14,8 +14,8 @@ import org.slieb.tools.jspackage.internal.DefaultsModule;
 import org.slieb.tools.jspackage.internal.ProviderFactory;
 import org.slieb.tools.jspackage.internal.SourceSet;
 import org.slieb.tools.jspackage.internal.SourceSetSpecifier;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.slieb.closure.dependencies.GoogResources.getResourceProviderForSourceDirectories;
-
+import static org.slieb.jspackage.dependencies.GoogResources.getResourceProviderForSourceDirectories;
 
 public abstract class AbstractPackageMojo extends AbstractMojo implements SourceSetSpecifier {
 
@@ -74,7 +73,6 @@ public abstract class AbstractPackageMojo extends AbstractMojo implements Source
         return Kute.getProvider(getCustomClassLoader(Boolean.TRUE, inludeTesting));
     }
 
-
     @Deprecated
     public Resource.Provider getSourceProvider(Boolean includeTesting) {
         Stream.Builder<JSPackageSourceSet> builder = Stream.builder();
@@ -98,13 +96,14 @@ public abstract class AbstractPackageMojo extends AbstractMojo implements Source
         return getSourceProvider(includeTesting, builder.build().toArray(JSPackageSourceSet[]::new));
     }
 
-    protected Resource.Provider getSourceProvider(Boolean includeTesting, SourceSet... sourceSets) {
+    protected Resource.Provider getSourceProvider(Boolean includeTesting,
+                                                  SourceSet... sourceSets) {
         return new ProviderFactory(getClaspathProvider(includeTesting)).create(sourceSets);
     }
 
-
     @Deprecated
-    protected Resource.Provider getSourceProvider(Boolean includeTesting, List<File> additionalDirectories) {
+    protected Resource.Provider getSourceProvider(Boolean includeTesting,
+                                                  List<File> additionalDirectories) {
         ImmutableList.Builder<Resource.Provider> builder = ImmutableList.builder();
         builder.add(getSourceProvider(includeTesting));
         if (additionalDirectories != null && !additionalDirectories.isEmpty()) {
@@ -129,7 +128,6 @@ public abstract class AbstractPackageMojo extends AbstractMojo implements Source
         }
         return Kute.group(builder.build());
     }
-
 
     protected Module getDefaultsModule() {
         return new DefaultsModule();

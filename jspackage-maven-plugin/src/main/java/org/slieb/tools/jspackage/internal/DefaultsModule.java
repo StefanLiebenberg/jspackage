@@ -7,7 +7,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
 import com.google.javascript.jscomp.CompilerOptions;
 import slieb.jspackage.api.OptionsHandler;
-import slieb.kute.Kute;
+import org.slieb.kute.Kute;
 
 import java.util.Set;
 

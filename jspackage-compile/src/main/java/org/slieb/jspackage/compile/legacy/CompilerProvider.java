@@ -1,17 +1,16 @@
 package org.slieb.jspackage.compile.legacy;
 
-
 import com.google.common.base.Preconditions;
 import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.Compiler;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slieb.closure.dependencies.GoogDependencyCalculator;
-import org.slieb.closure.dependencies.GoogDependencyNode;
-import org.slieb.closure.dependencies.GoogResources;
 import org.slieb.dependencies.DependencyResolver;
-import slieb.kute.Kute;
-import slieb.kute.api.Resource;
+import org.slieb.jspackage.dependencies.GoogDependencyCalculator;
+import org.slieb.jspackage.dependencies.GoogDependencyNode;
+import org.slieb.jspackage.dependencies.GoogResources;
+import org.slieb.kute.Kute;
+import org.slieb.kute.api.Resource;
 
 import java.io.*;
 import java.util.List;
@@ -31,7 +30,7 @@ public class CompilerProvider implements Resource.Provider {
         this.configuration = configuration;
     }
 
-    private List<SourceFile> mapToSourceFiles(Stream<? extends Resource.Readable> nodes) {
+    private List<SourceFile> mapToSourceFiles(Stream<Resource.Readable> nodes) {
         return nodes.map(GoogResources::getSourceFileFromResource).collect(toList());
     }
 
@@ -56,13 +55,12 @@ public class CompilerProvider implements Resource.Provider {
             if (cache == null) {
                 final Compiler compiler = new Compiler();
                 final CompilerOptions options = configuration.getCompilerOptions();
-//            final List<SourceFile> externs = getExterns();
+                //            final List<SourceFile> externs = getExterns();
                 final List<SourceFile> externs = AbstractCommandLineRunner.getBuiltinExterns(options);
                 final List<SourceFile> inputs = getInputs();
                 final Result result = compiler.compile(externs, inputs, options);
                 cache = new ImmutablePair<>(compiler, result);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -79,7 +77,6 @@ public class CompilerProvider implements Resource.Provider {
         return Stream.of(getCompiledResource(), getCompileErrorsResource());
     }
 
-
     public Resource.Readable getCompiledResource() {
         return new CompiledResource("/compile",
                                     checkNotNull(checkNotNull(compile(), "Compile returns nada").getLeft(),
@@ -93,7 +90,6 @@ public class CompilerProvider implements Resource.Provider {
     public Optional<Resource.Readable> getResourceByName(String path) {
         return Kute.findResource(stream(), path);
     }
-
 }
 
 class CompiledResource implements Resource.Readable {
@@ -156,7 +152,6 @@ class ResultErrorsResource implements Resource.Readable {
     public String getPath() {
         return path;
     }
-
 
     @Override
     public InputStream getInputStream() throws IOException {

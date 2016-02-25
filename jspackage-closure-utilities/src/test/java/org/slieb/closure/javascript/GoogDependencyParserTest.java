@@ -2,15 +2,14 @@ package org.slieb.closure.javascript;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.slieb.closure.dependencies.GoogDependencyNode;
-import org.slieb.closure.dependencies.GoogDependencyParser;
-import slieb.kute.Kute;
+import org.slieb.jspackage.dependencies.GoogDependencyNode;
+import org.slieb.jspackage.dependencies.GoogDependencyParser;
+import org.slieb.kute.Kute;
 
 import java.io.InputStream;
 
 import static org.junit.Assert.*;
-import static slieb.kute.Kute.inputStreamResource;
-
+import static org.slieb.kute.KuteFactory.inputStreamResource;
 
 public class GoogDependencyParserTest {
 
@@ -45,7 +44,6 @@ public class GoogDependencyParserTest {
             assertTrue(node.getProvides().contains("goog.array.ArrayLike"));
         }
     }
-
 
     @Test
     public void parseIfConstructs() throws Throwable {

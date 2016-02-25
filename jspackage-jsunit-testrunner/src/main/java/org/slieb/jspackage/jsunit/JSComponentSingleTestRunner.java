@@ -4,7 +4,7 @@ package org.slieb.jspackage.jsunit;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
-import slieb.kute.api.Resource;
+import org.slieb.kute.api.Resource;
 
 public class JSComponentSingleTestRunner extends Runner {
 
