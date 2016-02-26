@@ -8,56 +8,61 @@ import org.slieb.kute.api.Resource;
 import org.slieb.kute.providers.RenamedNamespaceProvider;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-import static java.util.Collections.emptyMap;
 import static org.slieb.kute.KuteIO.readResource;
 import static org.slieb.kute.KutePredicates.extensionFilter;
 import static org.slieb.throwables.FunctionWithThrowable.castFunctionWithThrowable;
 
 public class StandardLayoutDeployContainer implements DeployContainer {
 
-    private final Resource.Provider resourceProvider;
+    private final Resource.Provider assetsProvider, templatesProvider, informationProvider;
 
-    private final Supplier<SoyFileSet.Builder> soyBuilderProvider;
+    private final Supplier<SoyFileSet.Builder> soyBuilderSupplier;
 
     private final Gson gson;
 
     public StandardLayoutDeployContainer(final Resource.Provider resourceProvider,
-                                         final Supplier<SoyFileSet.Builder> soyBuilderProvider) {
-        this.resourceProvider = resourceProvider;
-        this.soyBuilderProvider = soyBuilderProvider;
+                                         final Supplier<SoyFileSet.Builder> soyBuilderSupplier) {
+        this.informationProvider = new RenamedNamespaceProvider(resourceProvider, "/information/", "/");
+        this.assetsProvider = new RenamedNamespaceProvider(resourceProvider, "/assets/", "/");
+        this.templatesProvider = Kute.filterResources(new RenamedNamespaceProvider(resourceProvider, "/templates/", "/"), extensionFilter(".soy"));
+        this.soyBuilderSupplier = soyBuilderSupplier;
         this.gson = new Gson();
     }
 
     @Override
-    public Resource.Provider getAssetsProvider() {
-        return new RenamedNamespaceProvider(resourceProvider, "/assets/", "/");
-    }
-
-    protected Resource.Provider getTemplateProvider() {
-        return Kute.filterResources(new RenamedNamespaceProvider(resourceProvider, "/templates/", "/"), extensionFilter(".soy"));
-    }
-
-    protected Resource.Provider getInformationProvider() {
-        return new RenamedNamespaceProvider(resourceProvider, "/information/", "/");
-    }
-
-    public SoyTofu getTofu() throws IOException {
-        final SoyFileSet.Builder builder = soyBuilderProvider.get();
-        getTemplateProvider().forEach(resource -> builder.add(readResource(resource), resource.getPath()));
-        return builder.build().compileToTofu();
+    public Optional<InputStream> getAssetInputStream(final String path) throws IOException {
+        return assetsProvider
+                .getResourceByName(path)
+                .flatMap(castFunctionWithThrowable(Resource.Readable::getInputStream)
+                                 .withLogging()
+                                 .thatReturnsOptional());
     }
 
     @Override
-    public Map<String, Object> getInformation(final String configurationName) {
-        return getInformationProvider()
+    public Optional<SoyTofu> getTofu() throws IOException {
+        if (templatesProvider.stream().findAny().isPresent()) {
+            final SoyFileSet.Builder builder = soyBuilderSupplier.get();
+            templatesProvider.forEach(resource -> builder.add(readResource(resource), resource.getPath()));
+            return Optional.of(builder.build().compileToTofu());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Map<String, Object>> getInformation(final String configurationName) {
+        return informationProvider
                 .getResourceByName(configurationName)
-                .flatMap(castFunctionWithThrowable(this::getInformationMapFromResource).thatReturnsOptional())
-                .orElse(emptyMap());
+                .flatMap(castFunctionWithThrowable(this::getInformationMapFromResource)
+                                 .withLogging()
+                                 .thatReturnsOptional());
     }
 
     protected Map<String, Object> getInformationMapFromResource(final Resource.Readable resource) throws IOException {

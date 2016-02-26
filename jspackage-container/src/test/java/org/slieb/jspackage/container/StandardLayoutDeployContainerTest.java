@@ -6,17 +6,17 @@ import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.SoyModule;
 import com.google.template.soy.base.SoySyntaxException;
 import com.google.template.soy.tofu.SoyTofu;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slieb.kute.Kute;
-import org.slieb.kute.KuteIO;
 import org.slieb.kute.api.Resource;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
-import java.util.Optional;
 
 public class StandardLayoutDeployContainerTest {
 
@@ -31,9 +31,9 @@ public class StandardLayoutDeployContainerTest {
     public void testTextAssets() throws IOException {
         Resource.Provider provider = Kute.providerOf(Kute.stringResource("/assets/sample.txt", "sample content"));
         StandardLayoutDeployContainer sldc = getStandardLayoutDeployContainer(provider);
-        Resource.Provider assets = sldc.getAssetsProvider();
-        Optional<Resource.Readable> optionalSample = assets.getResourceByName("/sample.txt");
-        Assert.assertEquals("sample content", KuteIO.readResource(optionalSample.get()));
+        try (InputStream sampleInputStream = sldc.getAssetInputStream("/sample.txt").get()) {
+            Assert.assertEquals("sample content", IOUtils.toString(sampleInputStream));
+        }
     }
 
     @Test
@@ -42,7 +42,7 @@ public class StandardLayoutDeployContainerTest {
                 ".One}\none\n{/template}\n");
         Resource.Provider provider = Kute.providerOf(templateResource);
         StandardLayoutDeployContainer sldc = getStandardLayoutDeployContainer(provider);
-        SoyTofu tofu = sldc.getTofu();
+        SoyTofu tofu = sldc.getTofu().get();
         Assert.assertEquals("one", tofu.newRenderer("templates.One").render());
     }
 
@@ -60,7 +60,7 @@ public class StandardLayoutDeployContainerTest {
         Resource.Readable templateResource = Kute.stringResource("/information/config.json", "{\"configured\": true}");
         Resource.Provider provider = Kute.providerOf(templateResource);
         StandardLayoutDeployContainer sldc = getStandardLayoutDeployContainer(provider);
-        Map<String, Object> config = sldc.getInformation("/config.json");
+        Map<String, Object> config = sldc.getInformation("/config.json").get();
         Assert.assertEquals(Boolean.TRUE, config.get("configured"));
     }
 

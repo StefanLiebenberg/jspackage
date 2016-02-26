@@ -1,16 +1,17 @@
 package org.slieb.jspackage.container;
 
 import com.google.template.soy.tofu.SoyTofu;
-import org.slieb.kute.api.Resource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
 
 public interface DeployContainer {
 
-    Resource.Provider getAssetsProvider();
+    Optional<InputStream> getAssetInputStream(String path) throws IOException;
 
-    SoyTofu getTofu() throws IOException;
+    Optional<SoyTofu> getTofu() throws IOException;
 
-    Map<String, Object> getInformation(String configurationName);
+    Optional<Map<String, Object>> getInformation(String configurationName);
 }
