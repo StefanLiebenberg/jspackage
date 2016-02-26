@@ -65,9 +65,9 @@ public class StandardLayoutDeployContainer implements DeployContainer {
                                  .thatReturnsOptional());
     }
 
+    @SuppressWarnings("unchecked")
     protected Map<String, Object> getInformationMapFromResource(final Resource.Readable resource) throws IOException {
         try (Reader reader = resource.getReader()) {
-            //noinspection unchecked
             return (Map<String, Object>) gson.fromJson(reader, HashMap.class);
         }
     }

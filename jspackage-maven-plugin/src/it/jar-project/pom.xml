@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>@project.groupId@</groupId>
-            <artifactId>jspackage-jsunit-testrunner</artifactId>
+            <artifactId>jspackage-jsunit</artifactId>
             <version>@project.version@</version>
             <scope>test</scope>
         </dependency>

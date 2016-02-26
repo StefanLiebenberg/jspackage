@@ -34,4 +34,12 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/javascript</directory>
+            </testResource>
+        </testResources>
+    </build>
+
 </project>

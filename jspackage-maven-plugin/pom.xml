@@ -198,7 +198,7 @@
 
         <dependency>
             <groupId>org.slieb.jspackage</groupId>
-            <artifactId>jspackage-jsunit-testrunner</artifactId>
+            <artifactId>jspackage-jsunit</artifactId>
             <version>${project.version}</version>
         </dependency>
 
