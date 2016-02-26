@@ -28,13 +28,14 @@
         <dep.rhino>1.7.7</dep.rhino>
         <dep.commons-io>2.4</dep.commons-io>
         <dep.sparkWrapper>1.1</dep.sparkWrapper>
-
-        <dep.closure-stylesheets>20150206</dep.closure-stylesheets>
-        <dep.soy>2015-04-10</dep.soy>
         <dep.mockito>2.0.2-beta</dep.mockito>
         <dep.junit>4.12</dep.junit>
         <dep.jsoup>1.8.3</dep.jsoup>
         <dep.plexus-utils>3.0.22</dep.plexus-utils>
+
+        <dep.closure-stylesheets>20160212</dep.closure-stylesheets>
+        <dep.soy>2016-01-12</dep.soy>
+
 
         <dep.js-runtimes>1.2</dep.js-runtimes>
         <plugin.maven-invoker-plugin>1.10</plugin.maven-invoker-plugin>
