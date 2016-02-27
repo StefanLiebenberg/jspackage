@@ -1,71 +1,60 @@
 package org.slieb.jspackage.container;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.template.soy.SoyFileSet;
-import com.google.template.soy.SoyModule;
+import com.google.gson.Gson;
 import com.google.template.soy.base.SoySyntaxException;
-import com.google.template.soy.tofu.SoyTofu;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.slieb.jspackage.testresources.TestConstants;
 import org.slieb.kute.Kute;
 import org.slieb.kute.api.Resource;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
+
+import static org.slieb.throwables.FunctionWithThrowable.castFunctionWithThrowable;
 
 public class StandardLayoutDeployContainerTest {
 
-    private Injector injector;
-
-    @Before
-    public void setup() {
-        injector = Guice.createInjector(new SoyModule());
-    }
+    public static final String SAMPLE_CONTENT = "sample content";
+    public static final String ASSETS_SAMPLE_TXT = "/assets/sample.txt";
 
     @Test
     public void testTextAssets() throws IOException {
-        Resource.Provider provider = Kute.providerOf(Kute.stringResource("/assets/sample.txt", "sample content"));
-        StandardLayoutDeployContainer sldc = getStandardLayoutDeployContainer(provider);
-        try (InputStream sampleInputStream = sldc.getAssetInputStream("/sample.txt").get()) {
-            Assert.assertEquals("sample content", IOUtils.toString(sampleInputStream));
+        Resource.Provider provider = Kute.providerOf(Kute.stringResource(ASSETS_SAMPLE_TXT, SAMPLE_CONTENT));
+        StandardLayoutDeployContainer sldc = new StandardLayoutDeployContainer(provider);
+        try (InputStream sampleInputStream = sldc.getResource("/sample.txt").get()) {
+            Assert.assertEquals(SAMPLE_CONTENT, IOUtils.toString(sampleInputStream));
         }
     }
 
     @Test
     public void testTemplate() throws IOException {
-        Resource.Readable templateResource = Kute.stringResource("/templates/template.soy", "{namespace templates}\n\n/** */\n{template " +
-                ".One}\none\n{/template}\n");
+        Resource.Readable templateResource = TestConstants.getResource("/templates/template.soy", "templates/ValidTemplates.soy");
         Resource.Provider provider = Kute.providerOf(templateResource);
-        StandardLayoutDeployContainer sldc = getStandardLayoutDeployContainer(provider);
-        SoyTofu tofu = sldc.getTofu().get();
-        Assert.assertEquals("one", tofu.newRenderer("templates.One").render());
+        StandardLayoutDeployContainer sldc = new StandardLayoutDeployContainer(provider);
+        Assert.assertEquals("one", sldc.getTofu().newRenderer("templates.One").render());
     }
 
     @Test(expected = SoySyntaxException.class)
     public void testTemplateWithError() throws IOException {
-        Resource.Readable templateResource = Kute.stringResource("/templates/template.soy", "{namespace templates}\n\n/** */\n{template " +
-                ".One}\none {$Foo}\n{/template}\n");
+        Resource.Readable templateResource = TestConstants.getResource("/templates/template.soy", "templates/InvalidTemplates.soy");
         Resource.Provider provider = Kute.providerOf(templateResource);
-        StandardLayoutDeployContainer sldc = getStandardLayoutDeployContainer(provider);
+        StandardLayoutDeployContainer sldc = new StandardLayoutDeployContainer(provider);
         sldc.getTofu();
     }
 
     @Test
     public void testGetInformation() throws IOException {
-        Resource.Readable templateResource = Kute.stringResource("/information/config.json", "{\"configured\": true}");
-        Resource.Provider provider = Kute.providerOf(templateResource);
-        StandardLayoutDeployContainer sldc = getStandardLayoutDeployContainer(provider);
-        Map<String, Object> config = sldc.getInformation("/config.json").get();
-        Assert.assertEquals(Boolean.TRUE, config.get("configured"));
-    }
-
-    @Nonnull
-    protected StandardLayoutDeployContainer getStandardLayoutDeployContainer(final Resource.Provider provider) {
-        return new StandardLayoutDeployContainer(provider, injector.getProvider(SoyFileSet.Builder.class)::get);
+        final Gson gson = new Gson();
+        final Resource.Readable templateResource = Kute.stringResource("/information/config.json", "{\"configured\": true}");
+        final Resource.Provider provider = Kute.providerOf(templateResource);
+        final StandardLayoutDeployContainer sldc = new StandardLayoutDeployContainer(provider);
+        Assert.assertEquals(Optional.of(Boolean.TRUE),
+                            sldc.getInformationResource("/config.json")
+                                .map(castFunctionWithThrowable(IOUtils::toString))
+                                .map(string -> gson.fromJson(string, Map.class).get("configured")));
     }
 }

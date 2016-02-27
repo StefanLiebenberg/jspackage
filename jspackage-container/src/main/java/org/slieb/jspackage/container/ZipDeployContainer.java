@@ -11,7 +11,7 @@ import java.util.zip.ZipInputStream;
 public class ZipDeployContainer extends StandardLayoutDeployContainer {
 
     public ZipDeployContainer(final SupplierWithThrowable<ZipInputStream, IOException> zipIOStreamSupplier,
-                              final Supplier<SoyFileSet.Builder> injector) {
-        super(new ZipStreamResourceProvider(zipIOStreamSupplier), injector);
+                              final Supplier<SoyFileSet.Builder> soyBuilderSupplier) {
+        super(new ZipStreamResourceProvider(zipIOStreamSupplier), soyBuilderSupplier);
     }
 }

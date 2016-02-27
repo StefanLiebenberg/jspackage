@@ -13,6 +13,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.slieb.jspackage</groupId>
+            <artifactId>jspackage-container</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slieb</groupId>
             <artifactId>spark-wrapper</artifactId>
             <version>${dep.sparkWrapper}</version>

@@ -1,6 +1,5 @@
 package org.slieb.jspackage.service.providers;
 
-
 import com.google.common.base.Preconditions;
 import org.slieb.kute.Kute;
 import org.slieb.kute.api.Resource;
@@ -32,16 +31,15 @@ public class IndexProvider implements Resource.Provider {
         map.clear();
         map.putAll(
                 sources.stream()
-                        .map(Resource::getPath)
-                        .map(Paths::get)
-                        .map(PathIterator::new)
-                        .flatMap(p -> StreamSupport.stream(spliteratorUnknownSize(p, 0), false))
-                        .filter(p -> p != null && p.getParent() != null)
-                        .map(Path::normalize)
-                        .distinct()
-                        .collect(groupingByConcurrent(Path::getParent, mapping(path -> path, toSet()))));
+                       .map(Resource::getPath)
+                       .map(Paths::get)
+                       .map(PathIterator::new)
+                       .flatMap(p -> StreamSupport.stream(spliteratorUnknownSize(p, 0), false))
+                       .filter(p -> p != null && p.getParent() != null)
+                       .map(Path::normalize)
+                       .distinct()
+                       .collect(groupingByConcurrent(Path::getParent, mapping(path -> path, toSet()))));
     }
-
 
     public void clear() {
         this.map.clear();
@@ -53,15 +51,14 @@ public class IndexProvider implements Resource.Provider {
         builder.append("<h1>").append(path).append("</h1>");
         Set<Path> parents = map.keySet();
         map.get(path)
-                .stream()
-                .map(p -> new Key(p, parents.contains(p) ? Type.DIR : Type.FILE))
-                .sorted(Key::compareTo)
-                .map(p -> p.path)
-                .forEach(p -> builder.append("<li><a href='").append(p.toString()).append("'>").append(
-                        p.getFileName()).append("</a></li>"));
+           .stream()
+           .map(p -> new Key(p, parents.contains(p) ? Type.DIR : Type.FILE))
+           .sorted(Key::compareTo)
+           .map(p -> p.path)
+           .forEach(p -> builder.append("<li><a href='").append(p.toString()).append("'>").append(
+                   p.getFileName()).append("</a></li>"));
         builder.append("</body></html>");
         return Kute.stringResource(path.toString(), builder.toString());
-
     }
 
     public Optional<Resource.Readable> getResourceByName(String path) {
@@ -121,14 +118,13 @@ class Key implements Comparable<Key> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
         Key key = (Key) o;
 
-        if (!path.equals(key.path)) return false;
+        if (!path.equals(key.path)) { return false; }
         return type == key.type;
-
     }
 
     @Override
@@ -151,5 +147,6 @@ class Key implements Comparable<Key> {
 }
 
 enum Type {
-    FILE, DIR
+    FILE,
+    DIR
 }
